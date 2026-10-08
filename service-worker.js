@@ -1,6 +1,15 @@
 /* service-worker.js – chơi offline. Đổi CACHE_NAME mỗi lần cập nhật. */
-const CACHE_NAME = 'canh-cong-painted53r1';
+const CACHE_NAME = 'canh-cong-painted54';
 const ASSETS = [
+  'journey.css',
+  'js/journey.js',
+  'js/painted-motion.js',
+  'js/hero-progress.js',
+  'js/journey-art.js',
+  'js/journey-ui.js',
+  'assets/sprites/nara-painted54.webp',
+  'assets/sprites/quiet-ground-painted54.webp',
+
   'assets/sprites/soldier-walk-painted53.webp',
   'assets/sprites/soldierShield-walk-painted53.webp',
   'assets/sprites/goblin-walk-painted53.webp',

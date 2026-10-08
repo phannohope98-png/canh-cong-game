@@ -12,7 +12,7 @@
   /* ---------- cảnh chính ---------- */
   const view = $('view'), stage = $('stage');
   const renderer = new T.WebGLRenderer({ canvas: view, antialias: true, alpha: true, preserveDrawingBuffer: true });
-  renderer.outputEncoding = T.sRGBEncoding; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.outputEncoding = T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
   const scene = new T.Scene(), cam = new T.PerspectiveCamera(30, 1, 0.1, 100);
   const ctl = new T.OrbitControls(cam, view);
   ctl.enableDamping = true; ctl.dampingFactor = 0.12; ctl.minDistance = 2; ctl.maxDistance = 22; ctl.maxPolarAngle = Math.PI * 0.56; ctl.enablePan = false;
@@ -27,11 +27,11 @@
   const shadowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,0.55)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new T.CanvasTexture(c); })();
   function makePlinth() {
     const g = new T.Group();
-    const top = new T.Mesh(new T.CylinderGeometry(1.7, 1.75, 0.12, 48), new T.MeshToonMaterial({ color: '#5c9a40' })); top.position.y = -0.06; g.add(top);
-    const side = new T.Mesh(new T.CylinderGeometry(1.75, 1.6, 0.3, 48), new T.MeshToonMaterial({ color: '#7a5a3a' })); side.position.y = -0.27; g.add(side);
+    const top = new T.Mesh(new T.CylinderGeometry(1.7, 1.75, 0.12, 48), new T.MeshStandardMaterial({color:'#4f5962',roughness:.9})); top.position.y = -0.06; g.add(top);
+    const side = new T.Mesh(new T.CylinderGeometry(1.75, 1.6, 0.3, 48), new T.MeshStandardMaterial({color:'#303941',roughness:.95})); side.position.y = -0.27; g.add(side);
     const rim = new T.Mesh(new T.TorusGeometry(1.72, 0.035, 6, 64), new T.MeshBasicMaterial({ color: C3.INK })); rim.rotation.x = Math.PI / 2; rim.position.y = 0; g.add(rim);
     for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2 + 0.3, r = 1.2 + (i % 3) * 0.14; const s = new T.Mesh(new T.DodecahedronGeometry(0.07 + (i % 2) * 0.04, 0), new T.MeshToonMaterial({ color: '#9a9488' })); s.position.set(Math.sin(a) * r, 0.02, Math.cos(a) * r); g.add(s); }
-    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 0.9 + ((i * 7) % 5) * 0.15; const b = new T.Mesh(new T.ConeGeometry(0.035, 0.14, 4), new T.MeshToonMaterial({ color: '#8ccc5a' })); b.position.set(Math.sin(a) * r, 0.06, Math.cos(a) * r); g.add(b); }
+    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 0.9 + ((i * 7) % 5) * 0.15; const b = new T.Mesh(new T.ConeGeometry(0.018, 0.07, 6), new T.MeshToonMaterial({ color: '#778378' })); b.position.set(Math.sin(a) * r, 0.06, Math.cos(a) * r); g.add(b); }
     const sh = new T.Mesh(new T.PlaneGeometry(1.6, 1.6), new T.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.y = 0.004; sh.name = 'shadow'; g.add(sh);
     return g;
   }
@@ -42,6 +42,7 @@
 
   function load(id, tier) {
     if (cur) { scene.remove(cur.root); cur.root.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    C3.setInk(.28);
     cur = C3.build(id, tier); st.id = cur.def.id; st.tier = cur.tier;
     scene.add(cur.root);
     const k = cur.def.scale || 1; plinth.scale.setScalar(Math.max(1, k * 0.85));
@@ -89,6 +90,7 @@
   function loop() {
     requestAnimationFrame(loop);
     const dt = Math.min(0.05, clock.getDelta()), tt = clock.elapsedTime;
+    if(C3.fx)C3.fx.uTime.value=tt;
     if (mixer) mixer.update(dt);
     ticks.forEach(f => f(tt));
     sprites.forEach((s, i) => { s.material.opacity = (s.userData.op0 || (s.userData.op0 = s.material.opacity)) * (0.8 + Math.sin(tt * 3 + i) * 0.2); });
@@ -123,6 +125,7 @@
   }
   /** dựng bản tạm, đặt tư thế clip ở thời điểm t */
   function posed(id, tier, anim, frac) {
+    C3.setInk(.28);
     const b = C3.build(id, tier), m = new T.AnimationMixer(b.root), clip = b.clips.find(c => c.name === anim) || b.clips[0];
     const a = m.clipAction(clip); if (!clip.userData.loop) { a.setLoop(T.LoopOnce, 1); a.clampWhenFinished = true; } a.play();
     m.setTime(Math.min(clip.duration * 0.999, clip.duration * (frac || 0)));

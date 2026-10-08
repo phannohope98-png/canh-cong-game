@@ -1485,21 +1485,21 @@ float surf(){
     const norm=pts=>pts.map(p=>p.map(v=>v*R));
     // Asymmetric layered bangs: parting, swept tips, exposed eyes and brows.
     for(let i=0;i<9;i++){
-      const x=(i-4)*.20,side=i<4?-1:1,tip=i===3?-.22:i===4?.08:-.22-Math.abs(i-4)*.12;
-      const pts=[[x*.55,.91,.30],[x*.90,.62,.80],[x+side*.12,.20,.94],[x+side*.22,tip,.85]];
+      const x=(i-4)*.20,side=i<4?-1:1,tip=i===3?.16:i===4?.28:.10-Math.abs(i-4)*.035;
+      const pts=[[x*.55,.91,.30],[x*.90,.62,.80],[x+side*.12,.20,.94],[x+side*.18,tip,.91]];
       add(head,lockMesh(norm(pts),R*(long?.105:.135),R*.035,color),0,0,0);
     }
     if(!long&&!dwarf)for(let i=0;i<13;i++){
       const a=i/13*TAU,x=Math.sin(a),z=Math.cos(a),y=.55+.16*Math.sin(i*1.7);
-      add(head,lockMesh(norm([[x*.45,y,.10+z*.40],[x*.80,y+.28,z*.72],[x*1.08,y+.11,z*.88],[x*1.15,y-.12,z*.98]]),R*.10,R*.04,color),0,0,0);
+      add(head,lockMesh(norm([[x*.45,y,.10+z*.40],[x*.80,y+.45,z*.72],[x*1.08,y+.11,z*.88],[x*1.15,y-.12,z*.98]]),R*.10,R*.04,color),0,0,0);
     }
     for(const side of [-1,1]){
       const name=side<0?'hairR':'hairL',owner=locks[name]=node(name,head,side*R*.77,R*.20,0);
-      for(let j=0;j<(long?3:2);j++)add(owner,lockMesh(norm([[side*.03,.45,.28],[side*.22,-.10,.32],[side*(.25+j*.10),long?-1.55:-.50,.12-j*.1],[side*(long?.42:.2),long?-2.10:-.72,-.08-j*.12]]),R*(long?.12:.09),R*.035,color),0,0,0);
+      for(let j=0;j<(long?3:2);j++)add(owner,lockMesh(norm([[side*.03,.45,.28],[side*.22,-.10,.32],[side*(.25+j*.10),long?-1.55:-.50,.12-j*.1],[side*(long?.42:.2),long?-3.15:-.72,-.08-j*.12]]),R*(long?.12:.09),R*.035,color),0,0,0);
     }
     if(long){
       const back=locks.hairBack=node('hairBack',head,0,R*.20,-R*.62);
-      for(let j=0;j<9;j++){const x=(j-4)*.19;add(back,lockMesh(norm([[x*.5,.42,-.10],[x,-.70,-.33],[x*1.25,-1.8,-.49],[x*1.50,-2.75+Math.abs(j-4)*.13,-.42]]),R*.15,R*.047,color),0,0,0);}
+      for(let j=0;j<9;j++){const x=(j-4)*.19;add(back,lockMesh(norm([[x*.5,.42,-.10],[x,-.70,-.33],[x*1.25,-1.8,-.49],[x*1.50,-4.15+Math.abs(j-4)*.18,-.42]]),R*.15,R*.047,color),0,0,0);}
     }
     if(dwarf){
       for(const side of [-1,1])add(head,lockMesh(norm([[side*.03,-.35,.85],[side*.40,-.29,1.02],[side*.69,-.37,.89],[side*.86,-.44,.7]]),R*.12,R*.07,color),0,0,0);
@@ -1510,7 +1510,7 @@ float surf(){
   function animeFace(head,R,female,iris){
     const eyes={},skin='#f3c6ac';
     for(const side of [-1,1]){
-      const key=side<0?'eyeR':'eyeL',e=eyes[key]=node(key,head,side*R*.40,-R*.05,R*.78);e.rotation.y=side*.13;
+      const key=side<0?'eyeR':'eyeL',e=eyes[key]=node(key,head,side*R*.40,-R*.05,R*.91);e.rotation.y=side*.13;
       const w=R*(female?.47:.43),h=R*(female?.25:.20);
       const shape=new T.Shape();shape.moveTo(-w*.5,0);shape.quadraticCurveTo(-w*.15,h*.65,w*.5,h*.10);shape.quadraticCurveTo(w*.10,-h*.66,-w*.5,0);
       add(e,part(G.ext(shape,.008,.001),'#fcf5ed',{ink:false}),0,0,0);
@@ -1528,8 +1528,8 @@ float surf(){
     // Nose bridge, tip, philtrum and subtle lips have depth and coherent scale.
     add(head,lockMesh([[0,R*.07,R*.85],[0,-R*.20,R*.93],[0,-R*.32,R*.96]],R*.030,R*.025,skin,''),0,0,0);
     add(head,part(G.ball(R*.055,1,.7,.7,20),'#edb49d',{ink:false}),0,-R*.30,R*.93);
-    add(head,part(G.tube([[-R*.115,-R*.58,R*.72],[0,-R*.59,R*.76],[R*.11,-R*.565,R*.72]],R*.008,18),'#985b60',{ink:false}),0,0,0);
-    add(head,part(G.ball(R*.075,1,.23,.16,18),'#e3a293',{ink:false}),0,-R*.63,R*.73);
+    add(head,part(G.tube([[-R*.115,-R*.58,R*.83],[0,-R*.59,R*.86],[R*.11,-R*.565,R*.83]],R*.008,18),'#985b60',{ink:false}),0,0,0);
+    add(head,part(G.ball(R*.075,1,.23,.16,18),'#e3a293',{ink:false}),0,-R*.63,R*.81);
     return eyes;
   }
 
@@ -1614,7 +1614,7 @@ float surf(){
     add(n.torso,part(G.lathe([[0,h],[w*.73,h],[w,h*.84],[w*.91,h*.56],[w*.68,h*.29],[w*.76,.05],[w*.85,-.07],[0,-.07]],20,o.torsoD/o.torsoW),cloth,{tex:'cloth',ink:.009}),0,0,0);
     if (!caster) {
       // Fitted breastplate with sloping clavicles and waist, rather than a box.
-      const plate=G.lathe([[0,h*.93],[w*.64,h*.93],[w*.95,h*.79],[w*1.015,h*.63],[w*.95,h*.47],[w*.77,h*.22],[w*.72,.11],[0,.11]],24,o.torsoD/o.torsoW*1.08);
+      const plate=G.lathe([[0,h*.93],[w*.64,h*.93],[w*1.02,h*.79],[w*1.08,h*.63],[w*.92,h*.47],[w*.77,h*.22],[w*.72,.11],[0,.11]],24,o.torsoD/o.torsoW*1.08);
       add(n.torso,part(plate,archer?'#237347':steel,{metal:!archer,ink:.007}),0,0,0);
       add(n.torso,part(G.sbox(.026,h*.63,.012,.65),trim,{metal:true,ink:false}),0,h*.49,o.torsoD*.59);
       for (const side of [-1, 1]) add(n.torso,new T.Mesh(G.tube([[0,h*.60,o.torsoD*.56],[side*w*.36,h*.67,o.torsoD*.54],[side*w*.70,h*.75,o.torsoD*.42]],.005,8),mat(trim)),0,0,0);
@@ -1632,7 +1632,7 @@ float surf(){
     for(const [side,k] of [[-1,'R'],[1,'L']]) {
       const arm=n['arm'+k], leg=n['leg'+k];
       for(const child of [...arm.children]) arm.remove(child);
-      add(arm,part(limb(o.armR,o.armL*.5),cloth,{tex:'cloth',ink:.006}),0,-o.armL*.25,0);
+      add(arm,part(limb(o.armR,o.armL*.5),archer?o.skin:cloth,{tex:archer?'':'cloth',ink:.002}),0,-o.armL*.25,0);
       const elbow=n['elbow'+k]=node('elbow'+k,arm,0,-o.armL*.5,0); elbow.rotation.x=-.15;
       add(elbow,part(limb(o.armR*.82,o.armL*.5),caster||archer?o.skin:steel,{metal:!female,ink:.006}),0,-o.armL*.25,0);
       n['hand'+k]=node('hand'+k,elbow,0,-o.armL*.5,0);
@@ -1649,10 +1649,11 @@ float surf(){
       add(elbow,part(G.ball(o.armR*.83,1,.8,.92,16),caster||archer?o.skin:steel,{ink:.003}),0,0,0);
       add(elbow,part(G.cyl(o.armR*.64,o.armR*.72,.035,16),trim,{metal:true,ink:.002}),0,-o.armL*.45,0);
       if(!caster) {
-        const shoulder=G.lathe([[0,.076],[o.armR*.58,.079],[o.armR*1.35,.057],[o.armR*1.80,.018],[o.armR*1.58,-.027],[0,-.027]],24,.85);
-        add(arm,part(shoulder,archer?'#436747':id==='aldric'?cloth:steel,{metal:!archer,ink:.003}),side*.018,.004,0);
-        add(arm,part(G.torus(o.armR*1.58,.007).rotateX(Math.PI/2).scale(1,1,.85),trim,{metal:true,ink:false}),side*.018,-.023,0);
-
+        const r=o.armR,edge=[[-r*1.1,0],[-r*.65,r*.75],[r*.20,r*.9],[r*1.55,r*.4],[r*1.72,-r*.35],[r*.7,-r*.72],[-r*.8,-r*.40]];
+        const shoulder=G.ext(edge.flat(),r*1.75,.009);
+        add(arm,part(shoulder,archer?'#2d6c47':dwarf?'#343239':cloth,{metal:!archer,ink:.0015}),side*.022,.012,0,0,0,-side*.20);
+        const rimPts=edge.concat([edge[0]]).map(([x,y])=>[x,y,r*.9]);
+        add(arm,part(G.tube(rimPts,.004,28),trim,{metal:true,ink:false}),side*.022,.012,0,0,0,-side*.20);
         add(arm,part(G.cyl(o.armR*1.05,o.armR*1.05,.024,12),trim,{metal:true,ink:.003}),0,-o.armL*.36,0);
       }
       for(const child of [...leg.children]) leg.remove(child);
@@ -1673,12 +1674,12 @@ float surf(){
       // Narrow crown and flowing pointed hat; no enormous toy brim.
       const hat=node('hat',n.head,0,R*.72,-R*.10);
       add(hat,part(G.cyl(R*2.0,R*2.05,.025,32),cloth,{tex:'cloth',ink:.007}),0,0,0);
-      add(hat,part(G.bentCone(R*1.10,R*2.8,.35),cloth,{tex:'cloth',ink:.008}),0,.015,0);
+      add(hat,part(G.bentCone(R*1.10,R*2.8,1.0),cloth,{tex:'cloth',ink:.008}),0,.015,0);
       add(hat,part(G.cyl(R*.77,R*.82,.035,20),trim,{metal:true,ink:.004}),0,.046,0);
-      n.staff=WEAP.staff(id==='selene'?'#92c8dd':'#aaa1e0',tier,n);add(n.handR,n.staff,0,0,0,.12);
+      n.staff=WEAP.staff(id==='selene'?'#92c8dd':'#aaa1e0',tier,n);add(n.handR,n.staff,0,0,0,.45,0,.28);
     } else if(archer) {
       for(const side of [-1,1]) add(n.head,part(G.ext([0,.02,side*.11,.085,side*.035,-.045],.025,.004),o.skin,{ink:.004}),side*R*.91,0,-.012,0,side*.3);
-      quiver(n,o,'#c7ad74');add(n.handL,WEAP.bow(tier,n,{wood:'#947648'}),0,0,.02);
+      quiver(n,o,'#c7ad74');const bow=WEAP.bow(tier,n,{wood:'#b6a550'});bow.scale.setScalar(1.35);add(n.handL,bow,0,0,.08);
     } else if(dwarf) {
       // Reference identity: orange braided beard, blue goggles, portable cannon.
       for(const side of [-1,1]) {
@@ -1690,6 +1691,7 @@ float surf(){
       }
       const cannon=node('weapon',n.handR,0,0,0);cannon.rotation.x=1.1;
       add(cannon,part(G.cyl(.14,.17,.66,24).rotateX(Math.PI/2),'#343238',{metal:true,ink:.003}),0,.12,.22);
+      add(cannon,part(G.cyl(.028,.028,.14,16),'#49392a',{ink:.001}),0,-.015,0);
       for(const z of [-.08,.10,.32,.54])add(cannon,part(G.torus(.15,.022),trim,{metal:true,ink:false}),0,.12,z);
       add(cannon,part(G.cyl(.108,.108,.012,24).rotateX(Math.PI/2),'#211918',{ink:false}),0,.12,.556);
       add(cannon,part(G.cyl(.077,.077,.014,24).rotateX(Math.PI/2),'#ffb542',{glow:1.3,ink:false}),0,.12,.565);
@@ -1729,10 +1731,21 @@ float surf(){
       add(n.torso,part(G.ext(star,.009,.002),trim,{metal:true,ink:false}),0,h*.72,o.torsoD*.60);
       for(const side of [-1,1])for(let j=0;j<3;j++)add(n['arm'+(side<0?'R':'L')],part(G.ext([0,0,side*.12,.03,side*.09,-.035,side*.015,-.08],.012,.002),cloth,{metal:true,ink:.002}),side*.012,-j*.037,0);
     }
+    if(caster){
+      const hat=n.head.getObjectByName('hat');
+      add(hat,part(G.cyl(R*.97,R*1.02,.085,28),'#6b452d',{tex:'cloth',ink:.001}),0,.10,0);
+      add(hat,part(G.ext([-.06,-.025,.06,-.025,.06,.025,-.06,.025],.014,.003),trim,{metal:true,ink:false}),0,.10,R*1.025);
+      for(const side of [-1,1])add(n.staff,part(G.tube([[side*.04,.67,0],[side*.14,.79,0],[side*.13,.99,0],[side*.05,1.09,0]],.012,24),trim,{metal:true,ink:false}),0,0,0);
+      if(n.gem){n.gem.children.filter(c=>c.isMesh).forEach(m=>{if(!m.userData.hull)m.material=mat('#9c62ed',{glow:.75});});}
+    }
+    if(dwarf){
+      for(const side of [-1,1])add(n.head,lockMesh([[side*R*.14,R*.15,R*.93],[side*R*.40,R*.24,R*.94],[side*R*.64,R*.21,R*.79]],R*.045,R*.023,hair),0,0,0);
+      add(n.head,part(G.ball(R*.15,1,.7,.6,24),'#e1a783',{ink:false}),0,-R*.25,R*.98);
+    }
     costumeSculpt(n,o,{archer,caster,dwarf,cloth,trim,steel,tier});
     rig.extra = (t, dur, name) => {
       const cycle = S(t * TAU), strike = name === 'attack' || name === 'skill', blink=name==='idle'?1-.94*Math.exp(-Math.pow((t-.78)/.025,2)):1;
-      return {...(dwarf&&name!=='die'?{armR:{rx:-.62-(strike?.08*Math.sin(t*Math.PI):0)},armL:{rx:-.74,rz:-.24}}:{}),hairR:{rz:cycle*.035,rx:cycle*.035},hairL:{rz:-cycle*.035,rx:-cycle*.035},hairBack:{rx:cycle*.04,rz:cycle*.02},eyeR:{sy:blink},eyeL:{sy:blink}, elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
+      return {...(dwarf&&name!=='die'?{armR:{rx:-.62-(strike?.08*Math.sin(t*Math.PI):0)},armL:{rx:-.65,rz:-1.05}}:{}),hairR:{rz:cycle*.035,rx:cycle*.035},hairL:{rz:-cycle*.035,rx:-cycle*.035},hairBack:{rx:cycle*.04,rz:cycle*.02},eyeR:{sy:blink},eyeL:{sy:blink}, elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
         elbowL: { rx: archer ? -.08 : dwarf && strike ? -.5 * Math.sin(t * Math.PI) : -.18 + cycle * .025 },
         kneeR: {rx: name==='walk'?Math.max(0,-cycle)*.95: strike?.18*Math.sin(t*Math.PI):.035},
         kneeL: {rx: name==='walk'?Math.max(0,cycle)*.95: strike?.12*Math.sin(t*Math.PI):.035} };
@@ -1747,7 +1760,9 @@ float surf(){
       add(n.head, part(skull(o.R), '#d6a783', { sculpted:true, ink:.006 }),0,0,0);
       Object.assign(n,animeFace(n.head,o.R,false,'#5a413a')); Object.assign(n,animeHair(n.head,o.R,'#302329',false,false));
       add(n.head,part(G.torus(o.R*.98,.018).rotateX(Math.PI/2),'#c6bba4',{ink:.004}),0,.07,0,-.08);
-      made.anim.skill=null; return made;
+      if(n.shield){n.shield.removeFromParent();delete n.shield;}
+      n.torso.traverse(m=>{if(m.isMesh&&!m.userData.hull&&m.material.userData.tex){const tex=m.material.userData.tex;if(tex==='cape')m.material=mat('#8b3432',{tex:'cape',ds:true});else if(tex==='cloth')m.material=mat('#67503b',{tex:'cloth'});}});
+      made.anim.shield=false;made.anim.skill=null; return made;
     }
     const armor=id==='deathKnight'?'#36364e':tier>=3?'#532e39':'#31313f';
     const rim=id==='deathKnight'?'#b79751':'#745493', eye=id==='deathKnight'?'#d0aa54':'#ad5cf0';
@@ -1765,7 +1780,7 @@ float surf(){
     const cache=new Map();
     for(const owner of [n.torso,n.armR,n.armL,n.legR,n.legL]) owner.traverse(mesh=>{
       if(!mesh.isMesh||mesh.material.userData.ink||mesh.parent===n.head)return;
-      const old=mesh.material;if(!cache.has(old)){const m=mat(old.userData.metal?armor:old.userData.tex==='cloth'?'#352b3b':'#49414b',{metal:old.userData.metal,tex:old.userData.tex,glow:old.userData.glow});cache.set(old,m);} mesh.material=cache.get(old);
+      const old=mesh.material;if(!cache.has(old)){const m=mat(old.userData.metal?armor:/cloth|cape/.test(old.userData.tex)?'#352b3b':'#49414b',{metal:old.userData.metal,tex:old.userData.tex,glow:old.userData.glow});cache.set(old,m);} mesh.material=cache.get(old);
     });
     n.handR.children.slice().filter(ch=>ch.name==='weapon').forEach(ch=>n.handR.remove(ch));
     add(n.handR,WEAP.sword(id==='darkLord'?1.02:.86,.12,'#687083',rim,{core:eye,grip:'#30232c'}),0,0,0,1.15);
@@ -1780,12 +1795,17 @@ float surf(){
       for(const m of [...n.torso.children])if(m.isMesh&&m.material.color&&m.material.color.equals(new T.Color(o.skin))){m.geometry.computeBoundingBox();if(m.geometry.boundingBox.max.x-m.geometry.boundingBox.min.x>o.torsoW*.70)n.torso.remove(m);}
       const w=o.torsoW*.5,h=o.torsoH;
       add(n.torso,part(G.lathe([[0,0],[w*.64,0],[w*.80,h*.18],[w*.99,h*.51],[w*1.08,h*.78],[w*.78,h],[0,h]],32,o.torsoD/o.torsoW),o.skin,{ink:.002}),0,0,0);
+      // Remove the old solid fur collar that intersects the entire lower face.
+      for(const m of [...n.torso.children])if(m.isMesh&&m.material.color&&['#8a8a92','#f2f0e8'].some(c=>m.material.color.equals(new T.Color(c))))n.torso.remove(m);
+      for(const side of [-1,1]){const arm=n['arm'+(side<0?'R':'L')];for(const m of [...arm.children])if(m.isMesh&&m.geometry.type==='SphereGeometry'){m.geometry.computeBoundingBox();if(m.geometry.boundingBox.max.x-m.geometry.boundingBox.min.x>.30)arm.remove(m);}
+        add(arm,part(G.ext([-.12,.03,-.08,.10,.09,.10,.19,.01,.12,-.07,-.09,-.04],.15,.008),'#4b4642',{metal:true,ink:.002}),0,0,0);
+      }
       n.head.children.slice().forEach(m=>n.head.remove(m));
       const faceGeo=portraitSkull(R,false);if(id!=='goblin')faceGeo.scale(1.10,.88,1.10);
       add(n.head,part(faceGeo,o.skin,{ink:.002}),0,0,0);
       for(const side of [-1,1]){
-        const eye=node('monster-eye',n.head,side*R*.42,-R*.03,R*.84);
-        add(eye,part(G.ball(R*.15,1.1,.65,.18,22),'#f1ddb1',{ink:false}),0,0,0);
+        const eye=node('monster-eye',n.head,side*R*.42,-R*.03,R*(id==='goblin'?.88:1.01));
+        add(eye,part(G.ball(R*.15,1.1,.48,.18,22),'#f1ddb1',{ink:false}),0,0,0);
         add(eye,part(G.ball(R*.077,.65,1,.18,18),'#ca9c39',{ink:false}),0,0,R*.026);
         add(eye,part(G.ball(R*.040,.40,1,.16,14),'#252019',{ink:false}),0,0,R*.043);
         add(n.head,lockMesh([[side*R*.18,R*.19,R*.89],[side*R*.39,R*.26,R*.91],[side*R*.65,R*.23,R*.78]],R*.07,R*.024,id==='goblin'?'#3e5831':'#39492c',''),0,0,0);
@@ -1796,7 +1816,7 @@ float surf(){
       add(n.head,part(G.ball(R*.26,1,.38,.16,22),'#3a2722',{ink:false}),0,-R*.56,R*.87);
       for(let j=0;j<6;j++)add(n.head,part(G.sbox(R*.045,R*.08,R*.04,.65),'#e5d3ad',{ink:false}),(j-2.5)*R*.065,-R*.54,R*.91);
       for(const side of [-1,1])add(n.head,lockMesh([[side*R*.25,-R*.65,R*.83],[side*R*.31,-R*.49,R*1.01],[side*R*.33,-R*.24,R*.99]],R*(id==='goblin'?.035:.065),R*.045,'#dfd4b4',''),0,0,0);
-      if(id!=='goblin')Object.assign(n,animeHair(n.head,R,'#252622',false,false));
+      if(id!=='goblin')warriorHair(n.head,R);
       else{
         add(n.head,part(new T.SphereGeometry(R*1.04,24,14,0,TAU,0,Math.PI*.48).scale(1,.60,1),'#584329',{tex:'cloth',ink:.002}),0,R*.54,-R*.10);
         add(n.torso,part(drapedMantle(o.torsoW,.34,.25),'#8f3030',{tex:'cape',ds:true,ink:.001}),0,h*.87,-o.torsoD*.51);
@@ -1818,14 +1838,74 @@ float surf(){
     }
   }
 
+  function warriorHair(head,R){
+    add(head,part(new T.SphereGeometry(R*1.025,24,16,0,TAU,0,Math.PI*.40).scale(1,1,.94),'#252622',{tex:'hair',ink:.001}),0,R*.16,-R*.14);
+    for(let j=0;j<9;j++){
+      const x=(j-4)*R*.16;
+      add(head,lockMesh([[x,R*.67,R*.72],[x*.95,R*1.30,R*.05],[x*.80,R*1.30,-R*.62],[x*.65,R*.92,-R*1.33]],R*.095,R*.045,'#252622'),0,0,0);
+    }
+    for(const side of [-1,1])add(head,lockMesh([[side*R*.85,R*.50,0],[side*R*.92,R*.17,-R*.10],[side*R*.88,-R*.14,-R*.16]],R*.08,R*.022,'#252622'),0,0,0);
+  }
+  function atelierSpecies(rig,id){
+    const {n,o}=rig;
+    if(n.wHead&&n.wolf){
+      const snow=id==='frostWolf',coat=snow?'#d5dce1':'#686773',mane=snow?'#edf1ee':'#b7b5b6';
+      for(const m of n.wHead.children)if(m.isMesh&&m.material.userData.glow&&m.position.z>.1)m.position.z=.27;
+      // Tapered muzzle and visible lower jaw, keeping the same wolf anatomy.
+      for(const m of [...n.wHead.children])if(m.isMesh&&m.geometry.type==='SphereGeometry'){
+        m.geometry.computeBoundingBox();const b=m.geometry.boundingBox;
+        if(b.max.z-b.min.z>.25&&m.position.z>.1){m.geometry.dispose();m.geometry=G.lathe([[0,-.16],[.075,-.16],[.11,-.07],[.09,.12],[.035,.19],[0,.20]],24,.73).rotateX(Math.PI/2);m.material=mat(coat,{tex:'fur'});m.children.filter(c=>c.userData.hull).forEach(c=>m.remove(c));}
+      }
+      for(const side of [-1,1]){
+        add(n.wHead,lockMesh([[side*.10,.06,.21],[side*.16,.08,.22],[side*.22,.045,.13]],.022,.012,coat,'fur'),0,0,0);
+        for(let j=0;j<10;j++)add(n.wHead,lockMesh([[side*.12,.10-j*.022,-.07],[side*(.22+j*.007),-.03-j*.025,-.13],[side*(.24+j*.007),-.16-j*.023,-.22]],.034,.014,j%3?coat:mane,'fur'),0,0,0);
+      }
+      for(const key of ['wFL','wFR','wBL','wBR']){
+        const leg=n[key];if(!leg)continue;leg.children.slice().forEach(m=>leg.remove(m));
+        add(leg,part(limb(.10,.25),coat,{tex:'fur',ink:.001}),0,-.14,0,.25);
+        const joint=n[key+'Knee']=node(key+'Knee',leg,0,-.25,-.035);
+        add(joint,part(limb(.055,.28),coat,{tex:'fur',ink:.001}),0,-.13,.015,-.12);
+        add(joint,part(G.ball(.080,1,.55,1.35,20),coat,{tex:'fur',ink:.001}),0,-.29,.06);
+        for(let j=0;j<3;j++)add(joint,part(G.cone(.012,.045).rotateX(Math.PI/2),'#d5d0c2',{ink:false}),(j-1)*.042,-.30,.145);
+      }
+      rig.extra=(t,dur,name)=>Object.fromEntries(['wFL','wFR','wBL','wBR'].map((k,j)=>[k+'Knee',{rx:name==='walk'?Math.max(0,Math.sin(t*TAU+(j%2?Math.PI:0)))*.6:.08}]));
+      if(n.rHead){
+        for(const m of [...n.rHead.children])if(m.isMesh&&m.material.color&&(m.material.color.equals(new T.Color('#8a8e98'))||m.material.color.equals(new T.Color('#c8302a'))))n.rHead.remove(m);
+        warriorHair(n.rHead,.30);
+        for(const side of [-1,1])for(let j=0;j<10;j++)add(n.rider,lockMesh([[side*.18,.40,-.04],[side*.26,.35,-.08],[side*.31,.22,-.11]],.035,.012,j%2?'#d6d0c2':'#aba59d','fur'),0,-j*.007,j*.013);
+        for(const m of [...n.rArm.children])if(m.name==='weapon')n.rArm.remove(m);
+        add(n.rArm,WEAP.axe('#746b60',true),0,-.30,0,1.15);
+      }
+    }
+    if(/^treant/.test(id)&&n.head){
+      for(const m of [...n.head.children])if(m.isMesh&&m.material.color&&['#4f9a3a','#6ab84a'].some(c=>m.material.color.equals(new T.Color(c))))n.head.remove(m);
+      for(const side of [-1,1])add(n.head,part(G.tube([[side*.12,.18,-.12],[side*.22,.42,-.15],[side*.31,.60,-.10],[side*.26,.76,-.06]],.035,24),'#6c5433',{tex:'bark',ink:.001}),0,0,0);
+      for(let j=0;j<44;j++){
+        const a=j*2.399,x=Math.sin(a)*(.24+.03*(j%3)),y=.32+(j%7)*.051,z=-.12+Math.cos(a)*.22;
+        add(n.head,part(G.ext([0,-.018,.035,.022,.018,.086,-.027,.035],.003,.001),j%3?'#50783b':'#789244',{tex:'leaf',ds:true,ink:false}),x,y,z,.4*Math.sin(a),a,.6*Math.cos(a));
+      }
+    }
+    if(/Golem|magmaLord/.test(id))rig.root.traverse(m=>{
+      if(!m.isMesh||m.userData.hull||m.material.userData.glow||m.material.userData.metal||m.geometry.type!=='SphereGeometry')return;
+      m.geometry.computeBoundingBox();const size=m.geometry.boundingBox.getSize(new T.Vector3());if(Math.max(size.x,size.y,size.z)<.18)return;
+      const g=new T.IcosahedronGeometry(1,2),p=g.attributes.position;
+      for(let j=0;j<p.count;j++){const x=p.getX(j),y=p.getY(j),z=p.getZ(j),v=1+.07*Math.sin(x*11+y*9+z*13);p.setXYZ(j,x*size.x*.5*v,y*size.y*.5*v,z*size.z*.5*v);}
+      g.computeVertexNormals();m.geometry.dispose();m.geometry=g;m.material=mat(m.material.color.getStyle(),{tex:'rock'});m.children.filter(c=>c.userData.hull).forEach(c=>m.remove(c));
+    });
+    if(id==='drake'&&n.neck){
+      for(let j=0;j<6;j++)for(const side of [-1,1])add(n.neck,part(G.ext([0,.016,.025,0,0,-.026,-.02,0],.004,.001),j%2?'#a73520':'#cb502c',{ink:false}),side*.088,.04+j*.042,.069,0,side*.65);
+      for(const side of [-1,1])add(n.dHead,part(G.tube([[side*.07,.08,.14],[side*.14,.12,.08],[side*.18,.06,-.02]],.023,18),'#922b1c',{ink:false}),0,0,0);
+    }
+  }
+
   function masterCreature(made,id){
     const {n,o}=made.rig;if(!n.head||!n.torso)return;
     const R=o.R||.3;
     if(id==='orc'||id==='blackOrc'){
       // White layered shoulder pelt, black topknot and red leather from the sheet.
-      for(const side of [-1,1])for(let j=0;j<15;j++){
-        const a=j*2.399,x=side*(o.torsoW*.28+Math.sin(a)*.09),y=o.torsoH+.025-Math.floor(j/5)*.034,z=Math.cos(a)*.12;
-        add(n.torso,part(G.cone(.023,.12).scale(1,1,.4),'#d9d0bc',{tex:'fur',ink:.001}),x,y,z,0,0,side*.35+Math.sin(a)*.25);
+      for(const side of [-1,1])for(let j=0;j<18;j++){
+        const a=j*2.399,x=side*(o.torsoW*.46+Math.sin(a)*.05),y=o.torsoH*.95-Math.floor(j/6)*.025,z=Math.cos(a)*.10-.025;
+        add(n.torso,lockMesh([[x,y,z],[x+side*.035,y-.075,z+.035],[x+side*.060,y-.14,z+.015]],.025,.012,j%3?'#d9d0bc':'#a8a394','fur'),0,0,0);
       }
       add(n.head,part(G.tube([[0,R*.45,-R*.4],[0,R*1.07,-R*.45],[0,R*.9,-R*.8]],R*.14,16),'#29272a',{tex:'hair',ink:.002}),0,0,0);
       for(const side of [-1,1])add(n.torso,part(G.ext([0,0,side*.12,-.02,side*.13,-.26,side*.035,-.20],.014,.002),'#932d30',{tex:'cloth',ink:.002}),side*.035,.04,o.torsoD*.54);
@@ -1869,13 +1949,22 @@ float surf(){
   };
   LIST.forEach(def => { if (ANIME_DESCRIPTIONS[def.id]) def.desc = ANIME_DESCRIPTIONS[def.id]; });
 
+  const MASTER_META={
+    soldier:{desc:'Hiệp sĩ tóc nâu, mắt xanh, giáp bạc viền vàng, vai và áo choàng xanh hoàng gia; kiếm bạc và khiên xanh huy hiệu vàng.',palette:pal(['#70442d','Tóc'],['#3675ac','Mắt'],['#c3cad4','Giáp bạc'],['#244a8e','Áo choàng'],['#c99b42','Viền vàng'])},
+    aldric:{desc:'Hiệp sĩ tóc nâu, giáp bạc và xanh hoàng gia, áo choàng xanh, kiếm bạc và khiên huy hiệu vàng.',palette:pal(['#70442d','Tóc'],['#3675ac','Mắt'],['#c3cad4','Giáp'],['#244a8e','Áo choàng'],['#c99b42','Viền'])},
+    elf:{desc:'Elf tóc vàng dài, mắt xanh lá, tai nhọn, giáp lá xanh viền vàng, vạt vải trắng ngà, cung xanh và vàng.',palette:pal(['#dec489','Tóc'],['#3f9164','Mắt'],['#237347','Giáp lá'],['#e1dcc4','Vạt áo'],['#c99b42','Viền'])},
+    lyra:{desc:'Elf tóc vàng dài, hoa trắng bên tai, mắt xanh lá, giáp lá xanh và cung vàng.',palette:pal(['#e8d18b','Tóc'],['#3f9164','Mắt'],['#237347','Giáp'],['#e1dcc4','Vạt áo'],['#c99b42','Viền'])},
+    dwarf:{desc:'Người lùn râu cam tết, kính xanh gọng đồng, giáp tối màu và pháo đồng cầm tay.',palette:pal(['#cd6427','Râu'],['#327c9a','Kính'],['#343139','Giáp'],['#c99b42','Đồng'])},
+    borin:{desc:'Người lùn râu cam tết, kính xanh gọng đồng, giáp da và kim loại tối, pháo đồng lớn.',palette:pal(['#cd6427','Râu'],['#327c9a','Kính'],['#343139','Giáp'],['#c99b42','Đồng'])}
+  };
+  LIST.forEach(def=>{if(MASTER_META[def.id])Object.assign(def,MASTER_META[def.id]);});
   const SKILL_NAME = { trollKing: 'Nện đất', voidLord: 'Xé không gian', soldier: 'Giơ khiên', elf: '3 mũi tên', mage: 'Mưa thiên thạch', dwarf: 'Đập đất', aldric: 'Thánh Quang', lyra: 'Mưa Tên', selene: 'Bão Băng', borin: 'Địa Chấn', wolfRider: 'Sói húc', darkKnight: 'Triệu hồi bóng tối', darkLord: 'Cắm kiếm' };
   function build(id, tier) {
     const def = LIST.find(c => c.id === id) || LIST[0];
     const t = Math.max(1, Math.min(def.tiers, tier || def.tiers));
     REAL.cur = realK(def.id); BUILD_ID = def.id;
     let made;
-    try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); sculptCreature(made.rig,def.id);masterCreature(made,def.id);realize(made.rig); }
+    try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); sculptCreature(made.rig,def.id);atelierSpecies(made.rig,def.id);masterCreature(made,def.id);realize(made.rig); }
     finally { REAL.cur = null; BUILD_ID = null; }
     const rig = made.rig;
     rig.root.name = 'root';
@@ -1892,6 +1981,7 @@ float surf(){
     c.traverse(o => {
       if (o.userData.noExport) { drop.push(o); return; }
       if (!o.isMesh) return;
+      o.geometry=o.geometry.clone();
       for (const a of ["uv", "tpos", "tnrm"]) if (o.geometry.attributes[a]) o.geometry.deleteAttribute(a); // không dùng texture → bỏ UV / toạ độ vân cho nhẹ
       const m = o.material;
       if (m.userData.ink) return;

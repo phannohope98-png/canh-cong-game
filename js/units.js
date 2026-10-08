@@ -43,7 +43,7 @@
         const t = this.target;
         // chỉ trúng khi mục tiêu còn sống và vẫn trong tầm (tránh chém trúng con ở xa sau khi đổi mục tiêu)
         if (prev < 0.5 && this.atk >= 0.5 && t && t.alive && t.uid === this.tUid && Math.hypot(t.x - this.x, t.y - this.y) <= this.reachOf(t) + 14) {
-          if (this.range) { Combat.fire(this.proj, this.x + this.face * 9, this.y - 26, t, { damage: this.damage, type: this.dtype || 'physical' }); AudioSys.play(this.proj === 'bolt' ? 'magic' : 'arrow'); }
+          if (this.range) { Combat.fire(this.proj, this.x + this.face * 9, this.y - 26, t, { damage: this.damage, type: this.dtype || 'physical',aoe:this.proj==='bomb'?40:0 }); AudioSys.play(this.proj === 'bomb' ? 'cannon' : this.proj === 'bolt' ? 'magic' : 'arrow'); }
           else {
             Combat.hitEnemy(t, this.damage, 'physical'); Effects.comic(t.x + this.face * 6, t.y - 44, ['POW!', 'BAM!', 'KAPOW!', 'SHUNT!', 'WHAM!'][(Math.random() * 5) | 0], ['#ffe14a', '#ff7a4a', '#7ae0ff'][(Math.random() * 3) | 0]); AudioSys.play(this.tower && this.tower.type === 'orc' ? 'orc' : 'sword'); Effects.hit(t.x - this.face * 4, t.y - t.height * 0.5, '#fff2c0');
             if (this.special === 'slam' && ++this.hits % 4 === 0) { // chiến binh Lùn đập đất
@@ -216,7 +216,7 @@
     },
     refresh(T, full) {
       const lv = T.def.levels[T.level - 1], M = Items.mods(T.type), hb = (1 + M.hp), db = (1 + M.damage);
-      const sh = M.list[1], art = sh && ArtChars[lv.art + 's' + sh.r] ? lv.art + 's' + sh.r : lv.art; // có Khiên gắn trụ → lính cầm khiên (màu theo bậc)
+      const sh=M.list[1], shieldKey=lv.art+'s'+(sh?Math.min(4,sh.r):0), art=sh&&ArtChars[shieldKey]?shieldKey:lv.art; // có Khiên gắn trụ → lính cầm khiên (màu theo bậc)
       for (const u of this.list) if (u.tower === T) {
         const r = full || !u.maxHp ? 1 : u.hp / u.maxHp;
         u.maxHp = Math.round(lv.hp * hb); u.hp = Math.max(1, Math.round(u.maxHp * r)); u.damage = [lv.damage[0] * db, lv.damage[1] * db];

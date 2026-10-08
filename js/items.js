@@ -128,7 +128,7 @@
       this.list.push({ x, y, it, t: 0, vx: (Math.random() - 0.5) * 60 });
       const R = Items.rar(it);
       Effects.text(x, y - 70, Items.name(it), R.col, it.r >= 3 ? 20 : 16);
-      if (it.r >= 3) { Effects.flash(x, y - 20, 90, R.col); Effects.comic(x, y - 96, it.r >= 4 ? 'HUYỀN THOẠI!' : 'ĐỒ XỊN!', R.col, true); }
+      if (it.r >= 3) { Effects.flash(x, y - 20, 90, R.col); Effects.comic(x, y - 96, it.r === 5 ? 'THẦN TÍCH!' : it.r >= 4 ? 'HUYỀN THOẠI!' : 'ĐỒ XỊN!', R.col, true); }
       AudioSys.play(it.r >= 3 ? 'holy' : 'gold');
     },
     update(dt) {

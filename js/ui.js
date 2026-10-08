@@ -242,10 +242,10 @@
         const eq = Items.isEquipped(sel), R = Items.rar(sel), cur = Items.equippedAt(sel.t, sel.s), nf = Items.fuseList(sel).length;
         det = `<div class="card it-detail" style="--rc:${R.col}">${this.itemIcon(sel, true)}<div class="it-dbody"><h3>${Items.name(sel)}</h3>
           <div class="sub"><span class="rtag" style="background:${R.col}">${R.name}</span> Trụ ${Items.towerName(sel.t)} · vị trí <b>${Items.slotName(sel.s)}</b></div>
-          <p class="it-stat">${Items.statText(sel)}</p>
+          <p class="it-stat">${Items.statText(sel)}</p><p class="sub">${Items.lore(sel)}</p>
           ${!eq && cur ? `<p class="sub">Đang gắn: ${Items.name(cur)} (${Items.statText(cur)})</p>` : ''}
           <div class="row it-acts">${eq ? `<button class="gbtn gray sm" data-action="it-unequip" data-u="${sel.u}"><span>Tháo ra</span></button>` : `<button class="gbtn green sm" data-action="it-equip" data-u="${sel.u}"><span>Gắn vào trụ</span></button>`}
-          ${sel.r < 4 ? `<button class="gbtn sm ${nf >= 3 ? '' : 'off'}" data-action="it-fuse" data-u="${sel.u}"><span>Ghép 3→1 (${Math.min(nf, 3)}/3)</span></button>` : ''}
+          ${sel.r < G.rarities.length-1 ? `<button class="gbtn sm ${nf >= 3 ? '' : 'off'}" data-action="it-fuse" data-u="${sel.u}"><span>Ghép 3→1 (${Math.min(nf, 3)}/3)</span></button>` : ''}
           <button class="gbtn red sm" data-action="it-salvage" data-u="${sel.u}"><span>Phân rã</span><span class="price">${I('coin')}${R.salvage}</span></button></div></div></div>`;
       }
       $('items-bag').innerHTML = det + `<div class="it-head"><b>${slot === null ? 'Đồ của trụ ' + CONFIG.towers[t].name : 'Đồ cho ' + G.slots[slot].name.toLowerCase() + ': ' + G.gear[t][slot].name}</b> <small>(${list.length} món · túi ${Items.bag().length}/${G.bag})</small>
@@ -289,7 +289,7 @@
     renderSettings() {
       const s = Save.data.settings, row = (k, label) => `<div class="setting"><span>${label}</span><button class="switch ${s[k] ? 'on' : ''}" data-action="toggle" data-key="${k}"><i></i></button></div>`;
       $('settings-list').innerHTML = `<div class="card">${row('music', 'Nhạc nền')}${row('sound', 'Âm thanh')}${row('shake', 'Rung màn hình')}${window.Art3D ? row('art3d', 'Hiệu ứng 3D (tắt nếu máy yếu)') : ''}</div>
-        <div class="card"><h3>Cách chơi</h3><p class="sub" style="line-height:1.55;font-size:14px">• Chạm ô đất có cọc gỗ để chọn 1 trong 4 trụ: Người (2 kiếm sĩ), Elf (bắn nhanh), Phù thủy (tầm xa, sát thương lan), Người Lùn (đại bác tầm xa nhất, nổ lan).<br>• Chạm trụ để nâng cấp (4 cấp đổi hình) hoặc bán.<br>• Kéo để di chuyển bản đồ, chụm 2 ngón để phóng to.<br>• Chạm anh hùng rồi chạm bản đồ để di chuyển; nút kỹ năng ở bên cạnh.<br>• Chạm đầu lâu đỏ để gọi đợt quái, gọi sớm được thưởng vàng.<br>• Xu kiếm được dùng mua anh hùng & trang bị.<br>• Chiến dịch có 6 vùng, mỗi vùng 6 map; map 6 là boss – hạ boss mới sang vùng mới.<br>• Quái chết có thể rơi đồ (5 bậc: Tệ, Bình thường, Cao, Cao cấp, Huyền thoại). Vào <b>Kho đồ</b> để gắn đồ vào 6 vị trí của mỗi trụ; ghép 3 món giống nhau thành 1 món bậc cao hơn.</p></div>
+        <div class="card"><h3>Cách chơi</h3><p class="sub" style="line-height:1.55;font-size:14px">• Chạm ô đất có cọc gỗ để chọn 1 trong 4 trụ: Người (2 kiếm sĩ), Elf (bắn nhanh), Phù thủy (tầm xa, sát thương lan), Người Lùn (đại bác tầm xa nhất, nổ lan).<br>• Chạm trụ để nâng cấp (4 cấp đổi hình) hoặc bán.<br>• Kéo để di chuyển bản đồ, chụm 2 ngón để phóng to.<br>• Chạm anh hùng rồi chạm bản đồ để di chuyển; nút kỹ năng ở bên cạnh.<br>• Chạm đầu lâu đỏ để gọi đợt quái, gọi sớm được thưởng vàng.<br>• Tướng mở theo cấp hành trình; cấp tướng nhận điểm cho ba nhánh phát triển.<br>• Chiến dịch có 6 vùng, mỗi vùng 6 map; map 6 là boss – hạ boss mới sang vùng mới.<br>• Quái chết có thể rơi đồ (6 bậc: Tệ, Bình thường, Cao, Cao cấp, Huyền thoại, Thần Tích). Vào <b>Kho đồ</b> để gắn đồ vào 6 vị trí của mỗi trụ; ghép 3 món giống nhau thành 1 món bậc cao hơn.</p></div>
         <div class="row"><button class="gbtn red sm" data-action="reset">${I('trash')}<span>Xoá dữ liệu</span></button></div>`;
     },
 

@@ -4,7 +4,7 @@
  * ========================================================= */
 (function () {
   const TS = 1.3; // trụ lớn, rõ hơn trên bản đồ gọn
-  const FALL = 0.42, SQUASH = 0.34, DROP_H = 620; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
+  const FALL = 0.32, SQUASH = 0.22, DROP_H = 150; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
   const TARGET = {
     first(T, air) { let b = null, bd = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.dist > bd) { bd = e.dist; b = e; } return b; },
     densest(T) {
@@ -37,10 +37,9 @@
     muzzle() {
       const T = ArtTowers, f = this.anim.face;
       if(window.PaintedWorld?.enabled){
-        const h=(94+this.level*14)*.7;
-        if(this.type==='archer')return{x:this.x+(8.4+9.8*f)*TS,y:this.y+(4.9-h*.45-14.7)*TS};
-        if(this.type==='mage')return{x:this.x+(8.4+9.1*f)*TS,y:this.y+(4.9-h*.24-16.1)*TS};
-        return{x:this.x+24.5*TS,y:this.y+(4.9-h*.7)*TS};
+        const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;
+        if(c)return{x:this.x+c[1]+(this.type==='artillery'?22:9)*f*TS,y:this.y+L.base+c[2]-13*TS};
+        return{x:this.x,y:this.y+L.base-L.h*.6};
       }
       if (this.type === 'archer') return { x: this.x + ((this.anim.k % 2 ? 9 : -9) + 10 * f) * TS, y: this.y + (T.ARCH_TOP[this.level] - 14) * TS };
       if (this.type === 'mage') return { x: this.x + 6 * f * TS, y: this.y + (T.MAGE_TOP[this.level] - 30) * TS };
@@ -63,10 +62,10 @@
     /** chạm đất sau khi rơi: bụi tung, rung màn hình, lính mới bước ra */
     land() {
       this.landed = true; const x = this.x, y = this.y;
-      Effects.burst(x - 30, y + 6, '#d8c8a0', 14, 190, 0.6, 7, 120); Effects.burst(x + 30, y + 6, '#d8c8a0', 14, 190, 0.6, 7, 120);
+      const soil=Game.map.theme.dirt; Effects.burst(x-24,y+5,soil,7,70,.4,4,70);Effects.burst(x+24,y+5,soil,7,70,.4,4,70);
       Effects.ring(x, y + 4, 14, 92, 0.45, '#f4e6c0', 6); Effects.ring(x, y + 4, 8, 60, 0.3, '#ffe58a', 4);
-      Effects.decal && Effects.decal(x, y + 8, 46, 'scorch');
-      Effects.shake(7, 0.25); AudioSys.play('explode');
+      // The permanent foundation supplies the soil contact.
+      Effects.shake(2, 0.15); AudioSys.play('build');
       if (this.def.kind === 'barracks' && !Units.list.some(u => u.tower === this)) Units.createFor(this);
     }
     /** Elf bắn 1 mũi tên; 15% chí mạng: mũi tên phát sáng, sát thương gấp đôi */
@@ -104,9 +103,10 @@
     }
     get drawY() { return this.y + 14; }
     draw(ctx) {
+      if(window.PaintedWorld?.foundation)PaintedWorld.foundation(ctx,this.x,this.y,this.type,this.level,this.drop);
       const k = this.pulse > 0 ? 1 + Math.sin(this.pulse / 0.4 * Math.PI) * 0.08 : 1;
       if (this.drop < FALL + SQUASH) { // rơi từ trời: tăng tốc dần, bóng dưới đất lớn dần; chạm đất thì bẹp xuống rồi nảy lại
-        const gx = this.x, gy = this.y + 14;
+        const gx = this.x, gy = this.y + 4.9*TS;
         if (this.drop < FALL) {
           const u = this.drop / FALL, off = -DROP_H * (1 - u * u);
           ctx.save(); ctx.globalAlpha = 0.15 + 0.4 * u; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(gx, gy, 20 + 34 * u, 8 + 12 * u, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -115,7 +115,7 @@
           ctx.save(); ctx.globalAlpha = 0.35 * (1 - u); ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3; for (const dx of [-26, 0, 26]) { ctx.beginPath(); ctx.moveTo(gx + dx, gy + off - 160); ctx.lineTo(gx + dx, gy + off - 260); ctx.stroke(); } ctx.restore();
           return;
         }
-        const v = (this.drop - FALL) / SQUASH, sy = 1 - 0.2 * Math.cos(v * Math.PI * 2.4) * (1 - v) * (1 - v), sx = 1 / Math.sqrt(sy);
+        const v = (this.drop - FALL) / SQUASH, sy = 1 - 0.055 * Math.cos(v * Math.PI * 2.4) * (1 - v) * (1 - v), sx = 1 / Math.sqrt(sy);
         ctx.save(); ctx.translate(gx, gy); ctx.scale(sx, sy); ctx.translate(-gx, -gy);
         Painter.tower(ctx, this.type, this.level, this.x, this.y, TS, this.t, this.anim); ctx.restore(); return;
       }
@@ -125,7 +125,7 @@
         Painter.tower(ctx, this.type, this.level, this.x, this.y, TS * k, this.t, this.anim); ctx.restore(); return;
       }
       Painter.tower(ctx, this.type, this.level, this.x, this.y, TS * k, this.t, this.anim);
-      this.drawItems(ctx);
+      // Attachments travel with the building and are drawn by Painter.tower.
     }
     /** đồ đang gắn: huy hiệu nhỏ đúng vị trí lắp trên thân trụ (đỉnh, tầng trên, mặt trước, 2 cánh, nền) */
     topY() { if(window.PaintedWorld?.enabled)return (4.9-(94+this.level*14)*.7)*TS; const TP = window.Towers3D && Towers3D.TOPS && Towers3D.TOPS[this.type]; return -(TP ? TP[this.level] : this.type === 'barracks' ? 34 + this.level * 7 : 70) * TS; }

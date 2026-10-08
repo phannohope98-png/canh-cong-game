@@ -11,7 +11,7 @@
     const loadout = {}; Object.keys(CONFIG.towers).forEach(t => { loadout[t] = [0, 0, 0, 0, 0, 0]; });
     return { stars: {}, unlocked: 1, upgrades, heroXp, seen: {}, settings: { music: true, sound: true, shake: true, art3d: true },
       coins: CONFIG.startCoins, heroes: { aldric: true }, hero: 'aldric', gear: { weapon: 0, gloves: 0, armor: 0, boots: 0 }, equip,
-      items: [], itemN: 0, loadout, mapv: 2 };
+      items: [], itemN: 0, loadout, mapv: 2,heroBuildVersion:1 };
   }
   const Save = {
     data: null,
@@ -23,8 +23,12 @@
         Object.assign(d.heroXp, p.heroXp || {}); Object.assign(d.heroes, p.heroes || {}); Object.assign(d.gear, p.gear || {});
         for (const h in (p.equip || {})) if (d.equip[h]) Object.assign(d.equip[h], p.equip[h]);
         d.unlocked = p.unlocked || 1; d.coins = typeof p.coins === 'number' ? p.coins : d.coins;
-        d.hero = d.heroes[p.hero] ? p.hero : 'aldric';
-        if (Array.isArray(p.items)) d.items = p.items.filter(i => i && CONFIG.items.gear[i.t] && i.s >= 0 && i.s < 6 && i.r >= 0 && i.r < 5);
+        d.hero = CONFIG.heroes[p.hero] && d.heroes[p.hero] ? p.hero : 'aldric';
+        d.accountXp = Number.isFinite(p.accountXp)?p.accountXp:Object.values(d.stars).reduce((a,b)=>a+b,0)*100;
+        d.talents = p.talents || {};
+        if(p.heroBuildVersion!==1)for(const slot of SLOTS){const n=Math.max(0,Math.min(CONFIG.equipment[slot].items.length,Math.floor(Number(p.gear?.[slot])||0)));d.coins+=CONFIG.equipment[slot].items.slice(0,n).reduce((sum,it)=>sum+it.cost,0);}
+        if(Array.isArray(p.items)) d.coins += p.items.filter(i=>i?.t==='orc').reduce((a,i)=>a+(CONFIG.items.rarities[i.r]?.salvage||0),0);
+        if (Array.isArray(p.items)) d.items = p.items.filter(i => i && CONFIG.items.gear[i.t] && i.s >= 0 && i.s < 6 && i.r >= 0 && i.r < CONFIG.items.rarities.length);
         d.itemN = Math.max(p.itemN || 0, ...d.items.map(i => i.u), 0);
         for (const t in d.loadout) if (p.loadout && Array.isArray(p.loadout[t])) d.loadout[t] = d.loadout[t].map((_, s) => { const u = p.loadout[t][s]; return d.items.some(i => i.u === u && i.t === t && i.s === s) ? u : 0; });
         if (p.mapv !== 2) { // bản cũ 12 màn (2 chương) → chiến dịch mới 6 vùng × 6 map: màn chương 1 = map 1, chương 2 = map 3 của vùng

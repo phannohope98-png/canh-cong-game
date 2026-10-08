@@ -47,6 +47,7 @@
         keys.forEach(k => { const d = CONFIG.enemies[k], a = ArtChars[k]; if (d && a) list.push({ key: k, scale: d.radius / a.dr * (CONFIG.unitScale || 1), modes: ['idle', 'die'], dirs: true }); });
         Art3D.warmClear(); Art3D.warm(list);
       }, 300);
+      if(window.PaintedMotion)PaintedMotion.warmFor([Progress.selectedHero(),'soldier','soldierShield','elf','mage','dwarf',...L.waves.join(',').split(',').map(p=>p.split(':')[0].trim())]);
       this.startLoop();
     },
     restart() { this.start(this.levelIndex); },

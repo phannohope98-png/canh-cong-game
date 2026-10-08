@@ -1,0 +1,108 @@
+/* Level based hero builds, collectible archive, original command skills. */
+(function(){
+  const $=id=>document.getElementById(id),oldLoad=Save.load,oldReset=Save.reset;
+  function normalize(){
+    const d=Save.data;d.accountXp=Math.max(0,Number(d.accountXp)||0);d.talents=d.talents||{};
+    for(const id of Object.keys(CONFIG.heroes)){
+      const a=d.talents[id];d.talents[id]=Array.from({length:3},(_,i)=>Math.max(0,Math.min(5,Math.floor(Number(a?.[i])||0))));
+      while(d.talents[id].reduce((x,y)=>x+y,0)>Progress.heroLevel(id)-1){const k=d.talents[id].findLastIndex(v=>v>0);d.talents[id][k]--;}
+    }
+    for(const [id,h] of Object.entries(CONFIG.heroes))if(Progress.playerLevel()>=h.unlockLevel)d.heroes[id]=true;
+  }
+  Save.load=function(){oldLoad.call(this);normalize();return this.data;};
+  Save.reset=function(){oldReset.call(this);normalize();this.save();};
+  Progress.playerLevel=function(){return Math.min(20,1+Math.floor(Math.sqrt((Save.data.accountXp||0)/160)));};
+  Progress.points=function(id){return Math.max(0,this.heroLevel(id)-1-(Save.data.talents?.[id]||[]).reduce((a,b)=>a+b,0));};
+  Progress.train=function(id,b){
+    b=Number(b);const h=CONFIG.heroes[id],a=Save.data.talents?.[id];
+    if(!h||!a||!Save.data.heroes[id]||!Number.isInteger(b)||b<0||b>2||!this.points(id)||a[b]>=5||this.heroLevel(id)<2+a[b])return false;
+    a[b]++;Save.save();return true;
+  };
+  Progress.respec=function(id){if(!CONFIG.heroes[id]||!Save.data.heroes[id])return false;Save.data.talents[id]=[0,0,0];Save.save();return true;};
+  Progress.gearMods=function(id){const m={dmg:0,rate:0,hp:0,arm:0,spd:0};CONFIG.heroes[id].branches.forEach((b,i)=>m[b.stat]+=(Save.data.talents?.[id]?.[i]||0)*b.value);return m;};
+  Progress.wornTiers=()=>[0,0,0,0];Progress.worn=()=>({});Progress.buyGear=()=>false;Progress.setGear=()=>false;
+  Progress.unlockHero=function(id){const h=CONFIG.heroes[id];if(!h||this.playerLevel()<h.unlockLevel)return false;Save.data.heroes[id]=true;Save.save();return true;};
+  const win=Progress.recordWin;
+  Progress.recordWin=function(i,s){const old=Save.data.stars[i]||0;Save.data.accountXp+=(s>old?160+CONFIG.levels[i].region*40:35);normalize();return win.call(this,i,s);};
+  const addXp=Progress.addHeroXp;
+  Progress.addHeroXp=function(id,n){addXp.call(this,id,Math.max(0,n));Save.data.accountXp+=Math.floor(Math.max(0,n)*.2);normalize();};
+  Items.lore=it=>Items.def(it).lore?.[it.r]||`${Items.def(it).name} của ${CONFIG.towers[it.t].name}. ${Items.statText(it)}. Trang bị này hiện trên công trình khi được gắn vào đúng vị trí.`;
+  Items.rollRarity=function(region,boss){const r=Math.max(0,Math.min(5,region)),weights=boss?[0,0,43-r*3,38,18+r*2,1+r]:[Math.max(8,46-r*7),34,13+r*3,5+r*2.4,1+r*1.1,.12+r*.12];let v=Math.random()*weights.reduce((a,b)=>a+b,0);for(let i=0;i<weights.length;i++){v-=weights[i];if(v<0)return i;}return 5;};
+  const key=ArtChars.heroKey;ArtChars.heroKey=function(id,tiers){return id==='nara'?'nara':key.call(this,id,tiers);};
+  const act=UI.act;
+  UI.act=function(a,d,el){
+    if(a==='talent'){if(!Progress.train(d.id,+d.branch))this.toast('Chưa đủ điểm hoặc cấp tướng');this.renderHeroes();return;}
+    if(a==='respec'){Progress.respec(d.id);this.renderHeroes();return;}
+    if(a==='hero-unlock'){if(Progress.unlockHero(d.id))Progress.selectHero(d.id);else this.toast('Cần cấp hành trình '+CONFIG.heroes[d.id].unlockLevel);this.renderHeroes();return;}
+    if(a==='hero-command'){const h=Units.hero;if(h&&!Hero.cast(h,+d.skill))this.toast(+d.skill===1&&h.level<4?'Kỹ năng phụ mở ở cấp tướng 4':'Kỹ năng chưa sẵn sàng');return;}
+    if(a==='catalog-filter'){this.catalogType=d.type||'';this.catalogRarity=d.rarity??'';this.renderCodex();return;}
+    if(a==='gear')return;
+    return act.call(this,a,d,el);
+  };
+  UI.renderHeroes=function(){
+    const id=CONFIG.heroes[this.viewHero]?this.viewHero:Progress.selectedHero(),h=CONFIG.heroes[id],own=Save.data.heroes[id],lv=Progress.heroLevel(id),a=Save.data.talents[id],m=Progress.gearMods(id),mult=1+(lv-1)*CONFIG.heroPerLevel;
+    $('hero-roster').innerHTML=Object.entries(CONFIG.heroes).map(([k,v])=>`<button class="roster-item ${k===id?'on':''} ${Save.data.heroes[k]?'':'locked'}" data-action="hero-pick" data-id="${k}"><canvas data-hero="${k}" width="108" height="132"></canvas><div><b>${v.name}</b><small>${v.role}</small><small>${Save.data.heroes[k]?'Cấp tướng '+Progress.heroLevel(k):'Mở ở cấp hành trình '+v.unlockLevel}</small></div></button>`).join('');
+    $('hero-detail').innerHTML=`<div class="card"><div class="hd-top"><div class="big"><canvas data-hero="${id}" data-full="1" width="300" height="360"></canvas></div><div class="hd-info"><h3>${h.name}</h3><p>${h.title} · ${h.role}</p><p>Cấp hành trình <b>${Progress.playerLevel()}</b> · Cấp tướng <b>${lv}/10</b></p><div class="bar"><i style="width:${Progress.heroXpProgress(id)*100}%"></i><span>Kinh nghiệm ${Math.round(Progress.heroXpProgress(id)*100)}%</span></div><div class="stat-row"><span class="chip">♥ ${Math.round(h.hp*mult*(1+m.hp))}</span><span class="chip">⚔ ${h.damage.map(v=>Math.round(v*mult*(1+m.dmg))).join('–')}</span><span class="chip">Giáp ${Math.round(Math.min(.8,h.armor+m.arm)*100)}%</span><span class="chip">Tốc độ ${Math.round(h.speed*(1+m.spd))}</span></div><p>${h.desc}</p>${own?`<button class="gbtn green sm" data-action="hero-pick" data-id="${id}">${Save.data.hero===id?'Đang dùng':'Chọn tướng'}</button>`:`<p class="chip">Mở miễn phí ở cấp hành trình ${h.unlockLevel}</p>`}</div></div><div class="talent-head"><b>${Progress.points(id)} điểm phát triển</b><button class="gbtn gray sm" data-action="respec" data-id="${id}">Phân bổ lại</button></div><div class="talent-grid">${h.branches.map((b,i)=>`<section class="talent-branch"><h3>${b.name}</h3><p>${b.text}</p><div class="talent-dots">${Array.from({length:5},(_,k)=>`<i class="${k<a[i]?'lit':''}"></i>`).join('')}</div><button class="gbtn sm" data-action="talent" data-id="${id}" data-branch="${i}" ${!own||!Progress.points(id)||a[i]>=5||lv<2+a[i]?'disabled':''}>${a[i]}/5 · ${a[i]>=5?'Tối đa':'Tăng 1 điểm (cấp '+(2+a[i])+')'}</button></section>`).join('')}</div><div class="hero-unlocks"><span class="${lv>=1?'lit':''}">Cấp 1 · ${h.skill.name}</span><span class="${lv>=4?'lit':''}">Cấp 4 · ${h.skill2.name}</span><span class="${lv>=8?'lit':''}">Cấp 8 · Chuyên sâu: thời gian miền kỹ năng +2 giây, hiệu lực +25%</span></div><p>Mỗi cấp tướng nhận 1 điểm. Chọn tập trung một nhánh hoặc kết hợp; phân bổ lại miễn phí ngoài trận.</p></div>`;
+    this.paintCanvases($('screen-heroes'));this.refreshCoins();
+  };
+  const codex=UI.renderCodex;
+  UI.renderCodex=function(){
+    document.querySelectorAll('#screen-codex [data-action="codex-tab"]').forEach(el=>el.classList.toggle('on',el.dataset.tab===this.codexTab));
+    if(this.codexTab==='heroes'){
+      $('codex-list').innerHTML='<div class="grid">'+Object.entries(CONFIG.heroes).map(([id,h])=>`<article class="card"><canvas data-hero="${id}" data-full="1" width="180" height="220"></canvas><h3>${h.name}</h3><p>${h.role}</p><p>${h.desc}</p><p>Mở ở cấp hành trình ${h.unlockLevel} · Kỹ năng phụ: ${h.skill2.name} (cấp 4)</p>${h.branches.map(b=>`<p><b>${b.name}</b>: ${b.text}</p>`).join('')}</article>`).join('')+'</div>';this.paintCanvases($('codex-list'));return;
+    }
+    if(this.codexTab!=='items')return codex.call(this);
+    const all=[];for(const t of Items.TYPES)for(let s=0;s<6;s++)for(let r=0;r<CONFIG.items.rarities.length;r++)all.push({t,s,r});
+    const list=all.filter(it=>(!this.catalogType||it.t===this.catalogType)&&(this.catalogRarity===''||this.catalogRarity==null||it.r===+this.catalogRarity));
+    $('codex-list').innerHTML=`<p class="catalog-intro">${all.length} vật phẩm · Sở hữu mới sáng · Có thể đọc mọi chỉ số và câu chuyện</p><div class="catalog-filters"><label>Trụ <select id="catalog-type"><option value="">Tất cả</option>${Items.TYPES.map(t=>`<option value="${t}" ${this.catalogType===t?'selected':''}>${CONFIG.towers[t].name}</option>`).join('')}</select></label><label>Độ hiếm <select id="catalog-rarity"><option value="">Tất cả</option>${CONFIG.items.rarities.map((r,i)=>`<option value="${i}" ${String(this.catalogRarity)===String(i)?'selected':''}>${r.name}</option>`).join('')}</select></label></div><div class="catalog-grid">${list.map(it=>{const n=Items.bag().filter(b=>b.t===it.t&&b.s===it.s&&b.r===it.r).length;return `<article class="catalog-card ${n?'owned':'unowned'}" style="--rc:${Items.rar(it).col}"><div class="catalog-art">${this.itemIcon(it,true)}</div><h3>${Items.name(it)}</h3><small>${CONFIG.towers[it.t].name} · ${CONFIG.items.slots[it.s].name} · ${n?'Sở hữu '+n:'Chưa sở hữu'}</small><p class="catalog-stat">${Items.statText(it)}</p><details ${it.r>=4?'open':''}><summary>${it.r>=4?'Nguồn gốc':'Thông tin'}</summary><p>${Items.lore(it)}</p></details></article>`;}).join('')}</div>`;
+    $('catalog-type').onchange=e=>{this.catalogType=e.target.value;this.renderCodex();};$('catalog-rarity').onchange=e=>{this.catalogRarity=e.target.value;this.renderCodex();};
+  };
+  const zones=[];window.HeroDomains=zones;
+  const colors={aldric:'#ffe19a',lyra:'#a6e4a0',selene:'#c29bff',borin:'#ffb778',nara:'#77ddb8'};
+  const create=Hero.create;
+  Hero.create=function(map){const u=create.call(this,map);u.commandCd=[0,0];u.commandZones=[];return u;};
+  function near(x,y,r){return Enemies.list.filter(e=>e.alive&&Math.hypot(e.x-x,e.y-y)<r).sort((a,b)=>b.dist-a.dist);}
+  function heal(x,y,r,p){for(const o of Units.list)if(o.active&&Math.hypot(o.x-x,o.y-y)<r){o.hp=Math.min(o.maxHp,o.hp+o.maxHp*p);}}
+  Hero.cast=function(u,slot=0){
+    if(u.state==='dead'||(slot===1&&u.level<4)||u.commandCd[slot]>0)return false;
+    const h=u.heroDef,id=u.heroId,master=u.level>=8?1.25:1,b=(1+(u.level-1)*CONFIG.heroPerLevel)*(1+Progress.gearMods(u.heroId).dmg);
+    u.commandCd[slot]=slot?h.skill2.cooldown:h.skill.cooldown;if(!slot)u.skillCd=u.commandCd[0];u.atk=0;
+    const e=near(u.x,u.y,260)[0],x=e?.x??u.x,y=e?.y??u.y,col=colors[id];
+    if(slot){
+      if(id==='aldric'){Combat.splash(u.x,u.y,105,u.damage[1]*3*master,'physical');u.shieldT=4;}
+      else if(id==='lyra'){const threat=near(u.x,u.y,220)[0],px=Math.max(70,Math.min(Game.map.W-70,threat?u.x+(u.x>=threat.x?95:-95):u.postX)),py=Math.max(90,Math.min(Game.map.H-70,u.y-25));Effects.ring(u.x,u.y,8,45,.4,col,2);Hero.moveHero(u,px,py);u.speedBoostT=3;u.shieldT=2;}
+      else if(id==='selene'){for(const o of near(x,y,110))o.stunT=Math.max(o.stunT||0,o.boss?.5:1.6);Combat.splash(x,y,110,u.damage[1]*2,'magic',{air:true});}
+      else if(id==='borin'){Combat.splash(x,y,105,u.damage[1]*3,'true',{air:false});Effects.burst(x,y,col,15,110,.5,5,60);}
+      else heal(u.x,u.y,180,.3*master);
+      Effects.ring(x,y,8,105,.5,col,3);return true;
+    }
+    if(id==='lyra'){
+      let sx=u.x,sy=u.y;for(const o of near(x,y,h.skill.radius).slice(0,u.level>=8?6:4)){Combat.hitEnemy(o,h.skill.damage*b*master/2,'physical');o.slowT=3;o.slowMul=.6;o.windMarkT=5;zones.push({id:'thread',x:sx,y:sy,tx:o.x,ty:o.y,t:0,life:.65,col});sx=o.x;sy=o.y;}
+    }else{
+      const life={aldric:6,selene:5,borin:7,nara:8}[id]+(u.level>=8?2:0),anchor=id==='aldric'||id==='borin'?u:e;
+      zones.push({id,x:anchor?.x??u.x,y:anchor?.y??u.y,r:h.skill.radius,life,t:0,pulse:0,col,u,power:master,damage:h.skill.damage*b*master});
+    }
+    Effects.ring(u.x,u.y,5,50,.4,col,3);AudioSys.play('magic');return true;
+  };
+  const tick=Hero.tick;
+  Hero.tick=function(u,dt){tick.call(this,u,dt);u.commandCd=u.commandCd.map(v=>Math.max(0,v-dt));if(u.speedBoostT>0){u.speedBoostT-=dt;u.speed=u.heroDef.speed*(1+Progress.gearMods(u.heroId).spd)*1.8;}else u.speed=u.heroDef.speed*(1+Progress.gearMods(u.heroId).spd);};
+  const fxUpdate=Effects.update;
+  Effects.update=function(dt){fxUpdate.call(this,dt);for(const e of Enemies.list)if(e.windMarkT>0)e.windMarkT=Math.max(0,e.windMarkT-dt);for(let i=zones.length-1;i>=0;i--){const z=zones[i];z.t+=dt;if(z.t>=z.life){zones.splice(i,1);continue;}if(z.id==='thread')continue;z.pulse-=dt;if(z.pulse>0)continue;z.pulse=.75;
+    if(z.id==='aldric'){heal(z.x,z.y,z.r,.025*z.power);for(const o of Units.list)if(o.active&&Math.hypot(o.x-z.x,o.y-z.y)<z.r)o.shieldT=Math.max(o.shieldT,1);for(const e of near(z.x,z.y,z.r)){e.slowT=1;e.slowMul=1-.3*z.power;}}
+    else if(z.id==='selene'){Combat.splash(z.x,z.y,z.r,z.damage/7,'magic',{air:true});for(const e of near(z.x,z.y,z.r)){e.slowT=1;e.slowMul=.45;}}
+    else if(z.id==='borin'){heal(z.x,z.y,z.r,.025*z.power);for(const t of Towers.list)if(Math.hypot(t.x-z.x,t.y-z.y)<z.r)t.cd-=.35*z.power;Combat.splash(z.x,z.y,z.r,z.damage/9,'physical');}
+    else{heal(z.x,z.y,z.r,.035*z.power);for(const e of near(z.x,z.y,z.r))if(!e.flying){e.stunT=Math.max(e.stunT||0,(e.boss?.1:.3)*z.power);}Combat.splash(z.x,z.y,z.r,z.damage/10,'magic');}
+  }};
+  const clear=Effects.clear;Effects.clear=function(){zones.length=0;return clear.call(this);};
+  const draw=Effects.drawCircles;
+  Effects.drawCircles=function(g){draw.call(this,g);for(const z of zones){g.save();g.strokeStyle=z.col;g.fillStyle=z.col;g.globalAlpha=Math.min(1,(z.life-z.t)*3)*.75;g.lineWidth=3;
+    if(z.id==='thread'){g.beginPath();g.moveTo(z.x,z.y-25);g.quadraticCurveTo((z.x+z.tx)/2,z.y-55,z.tx,z.ty-20);g.stroke();}
+    else{g.translate(z.x,z.y);g.beginPath();g.ellipse(0,0,z.r,z.r*.42,0,0,Math.PI*2);g.globalAlpha*=.1;g.fill();g.globalAlpha*=7;g.stroke();
+      const n=z.id==='selene'?3:z.id==='nara'?5:4;for(let i=0;i<n;i++){const a=i*Math.PI*2/n+(z.id==='selene'?z.t*1.8:0),x=Math.cos(a)*z.r*.75,y=Math.sin(a)*z.r*.32;g.beginPath();if(z.id==='borin'){g.rect(x-5,y-9,10,13);}else{g.ellipse(x,y-5,5,z.id==='nara'?9:5,a,0,Math.PI*2);}g.fill();}}
+    g.restore();}};
+  const hit=Combat.hitEnemy;Combat.hitEnemy=function(e,dmg,type,pen){const d=e.windMarkT>0?(Array.isArray(dmg)?dmg.map(v=>v*1.12):dmg*1.12):dmg;return hit.call(this,e,d,type,pen);};
+  const begin=Game.start;
+  Game.start=function(i){const result=begin.call(this,i);if(Units.hero){zones.length=0;buildCommands();}return result;};
+  function buildCommands(){let panel=$('hero-commands');if(!panel){panel=document.createElement('div');panel.id='hero-commands';$('hero-skill').parentElement.append(panel);}const h=Units.hero.heroDef;panel.innerHTML=`<span class="command-label">CHỈ HUY · ${h.name}</span>${[h.skill,h.skill2].map((s,i)=>`<button data-action="hero-command" data-skill="${i}" title="${i?h.skill2.name:h.desc}"><b>${s.name}</b><small id="command-time-${i}"></small><i></i></button>`).join('')}`;$('hero-skill').style.display='none';}
+  const hudTick=UI.tick;UI.tick=function(){hudTick.call(this);const u=Units.hero;if(this.current!=='screen-game'||!u)return;for(let i=0;i<2;i++){const e=$('command-time-'+i);if(!e)continue;const lock=i===1&&u.level<4,sec=Math.ceil(u.commandCd[i]);e.textContent=lock?'Mở cấp tướng 4':u.state==='dead'?'Đang hồi sinh':sec?sec+' giây':'Sẵn sàng';e.parentElement.disabled=lock||sec>0||u.state==='dead';e.parentElement.style.setProperty('--charge',((1-u.commandCd[i]/(i?u.heroDef.skill2.cooldown:u.heroDef.skill.cooldown))*100)+'%');}};
+})();

@@ -17,7 +17,7 @@
       this.flying = !!d.flying; this.boss = !!d.boss; this.reward = d.reward;
       this.art = type; this.pathIndex = pathIndex; this.rateMul = 1; this.speedMul = 1; this.chargeT = 0;
       this.scale = d.radius / art.dr * (CONFIG.unitScale || 1); this.height = (art.tall ? art.tall * 0.95 : art.box[3] * 0.78) * this.scale + (this.flying ? 18 : 0);
-      this.path = Game.map.paths[pathIndex]; this.dist = 0; this.lat = (Math.random() - 0.5) * CONFIG.pathWidth * 0.5;
+      this.path = Game.map.paths[pathIndex]; this.dist = 0; this.lat = (Math.random() - 0.5) * CONFIG.pathWidth * 0.32;
       this.alive = true; this.state = 'walk'; this.cd = 0.4; this.atk = -1; this.flash = 0; this.slow = 0;
       this.walk = Math.random(); this.anim = Math.random() * 3; this.face = 1; this.slamT = d.slam ? d.slam.every : 0; this.shootCd = 1;
       this.place();
@@ -109,9 +109,10 @@
           else this.shootCd = 0.3;
         }
       }
+      if(this.atk>=0&&!this.flying){this.state='idle';return;}
       this.state = 'walk';
       const step = this.speed * (this.slowMul || 1) * this.speedMul * (this.chargeT > 0 ? this.def.charge.mul : 1) * dt;
-      this.dist += step; this.walk += step / (window.ArtStylized?.stride(this.art,this.height)||this.radius*2.8);
+      const oldX=this.x,oldY=this.y;this.dist += step; this.place(); this.walk += Math.hypot(this.x-oldX,this.y-oldY) / (window.ArtStylized?.stride(this.art,this.height)||this.radius*2.8);
       if (this.dist >= this.path.length) { Game.enemyEscaped(this); return; }
       this.place();
     }

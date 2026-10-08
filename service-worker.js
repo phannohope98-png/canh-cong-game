@@ -1,5 +1,5 @@
 /* service-worker.js – chơi offline. Đổi CACHE_NAME mỗi lần cập nhật. */
-const CACHE_NAME = 'canh-cong-painted52';
+const CACHE_NAME = 'canh-cong-painted52r2';
 const ASSETS = [
   "js/art-world.js",
   "assets/sprites/env-forest-painted52.webp",

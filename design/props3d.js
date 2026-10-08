@@ -27,6 +27,14 @@
         for(let i=0;i<a.count;i++) {const xx=a.getX(i),yy=a.getY(i),zz=a.getZ(i), f=1+.15*S(xx*19+v*7+j)*C(yy*17+zz*13);a.setXYZ(i,xx*f,yy*f,zz*f);}
         geo.computeVertexNormals();add(g,part(geo,sh(c,(j-2)*.035),{tex:'leaf',ink:.004}),U(x),HY(y),U(z));
       }
+      const leaves=[],leafIndex=[],rng=seeded(103+Math.floor(v*1000));
+      for(let j=0;j<65;j++){
+        const a=rng()*TAU,rad=U(13+14*rng()),cx=S(a)*rad,cz=C(a)*rad,cy=HY(31+23*rng()),w=U(2.1+1.4*rng()),h=U(3.8+2*rng()),tilt=(rng()-.5)*1.5;
+        const off=leaves.length/3,points=[[-w,0,0],[0,h,0],[w,0,0],[0,-h*.65,0],[0,0,w*.55]];
+        for(const [x,y,z]of points){const xx=x*C(a)+z*S(a),zz=z*C(a)-x*S(a);leaves.push(cx+xx,cy+y*C(tilt)-zz*S(tilt),cz+zz*C(tilt)+y*S(tilt));}
+        leafIndex.push(off,off+1,off+4,off+1,off+2,off+4,off+2,off+3,off+4,off+3,off,off+4);
+      }
+      const leafGeo=new T.BufferGeometry();leafGeo.setAttribute('position',new T.Float32BufferAttribute(leaves,3));leafGeo.setIndex(leafIndex);leafGeo.computeVertexNormals();add(g,part(leafGeo,sh(c,.13),{tex:'leaf',ds:true,ink:false}),0,0,0);
       for (const [x, y, z, r] of [[-12, 33, 12, 6], [6, 47, 12, 6]]) add(g, new T.Mesh(G.ball(U(r), 1, 0.7, 1, 10), mat(sh(c, 0.16))), U(x), HY(y), U(z));
       if (v > 0.8 && P.flowers.length) for (const [x, y, z] of [[-12, 30, 14], [6, 44, 14], [12, 28, 13]]) add(g, new T.Mesh(G.ball(U(2), 1, 1, 1, 6), mat(P.flowers[2] || '#ff9ab8')), U(x), HY(y), U(z));
     },
@@ -151,7 +159,7 @@
   function blueRoofTower(g, x, z, y0, y1, r, wall, roof, roofH) {
     const t = node('tw'); t.position.set(x, 0, z); g.add(t);
     TK.tower(t, y0, y1, r, r * 0.93, wall);
-    add(t, part(G.cone(r * 1.25, roofH, 18), roof, { tex: 'tile' }), 0, y1 + roofH / 2, 0);
+    add(t,part(G.lathe([[0,0],[r*1.25,0],[r*1.12,roofH*.09],[r*.72,roofH*.43],[r*.35,roofH*.74],[r*.06,roofH*.97],[0,roofH]],28),roof,{tex:'tile',ink:.004}),0,y1,0);
     add(t, part(G.sbox(0.04, 0.06, 0.04), GOLD, { metal: 1, ink: 0.008 }), 0, y1 + roofH + 0.02, 0);
     TK.win(t, r * 0.95, (y0 + y1) * 0.55, 0, 0.1, 0.2);
     return t;

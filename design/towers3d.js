@@ -333,7 +333,31 @@
     add(g, new T.Mesh(G.sbox(0.24, 0.035, 0.06), mat('#5a3418')), 0.66, 0.68, -0.15); add(g, new T.Mesh(G.sbox(0.035, 0.18, 0.06), mat('#5a3418')), 0.66, 0.68, -0.15);
     g.name = 'root'; return g;
   }
-  const MAKERS = { archer: ARCHER, mage: MAGE, barracks: BARRACKS, artillery: DWARFHALL };
+  function ORCDEN(t){
+    const g=node('root'),stone='#5b5650',wood='#674a35',iron='#443f41',red='#7d2630',h=HY(37+t*8),R=U(26+t*2);
+    footing(g,35,stone);
+    add(g,part(G.cyl(R,R*1.07,h,16),stone,{tex:'brick',ink:.005}),0,h/2,0);
+    for(let i=0;i<10;i++){const a=i/10*TAU;add(g,part(G.cap(U(2.6),h*.9),wood,{tex:'bark',ink:.003}),S(a)*R,h*.52,C(a)*R,0,a,0);}
+    const roof=G.lathe([[0,0],[R*1.18,0],[R*1.12,.10],[R*.63,HY(22+t*3)],[0,HY(28+t*3)]],16);
+    add(g,part(roof,'#513b31',{tex:'wood',ink:.006}),0,h,0);
+    door(g,R+.012,0,0,U(18),HY(30),'#312727');
+    for(const side of [-1,1]){
+      const pts=[[side*R*.68,h*.6,R*.85],[side*R*.82,h*1.06,R*.86],[side*R*.66,h*1.34,R*.89],[side*R*.49,h*1.47,R*.92]];
+      add(g,part(G.tube(pts,U(2.7),20),'#ddd2b3',{ink:.003}),0,0,0);
+      add(g,part(G.sbox(U(4),HY(32+t*3),U(4),.3),iron,{metal:true,ink:.003}),side*U(24),h*.62,U(19));
+    }
+    const flag=node('war-banner',g,0,h*1.24,R*1.02);
+    add(flag,part(G.ext([-U(10),0,U(10),0,U(8),-HY(23),0,-HY(28),-U(8),-HY(23)],.015,.004),red,{tex:'cloth',ds:true,ink:.003}),0,0,0);
+    add(flag,part(G.ext([-U(4),-HY(8),0,-HY(13),U(4),-HY(8),U(3),-HY(17),0,-HY(20),-U(3),-HY(17)],.005,0),'#d9cba6',{ink:false}),0,0,.017);
+    if(t>=3)for(const side of [-1,1]){
+      const sub=node('watchtower',g,side*U(31),0,-U(5));tower(sub,0,h*.85,U(10),U(9),stone);merlons(sub,h*.85,U(9),stone,6);
+      add(sub,part(G.cone(U(12),HY(19),12),red,{tex:'tile',ink:.005}),0,h*.85+HY(9.5),0);
+    }
+    for(const side of [-1,1]){add(g,part(G.cyl(U(1),U(1.4),HY(18),10),iron,{metal:true,ink:false}),side*U(31),HY(9),U(16));glow(g,side*U(31),HY(22),U(16),.28,'#ff9b37',.5);}
+    return g;
+  }
+
+  const MAKERS = { orc:ORCDEN, archer: ARCHER, mage: MAGE, barracks: BARRACKS, artillery: DWARFHALL };
   function build(type, tier) { const f = MAKERS[type]; if (!f) return null; const r = f(Math.max(1, Math.min(4, tier || 1))); r.name = 'root'; return r; }
 
   // đưa vào Xưởng 3D (nhóm "Công trình")
@@ -344,6 +368,7 @@
     ['barracks', 'Trại Lính', 'Nhà gỗ mái rơm → nhà gạch mái đỏ → lâu đài 2 tháp mái nhọn', pal(['#b8864e', 'Gỗ'], ['#c8c4cc', 'Tường'], ['#8a1e24', 'Mái đỏ'], ['#f5c542', 'Vàng'])],
     ['artillery', 'Sảnh Người Lùn', 'Cửa hầm mỏ → lò rèn đá → sảnh tròn có mặt đá râu dài, sừng vàng', pal(['#8a8290', 'Đá núi'], ['#6a5a52', 'Mái'], ['#ff9a3a', 'Lửa lò'], ['#f2ead6', 'Sừng'])]
   ];
+  DEFS.push(['orc','Trại Chiến Thú','Trại sói với gỗ, giáp sắt, ngà và cờ đỏ; thêm tháp canh khi nâng cấp.',pal(['#674a35','Gỗ'],['#5b5650','Đá'],['#7d2630','Cờ'])]);
   DEFS.forEach(([type, name, desc, palette]) => Chars3D.list.push({ id: 'tower_' + type, name, group: 'Công trình', role: 'Trụ · 4 cấp', tiers: 4, tierName: 'Cấp trụ', desc, palette,
     make: t => ({ rig: { root: build(type, t), n: {}, o: {} }, anim: { kind: 'static' } }) }));
 

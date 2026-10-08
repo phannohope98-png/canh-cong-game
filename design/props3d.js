@@ -21,8 +21,12 @@
     tree(g, P, v) {
       const c = P.tree[Math.min(2, (v * 3) | 0)];
       add(g, part(G.cyl(U(3.4), U(4.6), HY(20), 10), '#6a4426', { tex: 'bark' }), 0, HY(10), 0);
-      for (const [x, y, z, r] of [[-14, 26, 4, 15], [13, 27, -2, 14], [0, 40, 2, 17], [-8, 51, -4, 12], [9, 50, 5, 12], [0, 30, -9, 14]])
-        add(g, part(G.ball(U(r) * 1.08, 1, 0.92, 1, 14), c, { tex: 'leaf' }), U(x), HY(y), U(z));
+      for(const [x,y,z] of [[-15,30,4],[14,34,-3],[0,47,0]]) TK.beam(g,[0,HY(12),0],[U(x),HY(y),U(z)],U(2), '#70543d');
+      for (const [j,x,y,z,r] of [[0,-14,30,4,16],[1,13,33,-2,15],[2,0,45,2,19],[3,-8,54,-4,13],[4,10,51,5,14]]) {
+        const geo=G.ball(U(r),1.15,.85,1,24), a=geo.attributes.position;
+        for(let i=0;i<a.count;i++) {const xx=a.getX(i),yy=a.getY(i),zz=a.getZ(i), f=1+.15*S(xx*19+v*7+j)*C(yy*17+zz*13);a.setXYZ(i,xx*f,yy*f,zz*f);}
+        geo.computeVertexNormals();add(g,part(geo,sh(c,(j-2)*.035),{tex:'leaf',ink:.004}),U(x),HY(y),U(z));
+      }
       for (const [x, y, z, r] of [[-12, 33, 12, 6], [6, 47, 12, 6]]) add(g, new T.Mesh(G.ball(U(r), 1, 0.7, 1, 10), mat(sh(c, 0.16))), U(x), HY(y), U(z));
       if (v > 0.8 && P.flowers.length) for (const [x, y, z] of [[-12, 30, 14], [6, 44, 14], [12, 28, 13]]) add(g, new T.Mesh(G.ball(U(2), 1, 1, 1, 6), mat(P.flowers[2] || '#ff9ab8')), U(x), HY(y), U(z));
     },
@@ -30,7 +34,7 @@
       const c = P.tree[Math.min(2, (v * 3) | 0)];
       add(g, part(G.cyl(U(2.5), U(3.2), HY(12), 8), '#5a3a22', { tex: 'bark' }), 0, HY(6), 0);
       for (const [y, w, h] of [[8, 20, 22], [24, 16, 20], [38, 11, 18]]) {
-        add(g, part(G.cone(U(w), HY(h), 9), c, { tex: 'leaf' }), 0, HY(y + h / 2), 0);
+        add(g, part(G.lathe([[0,0],[U(w)*.75,0],[U(w),HY(h)*.12],[U(w)*.66,HY(h)*.45],[U(w)*.26,HY(h)*.80],[0,HY(h)]],20),c,{tex:'leaf',ink:.004}),0,HY(y),0);
         if (snow) add(g, part(G.cone(U(w) * 0.6, HY(h) * 0.5, 9), '#ffffff', { ink: 0.012 }), 0, HY(y + h * 0.75) + 0.01, 0);
       }
     },
@@ -223,6 +227,12 @@
     },
     cabin(g) { TK.house(g, 0, 0, U(46), HY(26), U(32), '#a8784a', '#c04a3a', HY(20)); TK.door(g, U(16), 0, 0, 0.26, 0.38, '#7a5232').position.x = -U(6); TK.win(g, U(16), HY(13), 0, 0.12, 0.17).position.x = U(12); },
     house(g, p) {
+      // Timber frame, stone doorstep and chimney give cottages readable scale.
+      for(const x of [-21,0,21]) add(g,part(G.sbox(U(2),HY(28),U(2),.2),'#66513e',{tex:'wood.f',ink:.003}),U(x),HY(14),U(16.2));
+      for(const y of [3,26]) add(g,part(G.sbox(U(44),HY(2),U(2),.2),'#66513e',{ink:.003}),0,HY(y),U(16.3));
+      for(let i=0;i<3;i++) add(g,part(G.sbox(U(16+i*3),HY(2),U(5),.3),'#aaa393',{tex:'stone.f',ink:.003}),0,HY(1-i*.3),U(18+i*4));
+      add(g,part(G.sbox(U(7),HY(22),U(7),.15),'#998d7e',{tex:'brick.f',ink:.004}),U(13),HY(37),-U(6));
+      add(g,part(G.sbox(U(9),HY(2),U(9),.2),'#b5a898',{ink:.003}),U(13),HY(49),-U(6));
       TK.house(g, 0, 0, U(44), HY(28), U(32), p.snow ? '#e0e6ee' : '#d4ccbc', p.snow ? '#6a7aa0' : '#b8483a', HY(20));
       if (p.snow) add(g, part(G.sbox(U(48), 0.05, U(36), 0.5), '#ffffff', { ink: 0.01 }), 0, HY(28) * 1.2 + HY(20) * 0.7 * 0.5, 0, 0.5);
       TK.door(g, U(16), 0, 0, 0.26, 0.4, '#7a5232'); for (const s of [-1, 1]) TK.win(g, U(16), HY(15), 0, 0.12, 0.17).position.x = s * U(13);

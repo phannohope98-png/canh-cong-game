@@ -291,7 +291,7 @@ float surf(){
   function skull(R) {
     if (/Golem|magmaLord/.test(BUILD_ID || '')) return G.sbox(R * 1.9, R * 1.8, R * 1.85, 0.3);
     if (/^treant/.test(BUILD_ID || '')) return G.lathe([[0, -R], [R * .58, -R], [R * .9, -R * .45], [R, R * .5], [R * .7, R], [0, R]], 9, .9);
-    const g = G.ball(R, 1.04, 0.96, 1), p = g.attributes.position;
+    const g = G.ball(R, 1.04, 0.96, 1, 32), p = g.attributes.position;
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i), y = p.getY(i), z = p.getZ(i), lower = Math.max(0, -y / R);
       p.setXYZ(i, x * (1 - lower * 0.26), y, z > 0 ? z + R * 0.08 * lower : z);
@@ -327,12 +327,22 @@ float surf(){
     for (const [s, k] of [[-1, 'R'], [1, 'L']]) {
       const arm = n['arm' + k] = node('arm' + k, n.torso, s * sx, sy, 0);
       arm.rotation.z = s * 0.14;
-      add(arm, part(limb(o.armR, len), o.sleeve, { tex: 'cloth' }), 0, -len / 2 + o.armR * 0.3, 0);
-      add(arm, part(G.sbox(o.armR * 1.7, o.armR * 2.1, o.armR * 1.6, 0.5), o.glove || o.skin), 0, -len, 0);
-      n['hand' + k] = node('hand' + k, arm, 0, -len, 0);
+      add(arm,part(limb(o.armR,len*.5),o.sleeve,{tex:'cloth'}),0,-len*.25,0);
+      const elbow=n['elbow'+k]=node('elbow'+k,arm,0,-len*.5,0);
+      add(elbow,part(G.ball(o.armR*.8,1,.9,1,16),o.sleeve),0,0,0);
+      add(elbow,part(limb(o.armR*.8,len*.5),o.sleeve,{tex:'cloth'}),0,-len*.25,0);
+      const hand=n['hand'+k]=node('hand'+k,elbow,0,-len*.5,0);
+      const skin=o.glove||o.skin;
+      add(hand,part(G.ball(o.armR*.85,.85,1,.65,16),skin),0,-o.armR*.15,0);
+      for(let digit=0;digit<4;digit++) add(hand,part(G.cap(o.armR*.14,o.armR*.6),skin,{ink:false}),(digit-1.5)*o.armR*.28,-o.armR*.85,o.armR*.13,-.4);
+      add(hand,part(G.cap(o.armR*.20,o.armR*.65),skin,{ink:false}),s*o.armR*.7,-o.armR*.2,o.armR*.2,0,0,s*.6);
       const leg = n['leg' + k] = node('leg' + k, n.hips, s * o.torsoW * (o.real ? 0.27 : 0.22), 0.02, 0);
-      add(leg, part(limb(o.legR, o.legL), o.legs, { tex: 'cloth' }), 0, -o.legL / 2, 0);
-      add(leg, part(G.sbox(o.legR * 2.3, o.bootH, o.legR * 3.3, 0.4), o.boots), 0, -o.legL - o.bootH / 2 + 0.01, o.legR * 0.55);
+      add(leg,part(limb(o.legR,o.legL*.52),o.legs,{tex:'cloth'}),0,-o.legL*.26,0);
+      const knee=n['knee'+k]=node('knee'+k,leg,0,-o.legL*.52,0);
+      add(knee,part(G.ball(o.legR*.78,1,.85,1,16),o.legs),0,0,0);
+      add(knee,part(limb(o.legR*.8,o.legL*.48),o.legs,{tex:'cloth'}),0,-o.legL*.24,0);
+      add(knee,part(G.ball(o.legR,1.1,o.bootH/o.legR*.52,1.7,18),o.boots),0,-o.legL*.48-o.bootH*.4+.01,o.legR*.55);
+
     }
     return { root, n, o };
   }
@@ -1143,7 +1153,7 @@ float surf(){
   /** nướng hàm tư thế fn(t∈[0,1]) → { tênKhớp: { rx, ry, rz, x, y, z, s } } thành AnimationClip (cộng vào tư thế nghỉ) */
   function bake(rig, name, dur, fn, loop) {
     const N = Math.max(2, Math.round(dur * 30) + 1), frames = [], keys = new Set();
-    for (let f = 0; f < N; f++) { const p = fn(f / (N - 1)); if (rig.extra) Object.assign(p, rig.extra(f / (N - 1), dur, name)); frames.push(p); Object.keys(p).forEach(k => keys.add(k)); }
+    for (let f = 0; f < N; f++) { const p = fn(f / (N - 1)); if(rig.n.kneeR){const c=S(f/(N-1)*TAU);Object.assign(p,{kneeR:{rx:name==='walk'?Math.max(0,-c)*.85:.03},kneeL:{rx:name==='walk'?Math.max(0,c)*.85:.03},elbowR:{rx:-.12},elbowL:{rx:-.12}});} if (rig.extra) Object.assign(p, rig.extra(f / (N - 1), dur, name)); frames.push(p); Object.keys(p).forEach(k => keys.add(k)); }
     const times = frames.map((_, f) => f / (N - 1) * dur), tracks = [], e = new T.Euler(), q = new T.Quaternion();
     keys.forEach(k => {
       const nd = rig.n[k]; if (!nd) return;
@@ -1153,7 +1163,7 @@ float surf(){
         const v = fr[k] || {};
         e.set(r0.x + (v.rx || 0), r0.y + (v.ry || 0), r0.z + (v.rz || 0), r0.order); q.setFromEuler(e); qa.push(q.x, q.y, q.z, q.w);
         if (v.x || v.y || v.z) hasP = true; pa.push(p0.x + (v.x || 0), p0.y + (v.y || 0), p0.z + (v.z || 0));
-        const s = v.s === undefined ? 1 : v.s; if (s !== 1) hasS = true; sa.push(s0.x * s, s0.y * s, s0.z * s);
+        const s = v.s === undefined ? 1 : v.s; if (s !== 1) hasS = true; if(v.sy!==undefined&&v.sy!==1)hasS=true;sa.push(s0.x*s,s0.y*s*(v.sy===undefined?1:v.sy),s0.z*s);
       });
       tracks.push(new T.QuaternionKeyframeTrack(nd.name + '.quaternion', times, qa));
       if (hasP) tracks.push(new T.VectorKeyframeTrack(nd.name + '.position', times, pa));
@@ -1456,10 +1466,16 @@ float surf(){
     shell.scale(1, 1.02, .96);
     add(head, part(shell, color, { tex: 'hair', ink: .008 }), 0, R * .09, -R * .025);
     const lock = (x, y, z, w, h, angle) => {
-      const g = G.ext([-w * .5, h * .20, -w * .15, h * .34, w * .22, h * .30, w * .45, h * .16, w * .28, -h * .18, -w * .10, -h * .5, -w * .36, -h * .05], .025, .008);
-      const p = g.attributes.position;
-      for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) + .022 * Math.sin((p.getY(i) / h + .5) * Math.PI));
-      g.computeVertexNormals();
+      // Rounded, tapered curved hair locks instead of flat extruded strips.
+      const points=[],indices=[],rings=12,sides=8;
+      for(let j=0;j<=rings;j++) {
+        const t=j/rings, y=h*(.30-.80*t), bow=.022*Math.sin(t*Math.PI);
+        const width=w*.48*Math.pow(Math.sin((.10+.90*t)*Math.PI),.65)+.001;
+        for(let k=0;k<sides;k++) {const a=k/sides*TAU;points.push(Math.cos(a)*width,y,bow+Math.sin(a)*Math.min(.024,width*.42));}
+      }
+      for(let j=0;j<rings;j++)for(let k=0;k<sides;k++){const a=j*sides+k,b=j*sides+(k+1)%sides,c=a+sides,d=b+sides;indices.push(a,b,c,b,d,c);}
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(points,3));g.setIndex(indices);g.computeVertexNormals();
+
       add(head, part(g, color, { tex: 'hair.f', ink: .003 }), x, y, z, -.15, angle || 0, -x * 1.2);
     };
     for (const [x, y, w, h] of [[-.115,.13,.09,.19],[-.055,.14,.09,.17],[.012,.16,.08,.14],[.075,.15,.085,.18],[.13,.10,.07,.22]])
@@ -1474,9 +1490,9 @@ float surf(){
     }
   }
   function animeFace(head, R, female, iris) {
-    const skin = '#f3c6ac', eyeW = R * .48, eyeH = R * (female ? .23 : .18);
+    const skin = '#f3c6ac', eyeW = R * .48, eyeH = R * (female ? .23 : .18), eyes={};
     for (const side of [-1, 1]) {
-      const e = node('eye', head, side * R * .39, R * .02, R * .91); e.rotation.y = side * .22;
+      const key=side<0?'eyeR':'eyeL', e=eyes[key]=node(key,head,side*R*.39,R*.02,R*.91);e.rotation.y=side*.22;
       add(e, new T.Mesh(G.ext([-eyeW/2,0,-eyeW*.24,eyeH/2,eyeW*.23,eyeH*.43,eyeW/2,0,eyeW*.19,-eyeH*.4,-eyeW*.23,-eyeH*.38], .006, 0), mat('#fff5eb')), 0,0,0);
       add(e, new T.Mesh(G.ball(eyeH*.40, .8, 1, .22), mat(iris)), 0,0,.008);
       add(e, new T.Mesh(G.ball(eyeH*.22, .55, 1, .2), mat('#18212f')), 0,0,.011);
@@ -1486,7 +1502,7 @@ float surf(){
       add(head, part(G.ball(R*.12,.55,1,.45), skin,{ink:false}), side*R*.96,-R*.05,0);
     }
     add(head,new T.Mesh(G.ext([-.009,0,0,.036,.009,0],.025,.003),mat('#e5ad90')),0,-.026,R*.99);
-    add(head,new T.Mesh(G.cap(.002,.044).rotateZ(Math.PI/2),mat('#ac6b68')),0,-R*.45,R*.91);
+    add(head,new T.Mesh(G.cap(.002,.044).rotateZ(Math.PI/2),mat('#ac6b68')),0,-R*.45,R*.91); return eyes;
   }
   function ANIME(id, tier) {
     const archer = id === 'elf' || id === 'lyra', caster = id === 'mage' || id === 'selene';
@@ -1504,7 +1520,7 @@ float surf(){
     // stable so existing battle animations and weapon attachments still work.
     for (const child of [...n.head.children]) n.head.remove(child);
     add(n.head,part(skull(R).scale(.94,1.06,.93),o.skin,{sculpted:true,ink:.006}),0,0,0);
-    animeFace(n.head,R,female,archer ? '#416c58' : caster ? '#6363a0':'#495974');
+    Object.assign(n,animeFace(n.head,R,female,archer ? '#416c58' : caster ? '#6363a0':'#495974'));
     animeHair(n.head,R,hair,female,dwarf);
     const w=o.torsoW/2, h=o.torsoH;
     add(n.torso,part(G.lathe([[0,h],[w*.73,h],[w,h*.84],[w*.91,h*.56],[w*.68,h*.29],[w*.76,.05],[w*.85,-.07],[0,-.07]],20,o.torsoD/o.torsoW),cloth,{tex:'cloth',ink:.009}),0,0,0);
@@ -1532,14 +1548,31 @@ float surf(){
       const elbow=n['elbow'+k]=node('elbow'+k,arm,0,-o.armL*.5,0); elbow.rotation.x=-.15;
       add(elbow,part(limb(o.armR*.82,o.armL*.5),caster||archer?o.skin:steel,{metal:!female,ink:.006}),0,-o.armL*.25,0);
       n['hand'+k]=node('hand'+k,elbow,0,-o.armL*.5,0);
-      add(n['hand'+k],part(G.sbox(.068,.083,.05,.65),o.glove,{ink:.004}),0,-.016,0);
+      const hand=n['hand'+k];
+      add(hand,part(G.ball(.038,.87,1,.62,16),o.glove,{ink:.002}),0,-.023,0);
+      // Four curled digits and an opposed thumb retain the weapon grip pivot.
+      for(let f=0;f<4;f++) {
+        const finger=node('finger'+k+f,hand,(f-1.5)*.015,-.045,.004);
+        const length=.029+(f===1||f===2?.009:0);
+        add(finger,part(G.cap(.0065,length),o.glove,{ink:false}),0,-length*.42,.004,-.22);
+        add(finger,part(G.cap(.0058,.019),o.glove,{ink:false}),0,-length-.004,.011,-.8);
+      }
+      add(hand,part(G.cap(.009,.035),o.glove,{ink:false}),side*.033,-.023,.012,-.5,0,side*.55);
+      add(elbow,part(G.ball(o.armR*.83,1,.8,.92,16),caster||archer?o.skin:steel,{ink:.003}),0,0,0);
+      add(elbow,part(G.cyl(o.armR*.64,o.armR*.72,.035,16),trim,{metal:true,ink:.002}),0,-o.armL*.45,0);
       if(!caster) {
         const shoulder=new T.SphereGeometry(o.armR*1.9,Q(16),Q(10),0,TAU,0,Math.PI*.52).scale(1,.58,.88);
         add(arm,part(shoulder,archer?'#647753':steel,{metal:!archer,ink:.007}),side*.012,.005,0);
         add(arm,part(G.cyl(o.armR*1.05,o.armR*1.05,.024,12),trim,{metal:true,ink:.003}),0,-o.armL*.36,0);
       }
-      add(leg,part(G.sbox(o.legR*1.2,.09,.035,.6),caster?cloth:steel,{ink:.004}),0,-o.legL*.49,o.legR*.77);
-      add(leg,part(G.cyl(o.legR*.82,o.legR*1.02,o.legL*.27,12).scale(1,1,.88), '#45414a',{ink:.006}),0,-o.legL*.83,0);
+      for(const child of [...leg.children]) leg.remove(child);
+      const thigh=o.legL*.52, calf=o.legL-thigh;
+      add(leg,part(limb(o.legR,thigh),o.legs,{tex:'cloth',ink:.004}),0,-thigh*.5,0);
+      const knee=n['knee'+k]=node('knee'+k,leg,0,-thigh,0);
+      add(knee,part(G.ball(o.legR*.74,1,.85,.9,16),caster?cloth:steel,{ink:.003}),0,0,0);
+      add(knee,part(limb(o.legR*.77,calf),o.boots,{ink:.004}),0,-calf*.5,0);
+      add(knee,part(G.ball(o.legR,.9,.52,1.85,18),o.boots,{ink:.003}),0,-calf+.018,o.legR*.53);
+      add(knee,part(G.cyl(o.legR*.80,o.legR*.80,.018,16),trim,{metal:true,ink:false}),0,-calf*.12,0);
     }
     if(caster) {
       // Narrow crown and flowing pointed hat; no enormous toy brim.
@@ -1562,9 +1595,11 @@ float surf(){
     }
     if(hero||tier>=3) add(n.torso,part(G.oct(.025,1.25).scale(1,1,.4),archer?'#8cb89c':caster?'#aba3d7':'#aa665f',{ink:.003}),0,h*.79,o.torsoD*.57);
     rig.extra = (t, dur, name) => {
-      const cycle = S(t * TAU), strike = name === 'attack' || name === 'skill';
-      return { elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
-        elbowL: { rx: archer ? -.08 : dwarf && strike ? -.5 * Math.sin(t * Math.PI) : -.18 + cycle * .025 } };
+      const cycle = S(t * TAU), strike = name === 'attack' || name === 'skill', blink=name==='idle'?1-.94*Math.exp(-Math.pow((t-.78)/.025,2)):1;
+      return {eyeR:{sy:blink},eyeL:{sy:blink}, elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
+        elbowL: { rx: archer ? -.08 : dwarf && strike ? -.5 * Math.sin(t * Math.PI) : -.18 + cycle * .025 },
+        kneeR: {rx: name==='walk'?Math.max(0,-cycle)*.95: strike?.18*Math.sin(t*Math.PI):.035},
+        kneeL: {rx: name==='walk'?Math.max(0,cycle)*.95: strike?.12*Math.sin(t*Math.PI):.035} };
     };
     return {rig,anim:{kind:caster?'staff':archer?'bow':dwarf?'two':'melee',shield:!!n.shield,skill:caster?'meteor':archer?'triple':dwarf?'slam':n.shield?'block':'holy'}};
   }
@@ -1574,7 +1609,7 @@ float surf(){
     if (id === 'bandit') {
       for (const child of [...n.head.children]) n.head.remove(child);
       add(n.head, part(skull(o.R), '#d6a783', { sculpted:true, ink:.006 }),0,0,0);
-      animeFace(n.head,o.R,false,'#5a413a'); animeHair(n.head,o.R,'#302329',false,false);
+      Object.assign(n,animeFace(n.head,o.R,false,'#5a413a')); animeHair(n.head,o.R,'#302329',false,false);
       add(n.head,part(G.torus(o.R*.98,.018).rotateX(Math.PI/2),'#c6bba4',{ink:.004}),0,.07,0,-.08);
       made.anim.skill=null; return made;
     }

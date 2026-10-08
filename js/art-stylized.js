@@ -8,7 +8,7 @@
   function fill(g,path,c,lo=-.28,hi=.26,outline=true){
     let xs=[],ys=[];const record=(name,args)=>{if(name==='ellipse'){xs.push(args[0]-args[2],args[0]+args[2]);ys.push(args[1]-args[3],args[1]+args[3]);}else for(let i=0;i<args.length;i+=2){xs.push(args[i]);ys.push(args[i+1]);}g[name](...args);};
     const pen={moveTo:(...a)=>record('moveTo',a),lineTo:(...a)=>record('lineTo',a),quadraticCurveTo:(...a)=>record('quadraticCurveTo',a),bezierCurveTo:(...a)=>record('bezierCurveTo',a),ellipse:(...a)=>record('ellipse',a)};
-    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=g.createLinearGradient(minX,minY,maxX,maxY);gr.addColorStop(0,tint(c,hi));gr.addColorStop(.42,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(outline&&ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.65;g.stroke();}
+    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=(()=>{g.save();g.translate(minX,minY);g.scale(Math.max(.1,maxX-minX),Math.max(.1,maxY-minY));const light=g.createRadialGradient(.30,.23,.03,.43,.43,.78);g.restore();return light;})();gr.addColorStop(0,tint(c,hi));gr.addColorStop(.40,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(outline&&ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.65;g.stroke();}
   }
   const polygon=pts=>g=>{g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);};
   function oval(g,x,y,rx,ry,c,outline=true){fill(g,p=>p.ellipse(x,y,rx,ry,0,0,TAU),c,-.28,.26,outline);}
@@ -90,6 +90,15 @@
     const linen='#d9c99d',shade='#ab976a',blue='#326c8d',brass='#d1a34e';
     const paint=(path,col)=>fill(g,path,col,-.18,.16,false);
     function seam(pts,w,col){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+    // Local occlusion is clipped to the receiving surface, not a separate plate.
+    function wash(path,x,y,rx,ry,strength){
+      g.save();g.beginPath();path(g);g.closePath();g.clip();
+      g.translate(x,y);g.scale(rx,ry);const grad=g.createRadialGradient(0,0,0,0,0,1);
+      grad.addColorStop(0,'rgba(57,43,34,'+strength+')');grad.addColorStop(1,'rgba(57,43,34,0)');
+      g.fillStyle=grad;g.fillRect(-1,-1,2,2);g.restore();
+    }
+    const torso=p=>{p.moveTo(-10,-38);p.quadraticCurveTo(-2,-41,9,-37);p.quadraticCurveTo(14,-32,11,-24);p.lineTo(10,-17);p.quadraticCurveTo(0,-14,-10,-18);p.quadraticCurveTo(-14,-29,-10,-38);};
+    const facePath=p=>{p.moveTo(-8,-7);p.quadraticCurveTo(0,-12,9,-6);p.quadraticCurveTo(12,1,8,7);p.quadraticCurveTo(3,12,-3,8);p.quadraticCurveTo(-10,5,-8,-7);};
     g.save();g.lineJoin='round';g.lineCap='round';
     g.translate(swing*1.6,P.w>=0?-Math.abs(w)*.6:Math.sin(t*2.2)*.24);
     if(P.d!==undefined){g.translate(0,P.d*3);g.rotate(P.d*1.25);g.globalAlpha*=1-P.d*.65;}
@@ -111,34 +120,46 @@
     limb([-10,-34,-18,-29,-15,-20],3.5,3.1,shade);
     seam([-18,-29,-13,-28],.65,'#e4d6b0');seam([-17,-20,-13,-20],.55,'#8f7951');
     // A single torso silhouette avoids a stack of disconnected plates.
-    fill(g,p=>{p.moveTo(-10,-38);p.quadraticCurveTo(-2,-41,9,-37);p.quadraticCurveTo(14,-32,11,-24);p.lineTo(10,-17);p.quadraticCurveTo(0,-14,-10,-18);p.quadraticCurveTo(-14,-29,-10,-38);},linen);
-    paint(p=>{p.moveTo(-10,-35);p.quadraticCurveTo(-6,-31,-7,-23);p.lineTo(-4,-17);p.lineTo(-10,-18);p.quadraticCurveTo(-14,-29,-10,-35);},shade);
+    fill(g,torso,linen,-.27,.30);
+    wash(torso,1,-37,12,6,.24);wash(torso,10,-31,7,8,.18);
+    wash(torso,11,-23,7,11,.18);
     for(let i=0;i<4;i++){
       const y=-34+i*4;
       g.beginPath();g.moveTo(-9,y);g.quadraticCurveTo(0,y+2.3,10,y-1.1);g.strokeStyle='#a79368';g.lineWidth=.7;g.stroke();
-      g.beginPath();g.moveTo(-8,y-.8);g.quadraticCurveTo(0,y+1.2,9,y-1.8);g.strokeStyle='#ede2bd';g.lineWidth=.75;g.stroke();
+      g.beginPath();g.moveTo(-8,y-.8);g.quadraticCurveTo(0,y+1.2,9,y-1.8);g.strokeStyle='#f0e3bc';g.lineWidth=.65;g.stroke();
+      // A short lit crest and tapered fold, rather than a uniform stripe.
+      g.beginPath();g.moveTo(-5,y-.6);g.quadraticCurveTo(-1,y+.25,3,y-.6);g.strokeStyle='rgba(255,248,216,.65)';g.lineWidth=.4;g.stroke();
     }
     // Short pleated kilt, rounded hips and a readable blue/gold central panel.
     fill(g,p=>{p.moveTo(-10,-19);p.quadraticCurveTo(0,-17,11,-20);p.lineTo(15,-8);p.quadraticCurveTo(11,-5,7,-7);p.lineTo(0,-5);p.quadraticCurveTo(-9,-5,-13,-9);},blue);
     fill(g,p=>{p.moveTo(-3,-18);p.lineTo(5,-19);p.quadraticCurveTo(5,-11,7,-7);p.quadraticCurveTo(2,-5,-3,-7);p.lineTo(-3,-18);},brass);
-    stroke(g,[-10,-19,-1,-18,11,-20],2.3,brass);oval(g,2,-19,2,1.7,'#387caa');
+    paint(p=>{p.moveTo(6,-17);p.quadraticCurveTo(8,-14,10,-8);p.lineTo(12,-8);p.quadraticCurveTo(10,-15,9,-18);},'#23506c');
+    seam([-10,-10,-11,-14],.65,'#5e96b1');
+    stroke(g,[-10,-19,-1,-18,11,-20],2.3,brass);
+    seam([-9,-19.5,-1,-18.7,10,-20.5],.55,'#f1d48c');oval(g,2,-19,2,1.7,'#387caa');
     seam([-8,-15,-8,-9],.7,'#204e68');seam([10,-15,12,-9],.7,'#204e68');
     // Head, jaw and nemes are curved volumes, with asymmetric eyes for 3/4 view.
     g.save();g.translate(1,-43);g.rotate(-swing*.045);
     fill(g,p=>{p.moveTo(-12,-9);p.quadraticCurveTo(-9,-18,1,-18);p.quadraticCurveTo(12,-18,15,-8);p.lineTo(17,10);p.quadraticCurveTo(14,15,9,12);p.lineTo(6,5);p.lineTo(-6,6);p.lineTo(-9,14);p.quadraticCurveTo(-14,15,-16,10);p.lineTo(-12,-9);},blue);
+    paint(p=>{p.moveTo(-10,-10);p.quadraticCurveTo(-7,-16,0,-16);p.quadraticCurveTo(7,-16,10,-12);p.quadraticCurveTo(0,-14,-10,-10);},'#6394ad');
     fill(g,p=>{p.moveTo(-12,-8);p.quadraticCurveTo(-15,1,-14,9);p.lineTo(-10,10);p.lineTo(-8,-4);},brass);
     fill(g,p=>{p.moveTo(11,-8);p.quadraticCurveTo(15,0,15,9);p.lineTo(11,11);p.lineTo(8,-4);},brass);
+    seam([-13,-5,-14,5],.75,'#f1d08c');seam([12,0,14,8],.65,'#8e7239');
     for(let i=0;i<3;i++){seam([-14,-2+i*4,-10,-3+i*4],.95,blue);seam([11,-2+i*4,15,-1+i*4],.95,blue);}
-    fill(g,p=>{p.moveTo(-8,-7);p.quadraticCurveTo(0,-12,9,-6);p.quadraticCurveTo(12,1,8,7);p.quadraticCurveTo(3,12,-3,8);p.quadraticCurveTo(-10,5,-8,-7);},linen);
-    paint(p=>{p.moveTo(-8,-4);p.quadraticCurveTo(-6,-6,-3,-6);p.quadraticCurveTo(-5,3,-1,8);p.quadraticCurveTo(-10,5,-8,-4);},shade);
+    fill(g,facePath,linen,-.22,.35);
+    wash(facePath,1,-7,14,4,.22);wash(facePath,9,5,8,9,.18);
+    wash(facePath,8,6,8,8,.14);
     g.beginPath();g.moveTo(-7,-3);g.quadraticCurveTo(0,-1,9,-4);g.strokeStyle='#9f8b60';g.lineWidth=.7;g.stroke();
     // Deep sockets rather than rectangular robot eyes; a restrained blue glint.
     fill(g,p=>{p.moveTo(-5,-1);p.quadraticCurveTo(-2,-2.2,0,0);p.quadraticCurveTo(-2,2.8,-5,1);},'#4d4938');
     fill(g,p=>{p.moveTo(3,-.6);p.quadraticCurveTo(6,-3,9,-1.7);p.quadraticCurveTo(8,1.9,4,1.8);},'#4d4938');
     oval(g,-1.7,.2,.7,.65,'#77cce1');oval(g,6.9,-.1,.85,.75,'#90dfeb');
+    paint(p=>{p.moveTo(1,-2);p.quadraticCurveTo(2,-3,3,-2);p.lineTo(4,3);p.quadraticCurveTo(2,4,1.5,2);},'#f0dfb2');
+    seam([5,3,8,2.6],.45,'#ead7a4');
     g.beginPath();g.moveTo(2,1);g.quadraticCurveTo(1.6,4,4,4.1);g.strokeStyle='#a78e60';g.lineWidth=.75;g.stroke();
     g.beginPath();g.moveTo(-3,5);g.quadraticCurveTo(2,6.5,7,4.8);g.strokeStyle='#a28d63';g.lineWidth=.7;g.stroke();
     fill(g,p=>{p.moveTo(-11,-9);p.quadraticCurveTo(1,-15,12,-9);p.lineTo(11,-6);p.quadraticCurveTo(1,-10,-10,-6);},brass);
+    seam([-8,-8,-1,-10,8,-8],.6,'#f6dda0');
     fill(g,p=>{p.moveTo(-1,-11);p.quadraticCurveTo(-3,-19,1,-20);p.quadraticCurveTo(6,-20,4,-16);p.lineTo(2,-15);p.lineTo(2,-11);},brass);oval(g,2,-18,.65,.5,'#345b65');
     g.restore();
     // Arm and weapon share a local pivot, so the hand never loses its grip.
@@ -147,11 +168,14 @@
     stroke(g,[0,3,0,-6],2,'#81603a');
     fill(g,p=>{p.moveTo(-1.8,-6);p.quadraticCurveTo(-3,-17,5,-26);p.quadraticCurveTo(9,-30,13,-30);p.lineTo(12,-25);p.quadraticCurveTo(5,-24,2,-7);},'#ddb56c');
     paint(p=>{p.moveTo(0,-7);p.quadraticCurveTo(1,-20,11,-28);p.lineTo(12,-29);p.quadraticCurveTo(5,-24,2,-7);},'#f1d69a');
-    stroke(g,[-4,-6,4,-6],1.9,brass);
+    g.beginPath();g.moveTo(2,-8);g.quadraticCurveTo(5,-24,12,-27);g.strokeStyle='#fff0be';g.lineWidth=.6;g.stroke();
+    seam([-.6,-9,.2,-16],.6,'#a37b3d');
+    stroke(g,[-4,-6,4,-6],1.9,brass);seam([-3,-6.6,3,-6.6],.5,'#f6d895');
     g.restore();
     // One uninterrupted arm-to-knuckle contour, then only short finger marks.
     fill(g,p=>{p.moveTo(-2,-3);p.bezierCurveTo(2,-4,5,1,8,1.5);p.quadraticCurveTo(10,0,13,2);p.quadraticCurveTo(16,3,14,7);p.quadraticCurveTo(11,10,8,7.5);p.quadraticCurveTo(2,8,-2,3);p.quadraticCurveTo(-4,0,-2,-3);},linen);
     paint(p=>{p.moveTo(-1,-2);p.quadraticCurveTo(4,0,8,3);p.lineTo(7,4.5);p.quadraticCurveTo(2,3,-1,0);},'#ecddb7');
+    g.beginPath();g.moveTo(0,-1);g.quadraticCurveTo(4,1,7,3);g.strokeStyle='rgba(255,244,205,.65)';g.lineWidth=.55;g.stroke();
     seam([3,4,5,1],.6,'#ad986b');seam([6,6,7,3],.6,'#ad986b');
     seam([11,4,13,4.4],.55,'#a48b61');seam([10.8,6,13,6.2],.55,'#a48b61');
     g.restore();g.restore();

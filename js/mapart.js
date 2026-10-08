@@ -15,7 +15,7 @@
 
   /* ---------------- Bảng màu theo vùng ---------------- */
   const TH = {
-    forest: { g0: '#72966b', g1: '#547751', g2: '#a0b982', road: '#d8c4a3', roadD: '#ad9779', roadL: '#eddfc2', edge: '#796b52', water: '#438f9c', waterL: '#a4dbd5', bank: '#5a4a30',
+    forest: { g0: '#86a950', g1: '#597d3f', g2: '#b0c878', road: '#d8c4a3', roadD: '#ad9779', roadL: '#eddfc2', edge: '#796b52', water: '#247f96', waterL: '#94d7ce', bank: '#5a4a30',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
     castle: { g0: '#829975', g1: '#637c58', g2: '#aebe91', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
@@ -158,6 +158,21 @@
         paint(it, 0, T.water, 0); paint(it, -(it.r ? it.r.w * 0.3 : 12), K.alpha(T.waterL, 0.55), 5);
       }
     }
+    if(window.PaintedWorld?.enabled) for(const it of items){
+      const water=(it.r||it.l),kind=water.kind;
+      if(!it.r)continue;
+      const points=it.r.pts,w=it.r.w;
+      g.save();g.lineCap=g.lineJoin='round';
+      polyPath(g,points);g.strokeStyle=kind==='lava'?'rgba(255,215,79,.38)':kind==='ice'?'rgba(236,252,255,.4)':'rgba(144,228,222,.32)';g.lineWidth=Math.max(1,w*.37);g.stroke();
+      for(let i=5;i<points.length-5;i+=7){
+        const a=points[i-1],p=points[i],b=points[i+1],dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+        for(const side of[-1,1]){
+          const x=p.x+nx*w*.46*side,y=p.y+ny*w*.46*side;
+          g.strokeStyle=kind==='lava'?'rgba(255,166,49,.62)':'rgba(226,249,225,.5)';g.lineWidth=1.5;
+          g.beginPath();g.moveTo(x-dx/L*4,y-dy/L*4);g.quadraticCurveTo(x+nx*side*2,y+ny*side*2,x+dx/L*5,y+dy/L*5);g.stroke();
+        }
+      }g.restore();
+    }
     // chi tiết bề mặt
     for (const it of items) {
       const kind = (it.r || it.l).kind;
@@ -238,7 +253,9 @@
       }
     }
   }
-  function bridge(g, p, d0, d1, PW, theme) {
+  function bridge(g,p,d0,d1,PW,theme){
+    if(window.PaintedWorld?.enabled){paintedBridge(g,p,d0,d1,PW,theme);return;}
+
     const tmp = {}, half = PW / 2 + 9, stone = theme === 'castle' || theme === 'ice' || theme === 'chaos';
     const wood = theme === 'lava' ? '#4a3a36' : theme === 'desert' ? '#b88a52' : '#9a6a3a';
     const side = s => { const pts = []; for (let d = d0; d <= d1; d += 4) { p.pointAt(d, tmp); pts.push({ x: tmp.x + tmp.nx * half * s, y: tmp.y + tmp.ny * half * s }); } return pts; };
@@ -255,6 +272,36 @@
       for (const S of [L, R]) { g.lineCap = 'round'; g.lineJoin = 'round'; polyPath(g, S.map(q => ({ x: q.x, y: q.y - 8 }))); g.strokeStyle = INK; g.lineWidth = 5; g.stroke(); g.strokeStyle = sh(wood, -0.1); g.lineWidth = 2.6; g.stroke();
         for (let i = 0; i < S.length; i += 4) { line(g, S[i].x, S[i].y + 2, S[i].x, S[i].y - 9, INK, 5); line(g, S[i].x, S[i].y + 2, S[i].x, S[i].y - 9, wood, 2.8); } }
     }
+  }
+
+  function paintedBridge(g,p,d0,d1,PW,theme){
+    const stone=['castle','ice','chaos','lava'].includes(theme),half=PW/2+8,q={};
+    const color=theme==='chaos'?'#8374a9':theme==='ice'?'#b3c8d8':theme==='lava'?'#77716b':stone?'#bcb19a':'#a77745';
+    const shade=ArtKit.shade,edge=[];
+    for(let d=d0;d<=d1;d+=3){p.pointAt(d,q);edge.push({x:q.x-q.nx*half,y:q.y-q.ny*half});}
+    p.pointAt(d1,q);edge.push({x:q.x-q.nx*half,y:q.y-q.ny*half});
+    const far=[];for(let d=d0;d<=d1;d+=3){p.pointAt(d,q);far.push({x:q.x+q.nx*half,y:q.y+q.ny*half});}
+    p.pointAt(d1,q);far.push({x:q.x+q.nx*half,y:q.y+q.ny*half});
+    const polygon=(dy)=>{g.beginPath();edge.forEach((v,i)=>i?g.lineTo(v.x,v.y+dy):g.moveTo(v.x,v.y+dy));for(let i=far.length-1;i>=0;i--)g.lineTo(far[i].x,far[i].y+dy);g.closePath();};
+    g.save();g.lineJoin='round';polygon(9);g.fillStyle='rgba(20,29,29,.28)';g.fill();
+    polygon(5);g.fillStyle=shade(color,-.36);g.fill();polygon(0);g.fillStyle=color;g.fill();g.strokeStyle=shade(color,-.55);g.lineWidth=2;g.stroke();
+    polygon(0);g.save();g.clip();
+    for(let d=d0;d<d1;d+=stone?14:8){p.pointAt(d,q);
+      const grad=g.createLinearGradient(q.x-q.nx*half,q.y-q.ny*half,q.x+q.nx*half,q.y+q.ny*half);
+      grad.addColorStop(0,shade(color,.23));grad.addColorStop(.55,color);grad.addColorStop(1,shade(color,-.16));
+      g.strokeStyle=grad;g.lineWidth=stone?12:6.5;g.beginPath();g.moveTo(q.x-q.nx*half,q.y-q.ny*half);g.lineTo(q.x+q.nx*half,q.y+q.ny*half);g.stroke();
+      g.strokeStyle=shade(color,-.32);g.lineWidth=1;g.beginPath();g.moveTo(q.x-q.nx*half-q.tx*3,q.y-q.ny*half-q.ty*3);g.lineTo(q.x+q.nx*half-q.tx*3,q.y+q.ny*half-q.ty*3);g.stroke();
+      if(!stone){g.strokeStyle='rgba(251,217,147,.25)';g.lineWidth=.65;for(const o of[-14,9]){g.beginPath();g.moveTo(q.x+q.nx*o,q.y+q.ny*o);g.lineTo(q.x+q.nx*(o+12),q.y+q.ny*(o+12));g.stroke();}}
+    }g.restore();
+    for(const side of[-1,1]){
+      const rail=[];
+      for(let d=d0;d<=d1;d+=stone?20:24){p.pointAt(d,q);const x=q.x+q.nx*half*side,y=q.y+q.ny*half*side;rail.push({x,y:y-8});
+        g.fillStyle=shade(color,-.3);g.fillRect(x-3,y-10,6,13);g.fillStyle=shade(color,.24);g.fillRect(x-3,y-11,5,3);
+      }
+      p.pointAt(d1,q);rail.push({x:q.x+q.nx*half*side,y:q.y+q.ny*half*side-8});
+      polyPath(g,rail);g.strokeStyle=shade(color,-.47);g.lineWidth=stone?5:4;g.stroke();
+      polyPath(g,rail.map(v=>({x:v.x-1,y:v.y-1})));g.strokeStyle=shade(color,.2);g.lineWidth=stone?2:1.4;g.stroke();
+    }g.restore();
   }
 
   /* ---------------- Vật trang trí ---------------- */
@@ -458,7 +505,7 @@
     // 2) nước / dung nham
     drawWater(g, map.feat, T, rnd);
     // 3) chi tiết đất: cỏ, hoa, sỏi (tránh đường & nước) – có mặt đất 3D thì gom lại để dựng 3D thật
-    const det = map.det = window.Terrain3D && Terrain3D.will(map) ? { tuft: [], flower: [], peb: [], kerb: [], slab: [], tc: theme === "ice" ? "#ffffff" : theme === "desert" ? "#c8a050" : sh(T.g0, 0.08) } : null;
+    const det = map.det = !window.PaintedWorld?.enabled && window.Terrain3D && Terrain3D.will(map) ? { tuft: [], flower: [], peb: [], kerb: [], slab: [], tc: theme === "ice" ? "#ffffff" : theme === "desert" ? "#c8a050" : sh(T.g0, 0.08) } : null;
     const PW = CONFIG.pathWidth;
     const free = (x, y, m) => { for (const p of map.paths) if (p.nearest(x, y).perp < PW / 2 + m) return false; return !wetAt(map.feat, x, y, 4); };
     if (theme !== 'chaos' && theme !== 'lava') {
@@ -470,13 +517,14 @@
     for (let i = 0; i < 160; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (map.feat.void) { let d = Infinity; for (const p of map.paths) d = Math.min(d, p.nearest(x, y).perp); if (d > 130) continue; } if (det) { det.peb.push([x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2]); continue; } F(g, ell(x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2), theme === 'lava' ? '#2a2022' : theme === 'chaos' ? '#3a2a6a' : '#9a968e', { s: 0.6, h: 0.3, lw: 1 }); }
     // 4) đường đi + cầu
     drawRoad(g, map, T, res, rnd);
-    const t3 = window.Terrain3D && Terrain3D.render(map, res, c, T); // mặt đất 3D: bờ sông dốc, đường trũng, cầu 3D
+    const t3 = !window.PaintedWorld?.enabled && window.Terrain3D && Terrain3D.render(map, res, c, T); // mặt đất 3D: bờ sông dốc, đường trũng, cầu 3D
     if (t3) { c = t3; g = c.getContext('2d'); g.setTransform(res, 0, 0, res, 0, 0); g.lineJoin = 'round'; g.lineCap = 'round'; }
     else drawBridges(g, map, T);
     // 5) cây cối & công trình (theo chiều sâu)
     for (const d of map.decor) {
       if (t3 && d._in3d) continue; // đã dựng 3D cùng mặt đất (có bóng đổ thật)
-      if (window.Map3D && Map3D.draw(g, d, T, theme, res)) continue;
+      if (window.PaintedWorld?.enabled && PaintedWorld.prop(g,d,theme)) continue;
+      if (!window.PaintedWorld?.enabled && window.Map3D && Map3D.draw(g, d, T, theme, res)) continue;
       g.save(); g.translate(d.x, d.y);
       if (d.prop) { if (PROPS[d.k]) PROPS[d.k](g, d, T); }
       else { g.scale(d.s * d.flip, d.s); if (D[d.k]) D[d.k](g, T, d.v); }

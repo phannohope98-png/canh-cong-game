@@ -36,6 +36,12 @@
     inRange(e) { const r = this.stats.range + e.radius, dx = e.x - this.x, dy = (e.y - this.y) * 1.15; return dx * dx + dy * dy <= r * r; }
     muzzle() {
       const T = ArtTowers, f = this.anim.face;
+      if(window.PaintedWorld?.enabled){
+        const h=94+this.level*14;
+        if(this.type==='archer')return{x:this.x+(12+14*f)*TS,y:this.y+(7-h*.45-21)*TS};
+        if(this.type==='mage')return{x:this.x+(12+13*f)*TS,y:this.y+(7-h*.24-23)*TS};
+        return{x:this.x+35*TS,y:this.y+(7-h*.7)*TS};
+      }
       if (this.type === 'archer') return { x: this.x + ((this.anim.k % 2 ? 9 : -9) + 10 * f) * TS, y: this.y + (T.ARCH_TOP[this.level] - 14) * TS };
       if (this.type === 'mage') return { x: this.x + 6 * f * TS, y: this.y + (T.MAGE_TOP[this.level] - 30) * TS };
       return { x: this.x + 15 * TS, y: this.y + (T.ART_Y[this.level] - 24 - this.level) * TS };

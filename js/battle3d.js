@@ -67,6 +67,7 @@
       for(const [key,a]of this.towers)if(!towerKeys.has(key)){release(a.root);this.towers.delete(key);}
     },
     drawTitle(g,map,time){
+      if(window.PaintedWorld?.enabled)return false;
       if(!map.live3d||!Art3D.enabled)return false;
       const live=map.live3d;
       if(!window.ArtStylized&&!live.titleActors){
@@ -81,6 +82,7 @@
       return true;
     },
     draw(g,game,time){
+      if(window.PaintedWorld?.enabled)return this.active=false;
       if(!Art3D.enabled||!this.setup(game.map))return this.active=false;
       const live=game.map.live3d,r=Art3D.renderer();if(!r)return this.active=false;
       this.sync(game,time);Chars3D.fx.uTime.value=time;

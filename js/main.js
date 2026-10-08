@@ -23,7 +23,7 @@
   }
 
   window.addEventListener('error', e => console.error('Lỗi game:', e.message));
-  const go = () => Promise.all([window.ArtImg ? ArtImg.load() : Promise.resolve(), window.ArtStylized ? ArtStylized.ready : Promise.resolve()]).then(boot, err => { console.error(err); boot(); });
+  const go = () => Promise.all([window.ArtImg ? ArtImg.load() : Promise.resolve(), window.ArtStylized ? ArtStylized.ready : Promise.resolve(),window.PaintedWorld ? PaintedWorld.ready : Promise.resolve()]).then(boot, err => { console.error(err); boot(); });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
   else go();
 })();

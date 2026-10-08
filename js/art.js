@@ -4,7 +4,7 @@
  * ========================================================= */
 (function () {
   const K = ArtKit, TAU = Math.PI * 2;
-  const N = { walk: 16, atk: 12, idle: 10, die: 10 }, IDLE = 2.618;
+  const N = { walk: 24, atk: 20, idle: 32, die: 16 }, IDLE = 2.618;
   const BUCKETS = [0.35, 0.5, 0.7, 1, 1.4, 2, 2.4, 2.8, 3.4, 4];
   const bucket = v => { v = Math.min(v, (window.Painter && Painter.ppuCap) || 4); for (const b of BUCKETS) if (v <= b * 1.02) return b; return 4; }; // làm tròn LÊN: luôn thu nhỏ khi vẽ → nét
   const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; };

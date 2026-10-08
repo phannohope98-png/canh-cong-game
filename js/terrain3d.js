@@ -69,7 +69,7 @@
   }
   function details(scene, det, hAt, TH, theme) {
     const K = window.ArtKit, sh = (c, v) => K.shade(c, v), rr = i => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
-    const G = Chars3D.kit.G; Chars3D.setInk(1.0);
+    const G = Chars3D.kit.G; Chars3D.setInk(0.35);
     // cỏ
     const tc = det.tc, tcs = [tc, sh(tc, -0.1), sh(tc, 0.08), sh(tc, -0.2)];
     batch(scene, tuftGeo(), det.tuft, (t, i) => { const s = t[2] * (theme === 'ice' ? 0.8 : 1); return { x: WX(t[0]), y: hAt(t[0], t[1]) - 0.01, z: WZ(t[1]), ry: rr(i) * 6.28, sx: s * 1.1, sy: s, sz: s * 1.1, c: t[4] ? tcs[3] : tcs[(t[3] ? 1 : 0) + (rr(i + 7) < 0.3 ? 2 : 0) & 3] }; }, 0.0045);
@@ -94,7 +94,7 @@
       const vi = Math.min(2, (d.v * 3) | 0), key = prop ? [d.k, d.theme, d.snow ? 1 : 0, d.dark ? 1 : 0].join('|') : d.k + '|' + vi;
       let src = cache.get(key);
       if (src === undefined) {
-        Chars3D.setInk(1.0);
+        Chars3D.setInk(0.35);
         src = Props3D.build(d.k, prop ? (d.theme || theme) : theme, (vi + 0.5) / 3, prop ? d : null);
         if (src) {
           Art3D.optimize(src);
@@ -181,7 +181,14 @@
 
       /* --- mặt nước / dung nham --- */
       if (hasWater) {
-        const lava = theme === 'lava', wg = new T.PlaneGeometry(WX(W), WZ(H + 60)).rotateX(-Math.PI / 2).translate(WX(W) / 2, WATER_Y, WZ(H / 2));
+        const lava = theme === 'lava', waterPos=[];
+        const step=4;
+        for(let y=-30;y<H+30;y+=step) for(let x=0;x<W;x+=step) {
+          if(!MapArt.wetAt(F_,x+step/2,y+step/2,-3)) continue;
+          const a=WX(x),b=WX(Math.min(W,x+step)),c=WZ(y),d=WZ(y+step);
+          waterPos.push(a,WATER_Y,c,a,WATER_Y,d,b,WATER_Y,c,b,WATER_Y,c,a,WATER_Y,d,b,WATER_Y,d);
+        }
+        const wg=new T.BufferGeometry();wg.setAttribute('position',new T.Float32BufferAttribute(waterPos,3));wg.computeVertexNormals();
         scene.add(new T.Mesh(wg, new T.MeshBasicMaterial({ color: lava ? '#ff8a2a' : TH.water, transparent: true, opacity: lava ? 0.3 : 0.42, depthWrite: false })));
       }
       /* --- cầu 3D --- */

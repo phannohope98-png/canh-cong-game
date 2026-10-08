@@ -102,20 +102,30 @@
       if (r.width < 10) return;
       c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
       const g = c.getContext('2d'), map = this._menuMap || (this._menuMap = Level.build(0));
-      const z = Math.max(r.width / 1150, r.height / 640) * dpr, cx = 960, cy = 520;
+      const z = Math.max(r.width / map.W, r.height / map.H) * dpr;
       const bg = this._menuBg || (this._menuBg = Level.renderBackground(map, Math.min(2, z)));
-      g.setTransform(z, 0, 0, z, c.width / 2 - cx * z, c.height / 2 - cy * z);
-      g.drawImage(bg, 0, 0, map.W, map.H);
-      Painter.res = z;
-      const near = (x, y) => map.spots.slice().sort((a, b) => Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y))[0];
-      const items = [], used = new Set();
-      [['archer', 4, 700, 380], ['mage', 4, 1000, 640], ['barracks', 3, 840, 800], ['artillery', 4, 1250, 560]].forEach(([t, lv, x, y]) => { const s = near(x, y); if (s && !used.has(s.id)) { used.add(s.id); items.push({ y: s.y + 14, f: () => Painter.tower(g, t, lv, s.x, s.y, 1.0, 0.8, { a: -1, face: 1 }) }); } });
-      const p = map.paths[0], pt = d => p.pointAt(d, {});
-      const L = p.length, ch = (type, d, face, mode, ph, lat, sc) => { const q = pt(d); items.push({ y: q.y, f: () => Painter.char(g, type, q.x + q.nx * (lat || 0), q.y + q.ny * (lat || 0) + 6, sc || (CONFIG.enemies[type] ? CONFIG.enemies[type].radius / ArtChars[type].dr : 1), face, mode, ph) }); };
-      ch(ArtChars.heroKey('aldric'), L * 0.57, -1, 'atk', 0.5, -6, 1.1); ch('soldier4', L * 0.58, -1, 'idle', 0.2, 14, 1.1);
-      ch('orc', L * 0.6, 1, 'atk', 0.3, 0); ch('goblin', L * 0.63, 1, 'walk', 0.2, -10); ch('warg', L * 0.66, 1, 'walk', 0.6, 8); ch('blackOrc', L * 0.69, 1, 'walk', 0.4, -4); ch('troll', L * 0.74, 1, 'walk', 0.1, 0);
-      items.sort((a, b) => a.y - b.y).forEach(i => i.f());
-      g.setTransform(1, 0, 0, 1, 0, 0);
+      cancelAnimationFrame(this._menuFrame);
+      let last=0;
+      const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const render=(now)=>{
+        if(this.current!=='screen-menu')return;
+        this._menuFrame=reduced?null:requestAnimationFrame(render);
+        if(now-last<50)return;last=now;
+        const t=now*.001, drift=reduced?0:Math.sin(t*.13)*12;
+        g.setTransform(z,0,0,z,(c.width-map.W*z)/2+drift,(c.height-map.H*z)/2);
+        g.drawImage(bg,0,0,map.W,map.H);Painter.res=z;
+        g.setTransform(dpr,0,0,dpr,0,0);Painter.res=dpr;
+        const baseX=r.width*.25, baseY=r.height*.57, size=Math.min(5.5,r.height/95);
+        for(const [type,dx,dy,phase,sc] of [['lyra',-65,-12,.3,.88],['selene',65,-18,.65,.88],['aldric',0,12,0,1]])
+          Painter.char(g,ArtChars.heroKey(type),baseX+dx,baseY+dy,size*sc,1,'idle',reduced?phase:t+phase*2.618);
+        g.setTransform(1,0,0,1,0,0);
+        // Warm motes and drifting leaves give depth without covering the controls.
+        for(let i=0;i<22;i++){
+          const x=((i*.618*c.width+t*(5+i%4)*dpr)%c.width),y=(i*.371*c.height+Math.sin(t*.7+i)*14*dpr)%c.height;
+          g.globalAlpha=.18+.17*Math.sin(t+i);g.fillStyle=i%4?'#ffe1a0':'#b9d6b1';g.beginPath();g.ellipse(x,y,(i%3+1)*dpr,dpr,Math.sin(t*.3+i),0,Math.PI*2);g.fill();
+        }g.globalAlpha=1;
+      };render(performance.now());
+
     },
 
     /* ================= BẢN ĐỒ CHIẾN DỊCH: 6 vùng, mỗi vùng 6 map (map 6 = boss) ================= */

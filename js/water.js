@@ -24,6 +24,15 @@
         items.push({ kind: 'lake', lk, lava, chaos, fx });
       }
       this.items = items.length ? items : null;
+      this.mask=document.createElement('canvas');this.mask.width=map.W;this.mask.height=map.H;
+      this.buffer=document.createElement('canvas');this.buffer.width=map.W;this.buffer.height=map.H;
+      const m=this.mask.getContext('2d');m.strokeStyle=m.fillStyle='#fff';m.lineCap=m.lineJoin='round';
+      for(const rv of F.rivers){m.lineWidth=Math.max(1,rv.w-9);m.beginPath();rv.pts.map(P).forEach((p,i)=>i?m.lineTo(p.x,p.y+3):m.moveTo(p.x,p.y+3));m.stroke();}
+      for(const lk of F.lakes){m.beginPath();m.ellipse(lk.x,lk.y+3,Math.max(1,lk.rx-4),Math.max(1,lk.ry-4),0,0,TAU);m.fill();}
+      // Bridges occlude the current and ripples just as they occlude the river.
+      m.globalCompositeOperation='destination-out';m.lineWidth=CONFIG.pathWidth+20;
+      for(const path of map.paths){m.beginPath();path.points.forEach((p,i)=>i?m.lineTo(p.x,p.y):m.moveTo(p.x,p.y));m.stroke();}
+
     },
     at(it, s, out) {
       const c = it.cum; let lo = 0, hi = c.length - 1;
@@ -31,7 +40,9 @@
       const a = it.pts[lo], b = it.pts[hi], l = (c[hi] - c[lo]) || 1, k = (s - c[lo]) / l, tx = (b.x - a.x) / l, ty = (b.y - a.y) / l;
       out.x = a.x + (b.x - a.x) * k; out.y = a.y + (b.y - a.y) * k; out.tx = tx; out.ty = ty; return out;
     },
-    draw(c, t) {
+    draw(target, t) {
+      const c=this.buffer&&this.buffer.getContext('2d');
+      if(!c)return;c.clearRect(0,0,this.buffer.width,this.buffer.height);
       if (!this.items) return;
       const q = {};
       c.save(); c.globalCompositeOperation = 'lighter'; c.lineCap = 'round';
@@ -54,6 +65,8 @@
         }
       }
       c.restore();
+      c.save();c.globalCompositeOperation='destination-in';c.drawImage(this.mask,0,0);c.restore();
+      target.save();target.globalCompositeOperation='lighter';target.drawImage(this.buffer,0,0);target.restore();
     }
   };
 })();

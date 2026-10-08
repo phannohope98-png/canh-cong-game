@@ -15,10 +15,10 @@
 
   /* ---------------- Bảng màu theo vùng ---------------- */
   const TH = {
-    forest: { g0: '#6aa83e', g1: '#4a842c', g2: '#9ccc56', road: '#e8cf94', roadD: '#c09a60', roadL: '#f8e8bc', edge: '#8a6a3c', water: '#2f8fc0', waterL: '#7fd0ee', bank: '#5a4a30',
-      tree: ['#3f8a2e', '#4f9a34', '#2f7a2a'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
-    castle: { g0: '#74ae48', g1: '#4e8630', g2: '#a2d062', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
-      tree: ['#3f8a2e', '#4f9a34', '#2f7a2a'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
+    forest: { g0: '#72966b', g1: '#547751', g2: '#a0b982', road: '#d8c4a3', roadD: '#ad9779', roadL: '#eddfc2', edge: '#796b52', water: '#438f9c', waterL: '#a4dbd5', bank: '#5a4a30',
+      tree: ['#426d58', '#62846b', '#355b4c'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
+    castle: { g0: '#829975', g1: '#637c58', g2: '#aebe91', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
+      tree: ['#426d58', '#62846b', '#355b4c'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
     desert: { g0: '#dca85e', g1: '#c08440', g2: '#f2cc88', road: '#f6deae', roadD: '#d2aa70', roadL: '#fff2d4', edge: '#a8743e', water: '#2fa0b8', waterL: '#8ae0e8', bank: '#7a9a3a',
       tree: ['#6a9a3a', '#5a8a32', '#7aaa42'], flowers: ['#ffe080', '#ff8a5a'], mix: [['cactus', 0.24], ['rock', 0.3], ['deadtree', 0.1], ['bones', 0.1], ['palm', 0.08], ['drybush', 0.12], ['barrel', 0.06]] },
     ice: { g0: '#e4eef8', g1: '#bccee2', g2: '#ffffff', road: '#c4d8ea', roadD: '#98b0c8', roadL: '#e8f2fa', edge: '#7088a4', water: '#8ad0ee', waterL: '#e0f6ff', bank: '#9ab0c8',
@@ -55,7 +55,12 @@
     const f = L.feat || {}, cv = p => ({ x: (p[0] - B.x0) * sc, y: (p[1] - B.y0) * sc });
     return {
       void: !!f.void,
-      rivers: (f.rivers || []).map(r => ({ pts: smooth(r.pts.map(p => { const q = cv(p); return [q.x, q.y]; }), 12), w: r.w * sc, kind: r.kind || 'water' })),
+      rivers: (f.rivers || []).map(r => {
+        const pts=smooth(r.pts.map(p=>{const q=cv(p);return[q.x,q.y];}),12), w=r.w*sc;
+        const source=pts.map(p=>({...p}));
+        for(let i=1;i<pts.length-1;i++){const dx=source[i+1].x-source[i-1].x,dy=source[i+1].y-source[i-1].y,L=Math.hypot(dx,dy)||1,bend=Math.sin(i*.22)*w*.12;pts[i].x-=dy/L*bend;pts[i].y+=dx/L*bend;}
+        return{pts,w,kind:r.kind||'water'};
+      }),
       lakes: (f.lakes || []).map(l => { const q = cv([l.x, l.y]); return { x: q.x, y: q.y, rx: l.rx * sc, ry: l.ry * sc, kind: l.kind || 'water' }; }),
       props: (f.props || []).map(p => Object.assign({}, p, cv([p.x, p.y])))
     };
@@ -458,8 +463,8 @@
     const free = (x, y, m) => { for (const p of map.paths) if (p.nearest(x, y).perp < PW / 2 + m) return false; return !wetAt(map.feat, x, y, 4); };
     if (theme !== 'chaos' && theme !== 'lava') {
       const tc = theme === 'ice' ? '#ffffff' : theme === 'desert' ? '#c8a050' : sh(T.g0, 0.08);
-      for (let i = 0; i < 1400; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (det) det.tuft.push([x, y, 0.7 + rnd() * 0.6, i % 3 ? 0 : 1]); else tuft(g, x, y, i % 3 ? tc : sh(tc, -0.1), 0.7 + rnd() * 0.6); }
-      for (let i = 0; i < 90 && T.flowers.length; i++) { const cx = rnd() * W, cy = rnd() * H; if (!free(cx, cy, 14)) continue; const col = T.flowers[(rnd() * T.flowers.length) | 0];
+      for (let i = 0; i < 650; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (det) det.tuft.push([x, y, 0.7 + rnd() * 0.6, i % 3 ? 0 : 1]); else tuft(g, x, y, i % 3 ? tc : sh(tc, -0.1), 0.7 + rnd() * 0.6); }
+      for (let i = 0; i < 38 && T.flowers.length; i++) { const cx = rnd() * W, cy = rnd() * H; if (!free(cx, cy, 14)) continue; const col = T.flowers[(rnd() * T.flowers.length) | 0];
         for (let j = 0; j < 5; j++) { const x = cx + (rnd() - 0.5) * 30, y = cy + (rnd() - 0.5) * 16; if (det) { det.flower.push([x, y, col]); continue; } K.dot(g, x, y, 2.2, INK); K.dot(g, x, y, 1.6, col); K.dot(g, x - 0.4, y - 0.4, 0.6, '#ffffff'); } }
     }
     for (let i = 0; i < 160; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (map.feat.void) { let d = Infinity; for (const p of map.paths) d = Math.min(d, p.nearest(x, y).perp); if (d > 130) continue; } if (det) { det.peb.push([x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2]); continue; } F(g, ell(x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2), theme === 'lava' ? '#2a2022' : theme === 'chaos' ? '#3a2a6a' : '#9a968e', { s: 0.6, h: 0.3, lw: 1 }); }

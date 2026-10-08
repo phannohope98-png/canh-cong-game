@@ -277,14 +277,14 @@
 
   /* ---------- dựng sẵn khung hình lúc rảnh (≤ 6 ms mỗi khung màn hình) để khỏi khựng khi quái mới xuất hiện ---------- */
   const warmQ = []; let warmRaf = 0, scratch = null;
-  const MODES = [['walk', 16], ['atk', 12], ['idle', 10], ['die', 10]];
+  const MODES = [['walk', 24], ['atk', 20], ['idle', 32], ['die', 16]];
   Art3D.warm = function (list) {
     if (!Art3D.enabled || failed) return;
     for (const it of list) {
       if (!reg[it.key] || !reg[it.key].__3d) continue;
       for (const [mode, n] of (it.modes ? MODES.filter(m => it.modes.includes(m[0])) : MODES))
         for (let i = 0; i < n; i++) warmQ.push({ key: it.key, scale: it.scale, mode, ph: mode === 'idle' ? (i + 0.5) / n * IDLE : (i + 0.5) / n });
-      if (it.dirs) for (let k = 0; k < 8; k++) { const dk = it.key + '_a' + k; if (!reg[dk]) continue; for (let i = 0; i < 16; i++) warmQ.push({ key: dk, scale: it.scale, mode: 'walk', ph: (i + 0.5) / 16 }); if (k === 2 || k === 6) for (let i = 0; i < 12; i++) warmQ.push({ key: dk, scale: it.scale, mode: 'atk', ph: (i + 0.5) / 12 }); }
+      if (it.dirs) for (let k = 0; k < 8; k++) { const dk = it.key + '_a' + k; if (!reg[dk]) continue; for (let i = 0; i < 24; i++) warmQ.push({ key: dk, scale: it.scale, mode: 'walk', ph: (i + 0.5) / 24 }); if (k === 2 || k === 6) for (let i = 0; i < 20; i++) warmQ.push({ key: dk, scale: it.scale, mode: 'atk', ph: (i + 0.5) / 20 }); }
     }
     if (!warmRaf && warmQ.length) warmRaf = requestAnimationFrame(pump);
   };

@@ -16,7 +16,7 @@
       const key = (Art3D.lightTheme ? Art3D.lightTheme() + ':' : '') + (prop ? [d.k, d.theme, d.snow ? 1 : 0, d.dark ? 1 : 0].join('|') : d.k + '|' + theme + '|' + vi) + '@' + ppu;
       let sp = cache.get(key);
       if (sp === undefined) {
-        Chars3D.setInk(1.0);
+        Chars3D.setInk(0.35);
         const root = Props3D.build(d.k, prop ? (d.theme || theme) : theme, (vi + 0.5) / 3, prop);
         sp = root ? Art3D.sprite(root, ppu) : null;
         cache.set(key, sp);

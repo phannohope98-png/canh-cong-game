@@ -8,11 +8,11 @@
   function fill(g,path,c,lo=-.28,hi=.26){
     let xs=[],ys=[];const record=(name,args)=>{if(name==='ellipse'){xs.push(args[0]-args[2],args[0]+args[2]);ys.push(args[1]-args[3],args[1]+args[3]);}else for(let i=0;i<args.length;i+=2){xs.push(args[i]);ys.push(args[i+1]);}g[name](...args);};
     const pen={moveTo:(...a)=>record('moveTo',a),lineTo:(...a)=>record('lineTo',a),quadraticCurveTo:(...a)=>record('quadraticCurveTo',a),bezierCurveTo:(...a)=>record('bezierCurveTo',a),ellipse:(...a)=>record('ellipse',a)};
-    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=g.createLinearGradient(minX,minY,maxX,maxY);gr.addColorStop(0,tint(c,hi));gr.addColorStop(.42,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.82;g.stroke();}
+    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=g.createLinearGradient(minX,minY,maxX,maxY);gr.addColorStop(0,tint(c,hi));gr.addColorStop(.42,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.65;g.stroke();}
   }
   const polygon=pts=>g=>{g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);};
   function oval(g,x,y,rx,ry,c){fill(g,p=>p.ellipse(x,y,rx,ry,0,0,TAU),c);}
-  function stroke(g,pts,w,c){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=ink;g.lineWidth=w+1.5;g.stroke();g.strokeStyle=c;g.lineWidth=w;g.stroke();g.strokeStyle=tint(c,.25);g.lineWidth=w*.25;g.stroke();}
+  function stroke(g,pts,w,c){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=ink;g.lineWidth=w+1.1;g.stroke();g.strokeStyle=c;g.lineWidth=w;g.stroke();g.strokeStyle=tint(c,.25);g.lineWidth=w*.25;g.stroke();}
   function star(g,x,y,r,c){const p=[];for(let i=0;i<10;i++){const a=i*Math.PI/5,rr=i%2?r*.46:r;p.push(x+Math.sin(a)*rr,y-Math.cos(a)*rr);}fill(g,polygon(p),c);}
   const skin='#ecc49c',gold='#d7ae58';
   function kind(id){return /^(elf|lyra)$/.test(id)?'elf':/^(mage|selene)$/.test(id)?'mage':/^(dwarf|borin)$/.test(id)?'dwarf':/^(orct|orc)$/.test(id)?'orc':/^(soldier(S[0-4])?|aldric)$/.test(id)?'knight':null;}
@@ -45,8 +45,8 @@
     if(orc){stroke(g,[-8,-34,10,-24],3.1,'#554032');fill(g,polygon([-8,-19,9,-20,12,-8,5,-10,0,-5,-8,-9]),'#973e32');for(const x of [-10,12])fill(g,p=>{p.moveTo(x-4,-38);p.lineTo(x,-40);p.lineTo(x+5,-34);p.lineTo(x+3,-29);p.lineTo(x,-31);p.lineTo(x-4,-29);p.lineTo(x-6,-32);},'#cdc2a8');}
     // Heads are a smaller wedge with the visible face turned three-quarter.
     g.save();g.translate(3,-44+y);g.rotate(.07-strike*.12);
-    fill(g,p=>{p.moveTo(-10,-5);p.quadraticCurveTo(-12,5,-5,8);p.lineTo(5,10);p.lineTo(12,5);p.lineTo(13,-4);p.quadraticCurveTo(4,-12,-10,-5);},flesh);
-    fill(g,polygon([-10,-2,-5,-4,-4,6,-8,5]),tint(flesh,-.15));
+    fill(g,p=>{p.moveTo(-10,-5);p.quadraticCurveTo(-12,5,-5,8);p.quadraticCurveTo(2,12,8,7);p.quadraticCurveTo(14,4,13,-4);p.quadraticCurveTo(4,-12,-10,-5);},flesh);
+    fill(g,p=>{p.moveTo(-10,-2);p.quadraticCurveTo(-8,-5,-5,-4);p.quadraticCurveTo(-7,2,-4,6);p.quadraticCurveTo(-11,5,-10,-2);},tint(flesh,-.12));
     if(elf||orc)fill(g,polygon([-9,-2,-16,-7,-14,2,-9,4]),flesh);
     if(troop){
       fill(g,p=>{p.moveTo(-12,0);p.bezierCurveTo(-16,-10,-7,-17,3,-16);p.quadraticCurveTo(13,-16,15,-6);p.lineTo(11,4);p.lineTo(5,3);p.lineTo(4,-2);p.lineTo(-10,0);},metal);
@@ -84,23 +84,70 @@
     if(strike>.72){g.save();g.globalAlpha*=.45;g.strokeStyle='#c5d8cb';g.lineWidth=1.4;g.beginPath();g.arc(15,-28,29,-1.1,.8);g.stroke();g.restore();}g.restore();
   }
   function pharaohFigure(g,P){
-    const w=P.w>=0?Math.sin(P.w*TAU):0,a=P.a>=0?Math.sin(P.a*Math.PI):0;
-    g.save();g.translate(a*4,P.w>=0?-Math.abs(w):Math.sin((P.t||0)*2)*.3);g.rotate(-.06+a*.15);g.lineCap='round';g.lineJoin='round';
-    if(P.d!==undefined){g.rotate(P.d*1.3);g.globalAlpha*=1-P.d*.7;}
-    stroke(g,[-7,-19,-11+w*3,-10,-13+w,-3],6,'#b5ab87');stroke(g,[7,-19,10-w*3,-10,12-w,-3],6,'#d0c29b');
-    oval(g,-13+w,-2,5,2.8,'#87794f');oval(g,13-w,-2,5.8,3,'#a68f53');
-    fill(g,polygon([-11,-34,7,-38,14,-28,11,-18,-10,-18,-15,-28]),'#c8bea0');
-    for(let i=0;i<4;i++)stroke(g,[-11,-31+i*3,10,-33+i*3],1.05,i%2?'#9c947b':'#ece2bc');
-    fill(g,polygon([-11,-19,12,-20,14,-6,5,-8,0,-5,-7,-7]),'#446b82');stroke(g,[-11,-19,12,-20],3,'#bc984d');
-    fill(g,polygon([-6,-17,5,-18,7,-6,-3,-7]),'#c8a754');stroke(g,[-2,-15,2,-15],.8,'#7d673d');
-    stroke(g,[-10,-33,-17,-25,-15,-19],6,'#a89f83');stroke(g,[11,-34,19,-29,23+a*5,-22-a*5],6,'#d2c39d');
-    g.save();g.translate(3,-45);fill(g,polygon([-11,-9,0,-15,10,-9,14,5,11,15,5,10,-7,13,-16,8]),'#bfa354');
-    fill(g,polygon([-10,-7,-5,-9,-7,10,-12,10,-15,6]),'#365d76');fill(g,polygon([8,-8,11,-6,13,8,9,12,7,7]),'#365d76');
-    for(let i=0;i<4;i++){stroke(g,[-12+i*.3,-4+i*3,-7+i*.15,-5+i*3],1,'#d4b666');stroke(g,[9,-4+i*3,12,-3+i*3],1,'#d4b666');}
-    fill(g,polygon([-7,-5,5,-7,10,-2,9,7,1,10,-7,5]),'#b3aa8d');stroke(g,[-7,-1,9,-3],1,'#ddd2aa');fill(g,polygon([-4,1,1,0,1,3,-4,3]),'#463f33');fill(g,polygon([4,0,8,0,8,2,4,3]),'#463f33');stroke(g,[-2,2,0,2],.8,'#d7a545');stroke(g,[5,1,7,1],.8,'#d7a545');
-    fill(g,polygon([-8,-6,1,-11,9,-7,8,-4,0,-7,-7,-3]),'#c7a359');fill(g,p=>{p.moveTo(0,-9);p.quadraticCurveTo(-3,-18,2,-19);p.quadraticCurveTo(8,-18,4,-14);p.lineTo(2,-13);p.lineTo(2,-8);},'#c7a359');oval(g,3,-17,1.1,.7,'#3b5b63');g.restore();
-    g.save();g.translate(24+a*5,-24-a*5);g.rotate(.65+a*1.15);stroke(g,[0,4,0,-6],2.3,'#876637');fill(g,p=>{p.moveTo(-1,-5);p.quadraticCurveTo(-7,-18,1,-29);p.lineTo(7,-27);p.quadraticCurveTo(-1,-18,3,-6);},'#c2ab65');stroke(g,[-4,-6,5,-6],2,'#ad8842');g.restore();g.restore();
+    const t=P.t||0,w=P.w>=0?Math.sin(P.w*TAU):0,a=P.a>=0?P.a:-1;
+    const smooth=x=>x*x*(3-2*x);
+    const swing=a<0?0:a<.3?-.42*smooth(a/.3):a<.55?-.42+1.35*smooth((a-.3)/.25):.93*(1-smooth((a-.55)/.45));
+    const linen='#d9c99d',shade='#ab976a',blue='#326c8d',brass='#d1a34e';
+    g.save();g.lineJoin='round';g.lineCap='round';
+    g.translate(swing*1.6,P.w>=0?-Math.abs(w)*.6:Math.sin(t*2.2)*.24);
+    if(P.d!==undefined){g.translate(0,P.d*3);g.rotate(P.d*1.25);g.globalAlpha*=1-P.d*.65;}
+    // Curved, tapered limbs; joints remain inside the wrapped silhouette.
+    function limb(points,r0,r1,col){
+      const [x0,y0,x1,y1,x2,y2]=points,dx=x2-x0,dy=y2-y0,l=Math.hypot(dx,dy),nx=-dy/l,ny=dx/l;
+      fill(g,p=>{p.moveTo(x0+nx*r0,y0+ny*r0);p.quadraticCurveTo(x1+nx*r0,y1+ny*r0,x2+nx*r1,y2+ny*r1);p.quadraticCurveTo(x2+dx/l*r1,y2+dy/l*r1,x2-nx*r1,y2-ny*r1);p.quadraticCurveTo(x1-nx*r0,y1-ny*r0,x0-nx*r0,y0-ny*r0);p.quadraticCurveTo(x0-dx/l*r0,y0-dy/l*r0,x0+nx*r0,y0+ny*r0);},col);
+    }
+    limb([-6,-18,-9+w*2,-10,-10+w*2,-3],3.7,2.8,shade);
+    fill(g,p=>{p.moveTo(-14+w*2,-5);p.quadraticCurveTo(-8+w*2,-7,-6+w*2,-2);p.lineTo(-6+w*2,0);p.quadraticCurveTo(-15+w*2,2,-17+w*2,-1);p.quadraticCurveTo(-18+w*2,-3,-14+w*2,-5);},'#b39a65');
+    limb([7,-18,10-w*2,-11,11-w*2,-3],4,3,linen);
+    fill(g,p=>{p.moveTo(7-w*2,-5);p.quadraticCurveTo(12-w*2,-7,15-w*2,-3);p.quadraticCurveTo(22-w*2,-1,19-w*2,1);p.lineTo(9-w*2,1);p.quadraticCurveTo(6-w*2,0,7-w*2,-5);},'#c3aa71');
+    stroke(g,[-12+w*2,-9,-7+w*2,-8],.65,'#e2d2a3');stroke(g,[8-w*2,-10,13-w*2,-9],.7,'#aa9264');
+    // Far arm is bent towards the waist, behind the chest.
+    limb([-10,-34,-18,-29,-16,-21],3.5,2.5,shade);oval(g,-15,-20,3.3,3.6,linen);
+    stroke(g,[-18,-29,-13,-28],.65,'#e4d6b0');
+    // A single torso silhouette avoids a stack of disconnected plates.
+    fill(g,p=>{p.moveTo(-10,-38);p.quadraticCurveTo(-2,-41,9,-37);p.quadraticCurveTo(14,-32,11,-24);p.lineTo(10,-17);p.quadraticCurveTo(0,-14,-10,-18);p.quadraticCurveTo(-14,-29,-10,-38);},linen);
+    fill(g,p=>{p.moveTo(-10,-35);p.quadraticCurveTo(-6,-31,-7,-23);p.lineTo(-4,-17);p.lineTo(-10,-18);p.quadraticCurveTo(-14,-29,-10,-35);},shade);
+    for(let i=0;i<4;i++){
+      const y=-34+i*4;
+      g.beginPath();g.moveTo(-9,y);g.quadraticCurveTo(0,y+2.3,10,y-1.1);g.strokeStyle='#a79368';g.lineWidth=.7;g.stroke();
+      g.beginPath();g.moveTo(-8,y-.8);g.quadraticCurveTo(0,y+1.2,9,y-1.8);g.strokeStyle='#ede2bd';g.lineWidth=.75;g.stroke();
+    }
+    // Short pleated kilt, rounded hips and a readable blue/gold central panel.
+    fill(g,p=>{p.moveTo(-10,-19);p.quadraticCurveTo(0,-17,11,-20);p.lineTo(15,-8);p.quadraticCurveTo(11,-5,7,-7);p.lineTo(0,-5);p.quadraticCurveTo(-9,-5,-13,-9);},blue);
+    fill(g,p=>{p.moveTo(-3,-18);p.lineTo(5,-19);p.quadraticCurveTo(5,-11,7,-7);p.quadraticCurveTo(2,-5,-3,-7);p.lineTo(-3,-18);},brass);
+    stroke(g,[-10,-19,-1,-18,11,-20],2.3,brass);oval(g,2,-19,2,1.7,'#387caa');
+    stroke(g,[-8,-15,-8,-9],.7,'#204e68');stroke(g,[10,-15,12,-9],.7,'#204e68');
+    // Head, jaw and nemes are curved volumes, with asymmetric eyes for 3/4 view.
+    g.save();g.translate(1,-43);g.rotate(-swing*.045);
+    fill(g,p=>{p.moveTo(-12,-9);p.quadraticCurveTo(-9,-18,1,-18);p.quadraticCurveTo(12,-18,15,-8);p.lineTo(17,10);p.quadraticCurveTo(14,15,9,12);p.lineTo(6,5);p.lineTo(-6,6);p.lineTo(-9,14);p.quadraticCurveTo(-14,15,-16,10);p.lineTo(-12,-9);},blue);
+    fill(g,p=>{p.moveTo(-12,-8);p.quadraticCurveTo(-15,1,-14,9);p.lineTo(-10,10);p.lineTo(-8,-4);},brass);
+    fill(g,p=>{p.moveTo(11,-8);p.quadraticCurveTo(15,0,15,9);p.lineTo(11,11);p.lineTo(8,-4);},brass);
+    for(let i=0;i<3;i++){stroke(g,[-14,-2+i*4,-10,-3+i*4],.95,blue);stroke(g,[11,-2+i*4,15,-1+i*4],.95,blue);}
+    fill(g,p=>{p.moveTo(-8,-7);p.quadraticCurveTo(0,-12,9,-6);p.quadraticCurveTo(12,1,8,7);p.quadraticCurveTo(3,12,-3,8);p.quadraticCurveTo(-10,5,-8,-7);},linen);
+    fill(g,p=>{p.moveTo(-8,-4);p.lineTo(-3,-6);p.quadraticCurveTo(-5,3,-1,8);p.quadraticCurveTo(-10,5,-8,-4);},shade);
+    g.beginPath();g.moveTo(-7,-3);g.quadraticCurveTo(0,-1,9,-4);g.strokeStyle='#9f8b60';g.lineWidth=.7;g.stroke();
+    // Deep sockets rather than rectangular robot eyes; a restrained blue glint.
+    fill(g,p=>{p.moveTo(-5,-1);p.quadraticCurveTo(-2,-2.2,0,0);p.quadraticCurveTo(-2,2.8,-5,1);},'#4d4938');
+    fill(g,p=>{p.moveTo(3,-.6);p.quadraticCurveTo(6,-3,9,-1.7);p.quadraticCurveTo(8,1.9,4,1.8);},'#4d4938');
+    oval(g,-1.7,.2,.7,.65,'#77cce1');oval(g,6.9,-.1,.85,.75,'#90dfeb');
+    g.beginPath();g.moveTo(2,1);g.quadraticCurveTo(1.6,4,4,4.1);g.strokeStyle='#a78e60';g.lineWidth=.75;g.stroke();
+    g.beginPath();g.moveTo(-3,5);g.quadraticCurveTo(2,6.5,7,4.8);g.strokeStyle='#a28d63';g.lineWidth=.7;g.stroke();
+    fill(g,p=>{p.moveTo(-11,-9);p.quadraticCurveTo(1,-15,12,-9);p.lineTo(11,-6);p.quadraticCurveTo(1,-10,-10,-6);},brass);
+    fill(g,p=>{p.moveTo(-1,-11);p.quadraticCurveTo(-3,-19,1,-20);p.quadraticCurveTo(6,-20,4,-16);p.lineTo(2,-15);p.lineTo(2,-11);},brass);oval(g,2,-18,.65,.5,'#345b65');
+    g.restore();
+    // Arm and weapon share a local pivot, so the hand never loses its grip.
+    g.save();g.translate(10,-34);g.rotate(-.10+swing*.92);
+    limb([0,0,6,5,10,5],3.7,2.8,linen);
+    stroke(g,[2,3,5,-1],.7,'#aa9367');stroke(g,[6,7,8,2],.7,'#aa9367');
+    g.save();g.translate(11,5);g.rotate(.38);
+    stroke(g,[0,3,0,-6],2,'#81603a');
+    fill(g,p=>{p.moveTo(-1.8,-6);p.quadraticCurveTo(-3,-17,5,-26);p.quadraticCurveTo(9,-30,13,-30);p.lineTo(12,-25);p.quadraticCurveTo(5,-24,2,-7);},'#ddb56c');
+    fill(g,p=>{p.moveTo(0,-7);p.quadraticCurveTo(1,-20,11,-28);p.lineTo(12,-29);p.quadraticCurveTo(5,-24,2,-7);},'#f1d69a');
+    stroke(g,[-4,-6,4,-6],1.9,brass);
+    oval(g,0,0,3,3.2,linen);g.beginPath();g.moveTo(-1,0);g.lineTo(2,-.8);g.strokeStyle='#a48b61';g.lineWidth=.65;g.stroke();
+    g.restore();g.restore();g.restore();
   }
+
 
   function draw(g,id,P,height){if(id==='pharaoh'){g.save();g.scale((height||64)/66,(height||64)/66);pharaohFigure(g,P);g.restore();return true;}const k=kind(id);if(k){g.save();g.scale((height||54)/62,(height||54)/62);battleFigure(g,id,P);g.restore();return true;}const alias={wolfRider:'warg',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight',shade:'wraith'};const d=originals[id]||originals[alias[id]];if(!d)return false;g.save();const s=(height||d.tall)/d.tall;g.scale(s,s);d.draw(g,P);g.restore();return true;}
   function identify(key){const h=/(?:h_|c_)(aldric|lyra|selene|borin)/.exec(key);return h?h[1]:key.replace(/_a\d$|_[bfs]$/,'').replace(/([1-4])(s[0-4])?$/,'');}

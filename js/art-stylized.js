@@ -1,5 +1,4 @@
-/* Authored 2D character art. All poses are drawn with paths; no mesh renders,
-   reference-image billboards or external character artwork are used. */
+/* 2D game characters: painted Pharaoh animation atlas and path-based faction art. */
 (function(){
   'use strict';
   const TAU=Math.PI*2, originals=Object.fromEntries(Object.entries(ArtChars).filter(([,d])=>d&&d.draw).map(([k,d])=>[k,{...d}]));
@@ -107,116 +106,54 @@
     if(k==='knight'){g.save();g.translate(-11,-26);g.rotate(-.22-strike*.13);fill(g,p=>{p.moveTo(-8,-10);p.lineTo(5,-12);p.lineTo(9,-8);p.quadraticCurveTo(9,5,1,13);p.quadraticCurveTo(-7,8,-8,-10);},'#b99a59');fill(g,polygon([-6,-8,4,-10,6,-7,5,4,1,9,-5,4]),cloth);fill(g,polygon([-6,-8,-2,-9,-1,6,-4,3]),tint(cloth,.20));star(g,1,-1,3.4,'#dcc489');g.restore();}
     if(strike>.72){g.save();g.globalAlpha*=.45;g.strokeStyle='#c5d8cb';g.lineWidth=1.4;g.beginPath();g.arc(15,-28,29,-1.1,.8);g.stroke();g.restore();}g.restore();
   }
-  function pharaohFigure(g,P){
-    const t=P.t||0,w=P.w>=0?Math.sin(P.w*TAU):0,a=P.a>=0?P.a:-1;
-    const smooth=x=>x*x*(3-2*x);
-    const swing=a<0?0:a<.3?-.42*smooth(a/.3):a<.55?-.42+1.35*smooth((a-.3)/.25):.93*(1-smooth((a-.55)/.45));
-    const linen='#d9c99d',shade='#ab976a',blue='#326c8d',brass='#d1a34e';
-    const paint=(path,col)=>fill(g,path,col,-.18,.16,false);
-    function seam(pts,w,col){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=col;g.lineWidth=w;g.stroke();}
-    // Local occlusion is clipped to the receiving surface, not a separate plate.
-    function wash(path,x,y,rx,ry,strength){
-      g.save();g.beginPath();path(g);g.closePath();g.clip();
-      g.translate(x,y);g.scale(rx,ry);const grad=g.createRadialGradient(0,0,0,0,0,1);
-      grad.addColorStop(0,'rgba(57,43,34,'+strength+')');grad.addColorStop(1,'rgba(57,43,34,0)');
-      g.fillStyle=grad;g.fillRect(-1,-1,2,2);g.restore();
+  // Painted keyframes, with stable ground registration and continuous secondary motion.
+  // The source is a transparent 18-frame animation atlas, not a still billboard.
+  const pharaohAtlas=(()=>{
+    const img=new Image(),url=new URL('../assets/sprites/pharaoh-painted50.png',document.currentScript.src);
+    let loaded=false;
+    const ready=new Promise((resolve,reject)=>{
+      img.onload=()=>{loaded=true;if(window.Painter)Painter.clear();resolve();};
+      img.onerror=()=>reject(new Error('Cannot load painted Pharaoh animation atlas'));
+    });
+    // Handle failures for the game; the workshop awaits ready and reports them.
+    ready.catch(err=>console.error(err));img.src=url.href;
+    const smooth=x=>x*x*(3-2*x),BASE=[291,278,258];
+    function frame(g,row,col,height,alpha){
+      const cellW=img.naturalWidth/6,cellH=img.naturalHeight/3,s=height/218;
+      let x=Math.round(col*cellW),y=Math.round(row*cellH),width=Math.round((col+1)*cellW)-x;
+      // The follow-through blade occupies a small overhang into the empty margin.
+      let margin=0;
+      if(row===2&&col===4)width+=25;
+      if(row===2&&col===5){x+=25;width-=25;margin=25;}
+      const h=Math.round((row+1)*cellH)-y;
+      g.save();g.globalAlpha*=alpha;g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+      g.drawImage(img,x,y,width,h,(-cellW*.52+margin)*s,-BASE[row]*s,width*s,h*s);g.restore();
     }
-    const torso=p=>{p.moveTo(-10,-38);p.quadraticCurveTo(-2,-41,9,-37);p.quadraticCurveTo(14,-32,11,-24);p.lineTo(10,-17);p.quadraticCurveTo(0,-14,-10,-18);p.quadraticCurveTo(-14,-29,-10,-38);};
-    const facePath=p=>{p.moveTo(-8,-7);p.quadraticCurveTo(0,-12,9,-6);p.quadraticCurveTo(12,1,8,7);p.quadraticCurveTo(3,12,-3,8);p.quadraticCurveTo(-10,5,-8,-7);};
-    g.save();g.lineJoin='round';g.lineCap='round';
-    g.translate(swing*1.6,P.w>=0?-Math.abs(w)*.6:Math.sin(t*2.2)*.24);
-    if(P.d!==undefined){g.translate(0,P.d*3);g.rotate(P.d*1.25);g.globalAlpha*=1-P.d*.65;}
-    // Curved, tapered limbs; joints remain inside the wrapped silhouette.
-    function limb(points,r0,r1,col){
-      const [x0,y0,x1,y1,x2,y2]=points,dx=x2-x0,dy=y2-y0,l=Math.hypot(dx,dy),nx=-dy/l,ny=dx/l;
-      fill(g,p=>{p.moveTo(x0+nx*r0,y0+ny*r0);p.quadraticCurveTo(x1+nx*r0,y1+ny*r0,x2+nx*r1,y2+ny*r1);p.quadraticCurveTo(x2+dx/l*r1,y2+dy/l*r1,x2-nx*r1,y2-ny*r1);p.quadraticCurveTo(x1-nx*r0,y1-ny*r0,x0-nx*r0,y0-ny*r0);p.quadraticCurveTo(x0-dx/l*r0,y0-dy/l*r0,x0+nx*r0,y0+ny*r0);},col);
+    function draw(g,P,height){
+      if(!loaded)return false;
+      const H=height||64,walk=P.w>=0,attack=P.a>=0,dead=P.d!==undefined;
+      let row=attack?2:walk?1:0,phase=attack?Math.max(0,Math.min(.999999,P.a)):walk?((P.w%1)+1)%1:(((P.t||0)/2.618)%1+1)%1;
+      if(dead){row=0;phase=0;}
+      const key=phase*6,col=Math.min(5,Math.floor(key)),fraction=key-col;
+      g.save();
+      if(dead){const d=smooth(Math.min(1,Math.max(0,P.d)));g.translate(H*.18*d,H*.035*d);g.rotate(d*1.32);g.globalAlpha*=1-d*.8;}
+      else if(walk){const step=Math.sin(phase*TAU);g.translate(H*.012*step,-H*.008*Math.abs(step));g.rotate(step*.009);}
+      else if(!attack){const b=Math.sin((P.t||0)*2.4);g.scale(1-b*.004,1+b*.009);}
+      // A short blend only at keyframe boundaries avoids snapping while retaining
+      // crisp silhouettes through most of the cycle (no permanent double weapon).
+      const next=attack?Math.min(5,col+1):(col+1)%6;
+      const mix=next===col?0:smooth(Math.max(0,(fraction-.83)/.17));
+      if(mix>0){frame(g,row,col,H,1-mix);frame(g,row,next,H,mix);}else frame(g,row,col,H,1);
+      g.restore();return true;
     }
-    // Feet and shins share one outline; no ankle discs or cut edges.
-    function leg(x,shift,col){
-      g.save();g.translate(x,0);
-      fill(g,p=>{p.moveTo(-3.6,-20);p.quadraticCurveTo(-5+shift,-12,-4+shift,-6);p.quadraticCurveTo(-7+shift,-4,-6+shift,-1);p.quadraticCurveTo(-3+shift,2,6+shift,1);p.quadraticCurveTo(8+shift,-1,3+shift,-4);p.quadraticCurveTo(3+shift,-11,3.6,-20);},col);
-      paint(p=>{p.moveTo(-3,-17);p.quadraticCurveTo(-3+shift,-10,-2+shift,-5);p.lineTo(1+shift,-4);p.quadraticCurveTo(0+shift,-11,1,-17);},'#ead9ab');
-      seam([-4+shift,-10,2+shift,-9],.65,'#aa936b');seam([-4+shift,-7,2+shift,-6],.55,'#aa936b');
-      seam([-4+shift,-1,5+shift,0],.6,'#8b794f');g.restore();
-    }
-    leg(-9,w*2,shade);leg(10,-w*2,linen);
-    // The far arm ends in a single rounded fist, without a wrist seam.
-    limb([-10,-34,-18,-29,-15,-20],3.5,3.1,shade);
-    seam([-18,-29,-13,-28],.65,'#e4d6b0');seam([-17,-20,-13,-20],.55,'#8f7951');
-    // A single torso silhouette avoids a stack of disconnected plates.
-    fill(g,torso,linen,-.27,.30);
-    wash(torso,1,-37,12,6,.24);wash(torso,10,-31,7,8,.18);
-    wash(torso,11,-23,7,11,.18);
-    paint(p=>{p.moveTo(-9,-32);p.quadraticCurveTo(0,-29,10,-32);p.lineTo(9,-30.3);p.quadraticCurveTo(0,-28,-8,-30.6);},'#a98c5d');
-    paint(p=>{p.moveTo(-9,-27);p.quadraticCurveTo(0,-25,11,-28);p.lineTo(10,-26);p.quadraticCurveTo(0,-24,-8,-26);},'#bc9f71');
-    for(let i=0;i<4;i++){
-      const y=-34+i*4;
-      g.beginPath();g.moveTo(-9,y);g.quadraticCurveTo(0,y+2.3,10,y-1.1);g.strokeStyle='#a79368';g.lineWidth=.7;g.stroke();
-      g.beginPath();g.moveTo(-8,y-.8);g.quadraticCurveTo(0,y+1.2,9,y-1.8);g.strokeStyle='#f0e3bc';g.lineWidth=.65;g.stroke();
-      // A short lit crest and tapered fold, rather than a uniform stripe.
-      g.beginPath();g.moveTo(-5,y-.6);g.quadraticCurveTo(-1,y+.25,3,y-.6);g.strokeStyle='rgba(255,248,216,.65)';g.lineWidth=.4;g.stroke();
-    }
-    // Short pleated kilt, rounded hips and a readable blue/gold central panel.
-    fill(g,p=>{p.moveTo(-10,-19);p.quadraticCurveTo(0,-17,11,-20);p.lineTo(15,-8);p.quadraticCurveTo(11,-5,7,-7);p.lineTo(0,-5);p.quadraticCurveTo(-9,-5,-13,-9);},blue);
-    fill(g,p=>{p.moveTo(-3,-18);p.lineTo(5,-19);p.quadraticCurveTo(5,-11,7,-7);p.quadraticCurveTo(2,-5,-3,-7);p.lineTo(-3,-18);},brass);
-    paint(p=>{p.moveTo(6,-17);p.quadraticCurveTo(8,-14,10,-8);p.lineTo(12,-8);p.quadraticCurveTo(10,-15,9,-18);},'#23506c');
-    seam([-10,-10,-11,-14],.65,'#5e96b1');
-    stroke(g,[-10,-19,-1,-18,11,-20],2.3,brass);
-    seam([-9,-19.5,-1,-18.7,10,-20.5],.55,'#f1d48c');oval(g,2,-19,2,1.7,'#387caa');
-    paint(p=>{p.moveTo(-9,-18);p.quadraticCurveTo(-7,-14,-8,-7);p.lineTo(-11,-9);p.quadraticCurveTo(-9,-13,-9,-18);},'#224c68');
-    paint(p=>{p.moveTo(-7,-17);p.quadraticCurveTo(-5,-11,-6,-7);p.lineTo(-4,-7);p.quadraticCurveTo(-5,-14,-7,-17);},'#6399b3');
-    paint(p=>{p.moveTo(10,-18);p.quadraticCurveTo(13,-11,14,-9);p.lineTo(11,-9);p.quadraticCurveTo(10,-14,10,-18);},'#487f9a');
-    // Head, jaw and nemes are curved volumes, with asymmetric eyes for 3/4 view.
-    g.save();g.translate(1,-43);g.rotate(-swing*.045);
-    fill(g,p=>{p.moveTo(-12,-9);p.quadraticCurveTo(-9,-18,1,-18);p.quadraticCurveTo(12,-18,15,-8);p.lineTo(17,10);p.quadraticCurveTo(14,15,9,12);p.lineTo(6,5);p.lineTo(-6,6);p.lineTo(-9,14);p.quadraticCurveTo(-14,15,-16,10);p.lineTo(-12,-9);},blue);
-    paint(p=>{p.moveTo(-10,-10);p.quadraticCurveTo(-7,-16,0,-16);p.quadraticCurveTo(7,-16,10,-12);p.quadraticCurveTo(0,-14,-10,-10);},'#6394ad');
-    fill(g,p=>{p.moveTo(-12,-8);p.quadraticCurveTo(-15,1,-14,9);p.lineTo(-10,10);p.lineTo(-8,-4);},brass);
-    fill(g,p=>{p.moveTo(11,-8);p.quadraticCurveTo(15,0,15,9);p.lineTo(11,11);p.lineTo(8,-4);},brass);
-    seam([-13,-5,-14,5],.75,'#f1d08c');seam([12,0,14,8],.65,'#8e7239');
-    for(let i=0;i<3;i++){seam([-14,-2+i*4,-10,-3+i*4],.95,blue);seam([11,-2+i*4,15,-1+i*4],.95,blue);}
-    fill(g,facePath,linen,-.22,.35);
-    wash(facePath,1,-7,14,4,.22);wash(facePath,9,5,8,9,.18);
-    wash(facePath,8,6,8,8,.14);
-    g.beginPath();g.moveTo(-7,-3);g.quadraticCurveTo(0,-1,9,-4);g.strokeStyle='#9f8b60';g.lineWidth=.7;g.stroke();
-    // Deep sockets rather than rectangular robot eyes; a restrained blue glint.
-    fill(g,p=>{p.moveTo(-5,-1);p.quadraticCurveTo(-2,-2.2,0,0);p.quadraticCurveTo(-2,2.8,-5,1);},'#4d4938');
-    fill(g,p=>{p.moveTo(3,-.6);p.quadraticCurveTo(6,-3,9,-1.7);p.quadraticCurveTo(8,1.9,4,1.8);},'#4d4938');
-    oval(g,-1.7,.2,.7,.65,'#77cce1',false);oval(g,6.9,-.1,.85,.75,'#90dfeb',false);
-    paint(p=>{p.moveTo(-5,-2);p.quadraticCurveTo(-2,-3.8,0,-1.3);p.lineTo(-.7,-.6);p.quadraticCurveTo(-2,-2,-5,-1);},'#f2dca9');
-    paint(p=>{p.moveTo(3,-2);p.quadraticCurveTo(7,-4.5,9,-2.8);p.lineTo(8.8,-1.8);p.quadraticCurveTo(6,-3,3,-1);},'#edd4a0');
-    paint(p=>{p.moveTo(1,-2);p.quadraticCurveTo(2,-3,3,-2);p.lineTo(4,3);p.quadraticCurveTo(2,4,1.5,2);},'#f0dfb2');
-    seam([5,3,8,2.6],.45,'#ead7a4');
-    g.beginPath();g.moveTo(2,1);g.quadraticCurveTo(1.6,4,4,4.1);g.strokeStyle='#a78e60';g.lineWidth=.75;g.stroke();
-    paint(p=>{p.moveTo(-5,4);p.quadraticCurveTo(2,7,8,3.8);p.lineTo(7,5.5);p.quadraticCurveTo(2,8,-4,6);},'#b59a6c');
-    g.beginPath();g.moveTo(-3,5);g.quadraticCurveTo(2,6.5,7,4.8);g.strokeStyle='#a28d63';g.lineWidth=.7;g.stroke();
-    fill(g,p=>{p.moveTo(-11,-9);p.quadraticCurveTo(1,-15,12,-9);p.lineTo(11,-6);p.quadraticCurveTo(1,-10,-10,-6);},brass);
-    seam([-8,-8,-1,-10,8,-8],.6,'#f6dda0');
-    fill(g,p=>{p.moveTo(-1,-11);p.quadraticCurveTo(-3,-19,1,-20);p.quadraticCurveTo(6,-20,4,-16);p.lineTo(2,-15);p.lineTo(2,-11);},brass);oval(g,2,-18,.65,.5,'#345b65');
-    g.restore();
-    // Arm and weapon share a local pivot, so the hand never loses its grip.
-    g.save();g.translate(8,-33);g.rotate(-.10+swing*.92);
-    g.save();g.translate(11,5);g.rotate(.38);
-    stroke(g,[0,3,0,-6],2,'#81603a');
-    fill(g,p=>{p.moveTo(-1.8,-6);p.quadraticCurveTo(-3,-17,5,-26);p.quadraticCurveTo(9,-30,13,-30);p.lineTo(12,-25);p.quadraticCurveTo(5,-24,2,-7);},'#ddb56c');
-    paint(p=>{p.moveTo(0,-7);p.quadraticCurveTo(1,-20,11,-28);p.lineTo(12,-29);p.quadraticCurveTo(5,-24,2,-7);},'#f1d69a');
-    g.beginPath();g.moveTo(2,-8);g.quadraticCurveTo(5,-24,12,-27);g.strokeStyle='#fff0be';g.lineWidth=.6;g.stroke();
-    seam([-.6,-9,.2,-16],.6,'#a37b3d');
-    stroke(g,[-4,-6,4,-6],1.9,brass);seam([-3,-6.6,3,-6.6],.5,'#f6d895');
-    g.restore();
-    // One uninterrupted arm-to-knuckle contour, then only short finger marks.
-    fill(g,p=>{p.moveTo(-2,-3);p.bezierCurveTo(2,-4,5,1,8,1.5);p.quadraticCurveTo(10,0,13,2);p.quadraticCurveTo(16,3,14,7);p.quadraticCurveTo(11,10,8,7.5);p.quadraticCurveTo(2,8,-2,3);p.quadraticCurveTo(-4,0,-2,-3);},linen);
-    paint(p=>{p.moveTo(-1,-2);p.quadraticCurveTo(4,0,8,3);p.lineTo(7,4.5);p.quadraticCurveTo(2,3,-1,0);},'#ecddb7');
-    g.beginPath();g.moveTo(0,-1);g.quadraticCurveTo(4,1,7,3);g.strokeStyle='rgba(255,244,205,.65)';g.lineWidth=.55;g.stroke();
-    seam([3,4,5,1],.6,'#ad986b');seam([6,6,7,3],.6,'#ad986b');
-    seam([11,4,13,4.4],.55,'#a48b61');seam([10.8,6,13,6.2],.55,'#a48b61');
-    g.restore();g.restore();
-  }
+    return {draw,ready,get loaded(){return loaded;},src:url.href};
+  })();
 
 
-  function draw(g,id,P,height){if(id==='pharaoh'){g.save();g.scale((height||64)/66,(height||64)/66);pharaohFigure(g,P);g.restore();return true;}const k=kind(id);if(k){g.save();g.scale((height||54)/62,(height||54)/62);battleFigure(g,id,P);g.restore();return true;}const alias={wolfRider:'warg',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight',shade:'wraith'};const d=originals[id]||originals[alias[id]];if(!d)return false;g.save();const s=(height||d.tall)/d.tall;g.scale(s,s);d.draw(g,P);g.restore();return true;}
+  function draw(g,id,P,height){if(id==='pharaoh'){pharaohAtlas.draw(g,P,height);return true;}const k=kind(id);if(k){g.save();g.scale((height||54)/62,(height||54)/62);battleFigure(g,id,P);g.restore();return true;}const alias={wolfRider:'warg',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight',shade:'wraith'};const d=originals[id]||originals[alias[id]];if(!d)return false;g.save();const s=(height||d.tall)/d.tall;g.scale(s,s);d.draw(g,P);g.restore();return true;}
   function identify(key){const h=/(?:h_|c_)(aldric|lyra|selene|borin)/.exec(key);return h?h[1]:key.replace(/_a\d$|_[bfs]$/,'').replace(/([1-4])(s[0-4])?$/,'');}
-  function install(){for(const [key,d] of Object.entries(ArtChars)){if(!d||!d.draw)continue;const id=identify(key),base=originals[key]||originals[id];if(!kind(id)&&!base&&!originals[{darkKnight:'deathKnight',darkLord:'deathKnight',wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem'}[id]])continue;ArtChars[key]={...d,chibi:true,__3d:false,draw:(g,P)=>draw(g,id,P,d.tall),box:[d.tall*2.4,d.tall*1.6,d.tall*1.2,d.tall*1.35]};}
+  function install(){if(!ArtChars.pharaoh&&ArtChars.mummy)ArtChars.pharaoh={...ArtChars.mummy};for(const [key,d] of Object.entries(ArtChars)){if(!d||!d.draw)continue;const id=identify(key),base=originals[key]||originals[id];if(!kind(id)&&!base&&!originals[{darkKnight:'deathKnight',darkLord:'deathKnight',wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem'}[id]])continue;ArtChars[key]={...d,chibi:true,__3d:false,draw:(g,P)=>draw(g,id,P,d.tall),box:id==='pharaoh'?[d.tall*3,d.tall*1.8,d.tall*1.5,d.tall*1.4]:[d.tall*2.4,d.tall*1.6,d.tall*1.2,d.tall*1.35]};}
     const oldHero=ArtChars.heroKey;ArtChars.heroKey=function(id,tiers){const key=oldHero(id,tiers);const d=ArtChars[key];d.draw=(g,P)=>draw(g,id,P,d.tall);d.chibi=true;d.__3d=false;return key;};if(window.Art3D)Art3D.dirKey=()=>null;if(window.Painter)Painter.clear();}
   function captureLegacy(){for(const [key,d] of Object.entries(ArtChars))if(d&&d.draw)originals[key]={...d};}
-  window.ArtStylized={draw,kind,identify,install,captureLegacy,ink:true,originals};
+  window.ArtStylized={draw,kind,identify,install,captureLegacy,ink:true,originals,ready:pharaohAtlas.ready,atlas:pharaohAtlas};
 })();

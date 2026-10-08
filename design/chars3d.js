@@ -12,8 +12,9 @@
   const T = THREE, TAU = Math.PI * 2, S = Math.sin, C = Math.cos;
   T.ColorManagement.legacyMode = false; // màu hex = sRGB, xuất glTF đúng màu
 
-  const INK = '#1b0f16', GOLD = '#f5c542', SKIN = '#ffd9b8', OUT = 0.026;
+  const INK = '#1b0f16', GOLD = '#f5c542', SKIN = '#ffd9b8', OUT = 0.018;
   let INKK = 1; // hệ số độ dày viền (trong trận dùng dày hơn cho rõ ở cỡ nhỏ)
+  let BUILD_ID = null;
   let DET = 1; // mức chi tiết (trong trận < 1 cho nhẹ máy)
   const Q = n => Math.max(5, Math.round(n * DET));
 
@@ -150,6 +151,23 @@ float surf(){
   /** Một khối có màu + viền. o: { ink: độ dày | false, metal, glow, op, ds } */
   function part(geo, col, o) {
     o = o || {};
+    // Sculpt large character surfaces before generating their matching outline.
+    // Effects, eyes, props and tower geometry keep their original shapes.
+    if (BUILD_ID && !o.sculpted && geo.type === 'SphereGeometry' && !o.op && !o.glow && !o.tex) {
+      geo.computeBoundingBox();
+      const b = geo.boundingBox, size = b.getSize(new T.Vector3());
+      if (Math.max(size.x, size.y, size.z) > 0.22) {
+        const stone = /Golem|magmaLord/.test(BUILD_ID);
+        const e = stone ? 0.42 : o.metal ? 0.48 : 0.78;
+        const p = geo.attributes.position;
+        for (let i = 0; i < p.count; i++) {
+          const v = [p.getX(i), p.getY(i), p.getZ(i)];
+          const d = [size.x, size.y, size.z];
+          p.setXYZ(i, ...v.map((x, j) => Math.sign(x) * Math.pow(Math.abs(x / (d[j] / 2)), e) * d[j] / 2));
+        }
+        geo.computeVertexNormals();
+      }
+    }
     if (o.tex) texCoords(geo);
     const m = new T.Mesh(geo, mat(col, o));
     if (o.ink !== false && !o.op) { const h = new T.Mesh(hullGeo(geo, (o.ink || OUT) * INKK), inkMat); h.userData.hull = true; m.add(h); }
@@ -249,9 +267,9 @@ float surf(){
   /** Tỉ lệ người thật thay cho chibi đầu to: chân/tay dài hơn (tham số), thân kéo cao, đầu thu nhỏ (hậu kỳ trong build) */
   const REAL = { v: true, cur: null };
   const RK = { soldier: {}, elf: {}, mage: {}, aldric: {}, lyra: {}, selene: {}, dwarf: { leg: 1.7, torso: 1.2, head: 0.55, arm: 1.35 }, borin: { leg: 1.7, torso: 1.2, head: 0.55, arm: 1.35 },
-    pharaoh: {}, goblin: { leg: 1.6, torso: 1.2, head: 0.58, arm: 1.35 }, orc: { head: 0.5 }, orcArcher: {}, skeleton: {}, deathKnight: { head: 0.5 }, bandit: {}, mummy: {}, voidWalker: { head: 0.5 },
+    imp: { leg: 1.65, torso: 1.2, head: 0.62, arm: 1.35 }, pharaoh: {}, goblin: { leg: 1.6, torso: 1.2, head: 0.58, arm: 1.35 }, orc: { head: 0.5 }, orcArcher: {}, skeleton: {}, deathKnight: { head: 0.5 }, bandit: {}, mummy: {}, voidWalker: { head: 0.5 },
     blackOrc: { head: 0.5 }, darkKnight: { head: 0.55, leg: 1.8, torso: 1.25 }, darkLord: { head: 0.55, leg: 1.7, torso: 1.2 } };
-  function realK(id) { if (/^soldierS/.test(id)) id = 'soldier'; if (!REAL.v || !RK[id]) return null; return Object.assign({ leg: 2.2, torso: 1.38, head: 0.5, arm: 1.55 }, RK[id]); }
+  function realK(id) { if (id === 'shade' || id === 'voidling') id = 'goblin'; if (/^soldierS/.test(id)) id = 'soldier'; if (!REAL.v || !RK[id]) return null; return Object.assign({ leg: 2.2, torso: 1.38, head: 0.5, arm: 1.55 }, RK[id]); }
   function realBody(o) {
     const k = REAL.cur; if (!k || o.real) return;
     o.legL = o.legL * k.leg + 0.04 * (k.leg - 1); o.legR *= 1.12; o.armL *= k.arm; o.armR *= 1.1; o.real = k;
@@ -268,6 +286,23 @@ float surf(){
     n.head.scale.multiplyScalar(k.head);
     n.head.position.y = o.torsoH * ky + o.R * k.head * (o.neck || 0.8) + 0.04;
   }
+  // A jaw and cheek planes replace the spherical skull while retaining the
+  // forehead/eye surface used by onHead(), helmets and animation tracks.
+  function skull(R) {
+    const g = G.ball(R, 1.04, 0.96, 1), p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i), lower = Math.max(0, -y / R);
+      p.setXYZ(i, x * (1 - lower * 0.26), y, z > 0 ? z + R * 0.08 * lower : z);
+    }
+    g.computeVertexNormals(); return g;
+  }
+  // Continuous tapered limbs: broad upper segment, defined joint, narrower
+  // wrist/ankle. Existing arm/leg pivots and weapon attachment points survive.
+  function limb(r, len) {
+    return G.lathe([[0, len / 2], [r * 0.82, len / 2],
+      [r, len * 0.32], [r * 0.76, 0], [r * 0.9, -len * 0.19],
+      [r * 0.58, -len / 2], [0, -len / 2]], 12, 0.88);
+  }
   function humanoid(o) {
     const root = node('root'), n = {};
     realBody(o);
@@ -277,16 +312,24 @@ float surf(){
     if (o.hunch) n.torso.rotation.x = o.hunch;
     n.head = node('head', n.torso, 0, o.torsoH + o.R * (o.neck || 0.8), o.headZ || 0);
     if (o.hunch) n.head.rotation.x = -o.hunch * 0.8;
-    add(n.head, part(G.ball(o.R, 1.04, 0.96, 1), o.skin), 0, 0, 0);
+    add(n.head, part(skull(o.R), o.skin, { sculpted: true }), 0, 0, 0);
+    add(n.torso, part(G.cyl(o.R * 0.20, o.R * 0.24, o.R * 0.38), o.skin),
+      0, o.torsoH + o.R * 0.09, 0);
+    if (!/Knight|darkLord|Golem|treant|magmaLord/i.test(BUILD_ID || '')) {
+      onHead(n.head, o.R, part(G.ext([-o.R * .07, 0, 0, o.R * .18, o.R * .07, 0], o.R * .13, .005), o.skin, { ink: .008 }), 0, -.16, 1.01);
+      for (const side of [-1, 1]) add(n.head,
+        part(G.sbox(o.R * .12, o.R * .30, o.R * .15, .6), o.skin),
+        side * o.R * .99, -o.R * .05, 0);
+    }
     const len = o.armL, sx = o.torsoW / 2 + o.armR * 0.5, sy = o.torsoH - o.armR * 1.15;
     for (const [s, k] of [[-1, 'R'], [1, 'L']]) {
       const arm = n['arm' + k] = node('arm' + k, n.torso, s * sx, sy, 0);
       arm.rotation.z = s * 0.14;
-      add(arm, part(G.cap(o.armR, len - o.armR), o.sleeve, { tex: 'cloth' }), 0, -len / 2 + o.armR * 0.3, 0);
-      add(arm, part(G.ball(o.armR * 1.28), o.glove || o.skin), 0, -len, 0);
+      add(arm, part(limb(o.armR, len), o.sleeve, { tex: 'cloth' }), 0, -len / 2 + o.armR * 0.3, 0);
+      add(arm, part(G.sbox(o.armR * 1.7, o.armR * 2.1, o.armR * 1.6, 0.5), o.glove || o.skin), 0, -len, 0);
       n['hand' + k] = node('hand' + k, arm, 0, -len, 0);
       const leg = n['leg' + k] = node('leg' + k, n.hips, s * o.torsoW * (o.real ? 0.27 : 0.22), 0.02, 0);
-      add(leg, part(G.cap(o.legR, o.legL - o.legR), o.legs, { tex: 'cloth' }), 0, -o.legL / 2, 0);
+      add(leg, part(limb(o.legR, o.legL), o.legs, { tex: 'cloth' }), 0, -o.legL / 2, 0);
       add(leg, part(G.sbox(o.legR * 2.3, o.bootH, o.legR * 3.3, 0.4), o.boots), 0, -o.legL - o.bootH / 2 + 0.01, o.legR * 0.55);
     }
     return { root, n, o };
@@ -1398,9 +1441,11 @@ float surf(){
   function build(id, tier) {
     const def = LIST.find(c => c.id === id) || LIST[0];
     const t = Math.max(1, Math.min(def.tiers, tier || def.tiers));
-    REAL.cur = realK(def.id);
-    const made = def.make(t), rig = made.rig;
-    realize(rig); REAL.cur = null;
+    REAL.cur = realK(def.id); BUILD_ID = def.id;
+    let made;
+    try { made = def.make(t); realize(made.rig); }
+    finally { REAL.cur = null; BUILD_ID = null; }
+    const rig = made.rig;
     rig.root.name = 'root';
     if (def.scale) rig.root.scale.setScalar(def.scale);
     freeze(rig);

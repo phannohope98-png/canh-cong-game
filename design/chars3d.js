@@ -1,6 +1,6 @@
 /* =========================================================
- * chars3d.js – Dựng nhân vật CHIBI 3D cho Canh Cổng (Three.js r147, không cần build)
- * Phong cách Kingdom Rush: đầu to, thân ngắn, tô toon 3 tông, viền mực đen dày
+ * chars3d.js – Dựng nhân vật fantasy / anime 3D cho Canh Cổng (Three.js r147, không cần build)
+ * Nhân vật dạng người: tỷ lệ cân đối, mặt anime, tóc từng lọn, giáp ôm thân; tô toon và viền mảnh
  * (inverted hull – xuất ra .glb vẫn giữ viền ở mọi engine).
  * Mỗi nhân vật = cây khớp có tên (root › hips › torso › head, armR/armL › vũ khí, legR/legL …)
  * + các clip hoạt ảnh (idle, walk, attack, skill, die) nướng sẵn từ hàm tư thế.
@@ -20,7 +20,7 @@
 
   /* ---------- vật liệu toon ---------- */
   const GRAD = (() => {
-    const d = new Uint8Array([88, 88, 88, 255, 168, 168, 168, 255, 255, 255, 255, 255]);
+    const d = new Uint8Array([92, 92, 92, 255, 155, 155, 155, 255, 224, 224, 224, 255]);
     const t = new T.DataTexture(d, 3, 1, T.RGBAFormat); t.minFilter = t.magFilter = T.NearestFilter; t.needsUpdate = true; return t;
   })();
   /* ---------- chất liệu nâng cao (vá shader toon) ----------
@@ -102,9 +102,9 @@ float surf(){
       sh.fragmentShader = SH_F + sh.fragmentShader
         .replace('#include <color_fragment>', '#include <color_fragment>\n#if TEXK>0\ndiffuseColor.rgb *= surf();\n#endif\ndiffuseColor.rgb *= mix(uAO, 1.0, smoothstep(0.0, 0.2, vWY));')
         .replace('#include <output_fragment>', `{ vec3 nv = normalize(normal); float fr = pow(clamp(1.0 - nv.z, 0.0, 1.0), 2.4) * clamp(dot(nv.xy, vec2(0.62, 0.78)) * 0.9 + 0.35, 0.0, 1.0);
-  outgoingLight += uRim * uRimK * fr * diffuseColor.rgb * 1.5;
+  outgoingLight += uRim * uRimK * fr * diffuseColor.rgb * 0.65;
 #if CC_METAL==1
-  outgoingLight += vec3(1.0) * smoothstep(0.86, 0.95, dot(nv, normalize(vec3(-0.35, 0.55, 0.76)))) * 0.5;
+  outgoingLight += vec3(1.0) * smoothstep(0.86, 0.95, dot(nv, normalize(vec3(-0.35, 0.55, 0.76)))) * 0.18;
 #endif
 }
 #include <output_fragment>`);
@@ -193,7 +193,7 @@ float surf(){
       g.computeVertexNormals(); return g;
     },
     /** xoay biên dạng quanh trục Y; pts = [[bán kính, y], …] */
-    lathe(pts, seg, sz) { const g = new T.LatheGeometry(pts.map(q => new T.Vector2(q[0], q[1])), seg && seg <= 9 ? seg : Q(seg || 22)); if (sz) g.scale(1, 1, sz); return g; },
+    lathe(pts, seg, sz) { const ordered = pts[0][1] > pts[pts.length - 1][1] ? pts.slice().reverse() : pts; const g = new T.LatheGeometry(ordered.map(q => new T.Vector2(q[0], q[1])), seg && seg <= 9 ? seg : Q(seg || 22)); if (sz) g.scale(1, 1, sz); return g; },
     /** đùn đa giác phẳng (mặt XY), dày theo Z, căn giữa */
     ext(pts, depth, bevel) {
       const s = pts instanceof T.Shape ? pts : (() => { const q = new T.Shape(); q.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) q.lineTo(pts[i], pts[i + 1]); return q; })();
@@ -1441,13 +1441,190 @@ float surf(){
       make: t => DARKKNIGHT(true, true, t >= 3) }
   ];
 
+  /* Anime adventurers: deliberately authored silhouettes instead of a
+   * proportional rescale of the old chibi primitive assemblies. */
+  function animeHair(head, R, color, long, dwarf) {
+    const shell = new T.SphereGeometry(R * 1.075, Q(24), Q(16), 0, TAU, 0, Math.PI * .62);
+    const points = shell.attributes.position, radius = R * 1.075;
+    for(let i=0;i<points.count;i++) {
+      const a=Math.atan2(points.getX(i),points.getZ(i));
+      const theta=Math.acos(Math.max(-1,Math.min(1,points.getY(i)/radius)));
+      const hairline=Math.PI*(.42+.24*(1-Math.cos(a))*.5), t=theta/(Math.PI*.62)*hairline;
+      points.setXYZ(i,radius*Math.sin(t)*Math.sin(a),radius*Math.cos(t),radius*Math.sin(t)*Math.cos(a));
+    }
+    shell.computeVertexNormals();
+    shell.scale(1, 1.02, .96);
+    add(head, part(shell, color, { tex: 'hair', ink: .008 }), 0, R * .09, -R * .025);
+    const lock = (x, y, z, w, h, angle) => {
+      const g = G.ext([-w * .5, h * .20, -w * .15, h * .34, w * .22, h * .30, w * .45, h * .16, w * .28, -h * .18, -w * .10, -h * .5, -w * .36, -h * .05], .025, .008);
+      const p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) + .022 * Math.sin((p.getY(i) / h + .5) * Math.PI));
+      g.computeVertexNormals();
+      add(head, part(g, color, { tex: 'hair.f', ink: .003 }), x, y, z, -.15, angle || 0, -x * 1.2);
+    };
+    for (const [x, y, w, h] of [[-.115,.13,.09,.19],[-.055,.14,.09,.17],[.012,.16,.08,.14],[.075,.15,.085,.18],[.13,.10,.07,.22]])
+      lock(x * R / .19, y * R / .19, R * .83, w * R / .19, h * R / .19, x * 1.6);
+    for (const side of [-1, 1]) {
+      lock(side * R * .96, -R * .08, R * .10, R * .38, R * (long ? 2.2 : .9), side * 1.2);
+      if (long) for (let i = 0; i < 4; i++) lock((i - 1.5) * R * .46, -R * .8, -R * .74, R * .54, R * (2.6 + (i % 2) * .3), Math.PI);
+    }
+    if (dwarf) {
+      for (let i = -2; i <= 2; i++) lock(i * R * .28, -R * .82, R * .72, R * .4, R * (1.15 - Math.abs(i) * .17), 0);
+      for (const side of [-1, 1]) add(head, part(G.cap(.016, .08), color, { ink: .005 }), side * .038, -.055, R * 1.01, 0, 0, side * .3 + Math.PI / 2);
+    }
+  }
+  function animeFace(head, R, female, iris) {
+    const skin = '#f3c6ac', eyeW = R * .48, eyeH = R * (female ? .23 : .18);
+    for (const side of [-1, 1]) {
+      const e = node('eye', head, side * R * .39, R * .02, R * .91); e.rotation.y = side * .22;
+      add(e, new T.Mesh(G.ext([-eyeW/2,0,-eyeW*.24,eyeH/2,eyeW*.23,eyeH*.43,eyeW/2,0,eyeW*.19,-eyeH*.4,-eyeW*.23,-eyeH*.38], .006, 0), mat('#fff5eb')), 0,0,0);
+      add(e, new T.Mesh(G.ball(eyeH*.40, .8, 1, .22), mat(iris)), 0,0,.008);
+      add(e, new T.Mesh(G.ball(eyeH*.22, .55, 1, .2), mat('#18212f')), 0,0,.011);
+      add(e, new T.Mesh(G.ball(eyeH*.09), mat('#ffffff')), -.005,.005,.014);
+      add(e, new T.Mesh(G.tube([[-eyeW/2,0,.009],[-eyeW*.23,eyeH*.52,.009],[eyeW*.23,eyeH*.48,.009],[eyeW/2,0,.009]], .0028, 8), mat('#322736')), 0,0,0);
+      add(e, new T.Mesh(G.cap(.0028,eyeW*.68).rotateZ(Math.PI/2), mat('#5c4037')), 0,eyeH*.95,-.002,0,0,-side*.08);
+      add(head, part(G.ball(R*.12,.55,1,.45), skin,{ink:false}), side*R*.96,-R*.05,0);
+    }
+    add(head,new T.Mesh(G.ext([-.009,0,0,.036,.009,0],.025,.003),mat('#e5ad90')),0,-.026,R*.99);
+    add(head,new T.Mesh(G.cap(.002,.044).rotateZ(Math.PI/2),mat('#ac6b68')),0,-R*.45,R*.91);
+  }
+  function ANIME(id, tier) {
+    const archer = id === 'elf' || id === 'lyra', caster = id === 'mage' || id === 'selene';
+    const dwarf = id === 'dwarf' || id === 'borin', female = archer || caster, hero = ['aldric','lyra','selene','borin'].includes(id);
+    const cloth = id === 'aldric' ? '#243d70' : id === 'lyra' ? '#245953' : id === 'selene' ? '#343d83' : archer ? '#365d43' : caster ? '#51467e' : dwarf ? '#584236' : '#76353b';
+    const steel = dwarf ? '#687383' : '#8795a7', trim = tier >= 3 ? '#bc9855' : '#b6b8c1';
+    const hair = id === 'aldric' ? '#d1d8e4' : id === 'lyra' ? '#327c7c' : caster ? '#c7c5df' : archer ? '#c7a168' : dwarf ? '#873f2e' : '#282735';
+    const o = {R:dwarf ? .22 : .19, torsoH:dwarf ? .53 : .65, torsoW:dwarf ? .58 : female ? .40 : .48, torsoD:dwarf ? .32 : .25,
+      legL:dwarf ? .43 : .80, legR:dwarf ? .095 : .073, bootH:.115, armL:dwarf ? .51 : .62, armR:dwarf ? .079 : .060,
+      skin:'#f3c6ac',legs:archer ? '#303d35' : '#34333f',boots:'#302d34',sleeve:cloth,glove:caster||archer ? '#f3c6ac':'#48515e',neck:.76};
+    const proportions = REAL.cur; REAL.cur = null;
+    let rig; try { rig = humanoid(o); } finally { REAL.cur = proportions; }
+    const n = rig.n, R = o.R;
+    // Replace the generic base head and limb meshes. Named rig nodes remain
+    // stable so existing battle animations and weapon attachments still work.
+    for (const child of [...n.head.children]) n.head.remove(child);
+    add(n.head,part(skull(R).scale(.94,1.06,.93),o.skin,{sculpted:true,ink:.006}),0,0,0);
+    animeFace(n.head,R,female,archer ? '#416c58' : caster ? '#6363a0':'#495974');
+    animeHair(n.head,R,hair,female,dwarf);
+    const w=o.torsoW/2, h=o.torsoH;
+    add(n.torso,part(G.lathe([[0,h],[w*.73,h],[w,h*.84],[w*.91,h*.56],[w*.68,h*.29],[w*.76,.05],[w*.85,-.07],[0,-.07]],20,o.torsoD/o.torsoW),cloth,{tex:'cloth',ink:.009}),0,0,0);
+    if (!caster) {
+      // Fitted breastplate with sloping clavicles and waist, rather than a box.
+      const plate=G.lathe([[0,h*.93],[w*.64,h*.93],[w*.95,h*.79],[w*1.015,h*.63],[w*.95,h*.47],[w*.77,h*.22],[w*.72,.11],[0,.11]],24,o.torsoD/o.torsoW*1.08);
+      add(n.torso,part(plate,archer?'#596854':id==='aldric'?'#526d91':steel,{metal:!archer,ink:.007}),0,0,0);
+      add(n.torso,part(G.sbox(.026,h*.63,.012,.65),trim,{metal:true,ink:false}),0,h*.49,o.torsoD*.59);
+      for (const side of [-1, 1]) add(n.torso,new T.Mesh(G.tube([[0,h*.60,o.torsoD*.56],[side*w*.36,h*.67,o.torsoD*.54],[side*w*.70,h*.75,o.torsoD*.42]],.005,8),mat(trim)),0,0,0);
+    } else {
+      add(n.torso,part(G.lathe([[0,.22],[w*.76,.22],[w*.92,0],[w*1.34,-.28],[w*1.6,-.55],[0,-.55]],22,.76),cloth,{tex:'cloth',ink:.009}),0,0,0);
+      for(const side of [-1,1]) add(n.torso,part(G.ext([side*.01,.5,side*.045,.5,side*.12,-.52,side*.075,-.52],.012,.003),trim,{ink:false}),0,0,.17, -.12);
+    }
+    add(n.torso,part(G.cyl(w*.83,w*.83,.045,20).scale(1,1,o.torsoD/o.torsoW), '#44312c',{ink:.007}),0,.11,0);
+    add(n.torso,part(G.sbox(.066,.047,.017,.4),trim,{metal:true,ink:.004}),0,.11,o.torsoD*.51);
+    // Collar, cape clasp and split cloth skirt establish layered clothing.
+    add(n.torso,part(G.torus(w*.58,.014).rotateX(Math.PI/2).scale(1,1,.7),trim,{metal:true,ink:.004}),0,h*.94,0);
+    n.cape=node('cape',n.torso,0,h*.88,-o.torsoD*.45);
+    add(n.cape,part(G.cape(o.torsoW*.96,caster?.88:archer?.55:.66,.55),hero?'#243047':cloth,{tex:'cloth',ds:true,ink:.008}),0,0,0);
+    if(!caster) for(const side of [-1,1]) add(n.torso,part(G.ext([0,0,side*.13,0,side*.15,-.24,side*.025,-.20],.012,.004),cloth,{tex:'cloth',ink:.006}),side*.015,.045,o.torsoD*.5);
+    for(const [side,k] of [[-1,'R'],[1,'L']]) {
+      const arm=n['arm'+k], leg=n['leg'+k];
+      for(const child of [...arm.children]) arm.remove(child);
+      add(arm,part(limb(o.armR,o.armL*.5),cloth,{tex:'cloth',ink:.006}),0,-o.armL*.25,0);
+      const elbow=n['elbow'+k]=node('elbow'+k,arm,0,-o.armL*.5,0); elbow.rotation.x=-.15;
+      add(elbow,part(limb(o.armR*.82,o.armL*.5),caster||archer?o.skin:steel,{metal:!female,ink:.006}),0,-o.armL*.25,0);
+      n['hand'+k]=node('hand'+k,elbow,0,-o.armL*.5,0);
+      add(n['hand'+k],part(G.sbox(.068,.083,.05,.65),o.glove,{ink:.004}),0,-.016,0);
+      if(!caster) {
+        const shoulder=new T.SphereGeometry(o.armR*1.9,Q(16),Q(10),0,TAU,0,Math.PI*.52).scale(1,.58,.88);
+        add(arm,part(shoulder,archer?'#647753':steel,{metal:!archer,ink:.007}),side*.012,.005,0);
+        add(arm,part(G.cyl(o.armR*1.05,o.armR*1.05,.024,12),trim,{metal:true,ink:.003}),0,-o.armL*.36,0);
+      }
+      add(leg,part(G.sbox(o.legR*1.2,.09,.035,.6),caster?cloth:steel,{ink:.004}),0,-o.legL*.49,o.legR*.77);
+      add(leg,part(G.cyl(o.legR*.82,o.legR*1.02,o.legL*.27,12).scale(1,1,.88), '#45414a',{ink:.006}),0,-o.legL*.83,0);
+    }
+    if(caster) {
+      // Narrow crown and flowing pointed hat; no enormous toy brim.
+      const hat=node('hat',n.head,0,R*.72,-R*.10);
+      add(hat,part(G.cyl(R*1.38,R*1.40,.025,24),cloth,{tex:'cloth',ink:.007}),0,0,0);
+      add(hat,part(G.bentCone(R*.82,R*1.8,.20),cloth,{tex:'cloth',ink:.008}),0,.015,0);
+      add(hat,part(G.cyl(R*.77,R*.82,.035,20),trim,{metal:true,ink:.004}),0,.046,0);
+      n.staff=WEAP.staff(id==='selene'?'#92c8dd':'#aaa1e0',tier,n);add(n.handR,n.staff,0,0,0,.12);
+    } else if(archer) {
+      for(const side of [-1,1]) add(n.head,part(G.ext([0,.02,side*.11,.085,side*.035,-.045],.025,.004),o.skin,{ink:.004}),side*R*.91,0,-.012,0,side*.3);
+      quiver(n,o,'#c7ad74');add(n.handL,WEAP.bow(tier,n,{wood:'#947648'}),0,0,.02);
+    } else if(dwarf) {
+      const helmet=new T.SphereGeometry(R*1.08,Q(20),Q(12),0,TAU,0,Math.PI*.50).scale(1,.88,.98);
+      add(n.head,part(helmet,steel,{metal:true,ink:.007}),0,R*.24,-R*.03);
+      add(n.head,part(G.sbox(.025,.15,.021,.6),trim,{metal:true,ink:.004}),0,R*.25,R*.99);
+      add(n.handR,id==='borin'?WEAP.warhammer(steel):WEAP.axe(steel,true),0,0,0,1.1);
+    } else {
+      add(n.handR,WEAP.sword(hero?.88:.75,hero?.11:.085,'#bac8d5',trim,{core:hero?'#9ac2dd':null,grip:'#40343a'}),0,0,0,1.15);
+      const shield=/^soldierS/.test(id);if(shield){n.shield=WEAP.shield(['#7a5a3a','#76353b','#355477','#665183','#ae8549'][+id.slice(-1)]||cloth,tier,trim);add(n.handL,n.shield,.045,.10,.03,0,.35);}
+    }
+    if(hero||tier>=3) add(n.torso,part(G.oct(.025,1.25).scale(1,1,.4),archer?'#8cb89c':caster?'#aba3d7':'#aa665f',{ink:.003}),0,h*.79,o.torsoD*.57);
+    rig.extra = (t, dur, name) => {
+      const cycle = S(t * TAU), strike = name === 'attack' || name === 'skill';
+      return { elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
+        elbowL: { rx: archer ? -.08 : dwarf && strike ? -.5 * Math.sin(t * Math.PI) : -.18 + cycle * .025 } };
+    };
+    return {rig,anim:{kind:caster?'staff':archer?'bow':dwarf?'two':'melee',shield:!!n.shield,skill:caster?'meteor':archer?'triple':dwarf?'slam':n.shield?'block':'holy'}};
+  }
+
+  function ANIME_ENEMY(id, tier) {
+    const made = ANIME('soldier', tier), n = made.rig.n, o = made.rig.o;
+    if (id === 'bandit') {
+      for (const child of [...n.head.children]) n.head.remove(child);
+      add(n.head, part(skull(o.R), '#d6a783', { sculpted:true, ink:.006 }),0,0,0);
+      animeFace(n.head,o.R,false,'#5a413a'); animeHair(n.head,o.R,'#302329',false,false);
+      add(n.head,part(G.torus(o.R*.98,.018).rotateX(Math.PI/2),'#c6bba4',{ink:.004}),0,.07,0,-.08);
+      made.anim.skill=null; return made;
+    }
+    const armor=id==='deathKnight'?'#36364e':tier>=3?'#532e39':'#31313f';
+    const rim=id==='deathKnight'?'#8675b1':'#98655e', eye=id==='deathKnight'?'#85c8d4':'#d8765e';
+    for(const ch of [...n.head.children]) n.head.remove(ch);
+    const R=o.R;
+    add(n.head,part(G.lathe([[0,-R],[R*.68,-R],[R*.95,-R*.40],[R,R*.42],[R*.72,R*.91],[0,R*1.10]],16,.87),armor,{metal:true,ink:.009}),0,0,0);
+    for(const side of [-1,1]) {
+      add(n.head,part(G.ext([side*.008,.025,side*.14,.045,side*.14,.012,side*.018,-.004],.008,0),'#100f1b',{ink:false}),0,0,R*.91);
+      add(n.head,new T.Mesh(G.sbox(.070,.011,.006,.7),mat(eye,{glow:.7})),side*.060,.021,R*.96);
+      add(n.head,part(G.ext([0,0,side*.07,.08,side*.04,-.13,0,-.17],.024,.006),armor,{metal:true,ink:.004}),side*R*.64,-.016,R*.69);
+    }
+    add(n.head,part(G.sbox(.018,.22,.026,.6),rim,{metal:true,ink:.003}),0,.01,R*.93);
+    if(id!=='deathKnight') for(const side of [-1,1]) add(n.head,part(G.tube([[side*R*.72,R*.65,0],[side*R*1.12,R*1.08,-.04],[side*R*1.02,R*1.65,-.13]],.024,12),rim,{ink:.005}),0,0,0);
+    // Tint each material once; shared material instances are never mutated.
+    const cache=new Map();
+    for(const owner of [n.torso,n.armR,n.armL,n.legR,n.legL]) owner.traverse(mesh=>{
+      if(!mesh.isMesh||mesh.material.userData.ink||mesh.parent===n.head)return;
+      const old=mesh.material;if(!cache.has(old)){const m=mat(old.userData.metal?armor:old.userData.tex==='cloth'?'#352b3b':'#49414b',{metal:old.userData.metal,tex:old.userData.tex,glow:old.userData.glow});cache.set(old,m);} mesh.material=cache.get(old);
+    });
+    n.handR.children.slice().filter(ch=>ch.name==='weapon').forEach(ch=>n.handR.remove(ch));
+    add(n.handR,WEAP.sword(id==='darkLord'?1.02:.86,.12,'#687083',rim,{core:eye,grip:'#30232c'}),0,0,0,1.15);
+    made.anim.heavy=true;made.anim.still=id!=='darkLord';made.anim.skill=id==='darkLord'?'slam':id==='darkKnight'?'summon':null;
+    return made;
+  }
+
+  const ANIME_DESCRIPTIONS = {
+    soldier: 'Kiếm sĩ tóc đen, giáp bạc ôm thân, vai giáp gọn, áo choàng đỏ và kiếm dài. Tỷ lệ người, mặt anime và khuỷu tay có khớp.',
+    aldric: 'Hiệp sĩ tóc bạc, giáp xanh thép ôm thân với đường viền vàng, áo choàng xanh sẫm và kiếm thánh lõi lam.',
+    elf: 'Cung thủ tai nhọn, tóc vàng dài từng lọn, giáp nhẹ xanh rêu, áo choàng ngắn và cung gỗ. Dáng mảnh, mắt anime.',
+    lyra: 'Xạ thủ tóc xanh ngọc dài, giáp nhẹ xanh rêu và áo choàng xanh sẫm. Tay giương cung có khớp khuỷu.',
+    mage: 'Pháp sư tóc bạc tím, váy áo nhiều lớp, mũ nhọn gọn, đường viền vàng và gậy pha lê.',
+    selene: 'Pháp sư tóc bạc tím, áo lam nhiều lớp có eo, mũ nhọn và gậy pha lê băng. Mặt anime, tay có khớp khuỷu.',
+    dwarf: 'Chiến binh lùn vai rộng, râu tết từng lọn, mũ sắt gọn, giáp ôm thân và rìu hai lưỡi.',
+    borin: 'Chiến thần lùn râu đỏ, mũ sắt và giáp nhiều lớp; cầm búa chiến, tay có khớp khuỷu.',
+    bandit: 'Cướp sa mạc dạng người, tóc đen từng lọn, khăn buộc đầu, giáp nhẹ, áo choàng và kiếm.',
+    deathKnight: 'Kỵ sĩ tỷ lệ người với mũ kín có khe mắt lam, giáp tím đen ôm thân, áo choàng và kiếm ma thuật.',
+    darkKnight: 'Kỵ sĩ hắc ám tỷ lệ người, mũ kín có sừng và khe mắt đỏ, giáp đen ôm thân, áo choàng và kiếm lõi đỏ.',
+    darkLord: 'Chúa hắc ám khổng lồ với giáp đen ôm thân, mũ sừng kín có khe mắt đỏ, áo choàng dài và đại kiếm.'
+  };
+  LIST.forEach(def => { if (ANIME_DESCRIPTIONS[def.id]) def.desc = ANIME_DESCRIPTIONS[def.id]; });
+
   const SKILL_NAME = { trollKing: 'Nện đất', voidLord: 'Xé không gian', soldier: 'Giơ khiên', elf: '3 mũi tên', mage: 'Mưa thiên thạch', dwarf: 'Đập đất', aldric: 'Thánh Quang', lyra: 'Mưa Tên', selene: 'Bão Băng', borin: 'Địa Chấn', wolfRider: 'Sói húc', darkKnight: 'Triệu hồi bóng tối', darkLord: 'Cắm kiếm' };
   function build(id, tier) {
     const def = LIST.find(c => c.id === id) || LIST[0];
     const t = Math.max(1, Math.min(def.tiers, tier || def.tiers));
     REAL.cur = realK(def.id); BUILD_ID = def.id;
     let made;
-    try { made = def.make(t); realize(made.rig); }
+    try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); realize(made.rig); }
     finally { REAL.cur = null; BUILD_ID = null; }
     const rig = made.rig;
     rig.root.name = 'root';

@@ -5,13 +5,13 @@
   const TAU=Math.PI*2, originals=Object.fromEntries(Object.entries(ArtChars).filter(([,d])=>d&&d.draw).map(([k,d])=>[k,{...d}]));
   const ink='#352c36';
   function tint(c,k){const n=parseInt(c.slice(1),16),a=[n>>16,(n>>8)&255,n&255];return '#'+a.map(v=>Math.round(k>0?v+(255-v)*k:v*(1+k)).toString(16).padStart(2,'0')).join('');}
-  function fill(g,path,c,lo=-.28,hi=.26){
+  function fill(g,path,c,lo=-.28,hi=.26,outline=true){
     let xs=[],ys=[];const record=(name,args)=>{if(name==='ellipse'){xs.push(args[0]-args[2],args[0]+args[2]);ys.push(args[1]-args[3],args[1]+args[3]);}else for(let i=0;i<args.length;i+=2){xs.push(args[i]);ys.push(args[i+1]);}g[name](...args);};
     const pen={moveTo:(...a)=>record('moveTo',a),lineTo:(...a)=>record('lineTo',a),quadraticCurveTo:(...a)=>record('quadraticCurveTo',a),bezierCurveTo:(...a)=>record('bezierCurveTo',a),ellipse:(...a)=>record('ellipse',a)};
-    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=g.createLinearGradient(minX,minY,maxX,maxY);gr.addColorStop(0,tint(c,hi));gr.addColorStop(.42,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.65;g.stroke();}
+    g.beginPath();path(pen);g.closePath();const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),gr=g.createLinearGradient(minX,minY,maxX,maxY);gr.addColorStop(0,tint(c,hi));gr.addColorStop(.42,c);gr.addColorStop(1,tint(c,lo));g.fillStyle=gr;g.fill();if(outline&&ArtStylized.ink){g.strokeStyle=ink;g.lineWidth=.65;g.stroke();}
   }
   const polygon=pts=>g=>{g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);};
-  function oval(g,x,y,rx,ry,c){fill(g,p=>p.ellipse(x,y,rx,ry,0,0,TAU),c);}
+  function oval(g,x,y,rx,ry,c,outline=true){fill(g,p=>p.ellipse(x,y,rx,ry,0,0,TAU),c,-.28,.26,outline);}
   function stroke(g,pts,w,c){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=ink;g.lineWidth=w+1.1;g.stroke();g.strokeStyle=c;g.lineWidth=w;g.stroke();g.strokeStyle=tint(c,.25);g.lineWidth=w*.25;g.stroke();}
   function star(g,x,y,r,c){const p=[];for(let i=0;i<10;i++){const a=i*Math.PI/5,rr=i%2?r*.46:r;p.push(x+Math.sin(a)*rr,y-Math.cos(a)*rr);}fill(g,polygon(p),c);}
   const skin='#ecc49c',gold='#d7ae58';
@@ -35,9 +35,9 @@
     fill(g,p=>{p.moveTo(8-leg*.3,-7);p.lineTo(15-leg*.3,-7);p.lineTo(20-leg*.3,-3);p.quadraticCurveTo(21-leg*.3,1,9-leg*.3,1);p.lineTo(7-leg*.3,-1);},elf?'#526138':'#65513b');
     if(!elf&&!mage&&!orc){fill(g,polygon([-14+leg*.4,-12,-9+leg*.4,-13,-9+leg*.4,-7,-15+leg*.4,-6]),tint(metal,-.16));fill(g,polygon([7-leg*.3,-13,13-leg*.3,-14,16-leg*.3,-7,9-leg*.3,-6]),metal);}
     // Far hand and compact shoulder block are behind the cuirass.
-    stroke(g,[-7,-34+y,-15,-28+y,-16,-19+y],5.2,tint(cloth,-.2));oval(g,-16,-19+y,2.5,2.8,flesh);
+    stroke(g,[-7,-34+y,-15,-28+y,-16,-19+y],5.2,tint(cloth,-.2));oval(g,-16,-19+y,2.5,2.8,flesh,false);
     fill(g,p=>{p.moveTo(-8,-38+y);p.quadraticCurveTo(2,-43+y,11,-34+y);p.lineTo(15,-22);p.quadraticCurveTo(2,-13,-10,-19);p.lineTo(-13,-30+y);},orc?flesh:cloth);
-    if(!mage&&!orc){fill(g,p=>{p.moveTo(-8,-36+y);p.lineTo(2,-39+y);p.lineTo(11,-32+y);p.lineTo(9,-25+y*.3);p.lineTo(-3,-23+y*.3);p.lineTo(-10,-29+y);},elf?'#547e4d':dwarf?'#716454':metal);fill(g,polygon([-8,-35+y,-1,-37+y,0,-26,-6,-27]),tint(elf?'#547e4d':dwarf?'#716454':metal,.22));}
+    if(!mage&&!orc){fill(g,p=>{p.moveTo(-8,-36+y);p.lineTo(2,-39+y);p.lineTo(11,-32+y);p.lineTo(9,-25+y*.3);p.lineTo(-3,-23+y*.3);p.lineTo(-10,-29+y);},elf?'#547e4d':dwarf?'#716454':metal);fill(g,polygon([-8,-35+y,-1,-37+y,0,-26,-6,-27]),tint(elf?'#547e4d':dwarf?'#716454':metal,.22),-.18,.16,false);}
     fill(g,polygon([-10,-23+y*.3,11,-25+y*.3,12,-20,-8,-17]),'#5d4030');oval(g,3,-21.8,2.3,1.7,gold);
     if(k==='knight')star(g,2,-31+y,2.5,gold);
     if(elf){fill(g,polygon([-3,-38,4,-35,0,-28,-5,-32]),'#96aa6b');fill(g,polygon([-8,-18,0,-19,-5,-10,-10,-12]),'#d2cdac');}
@@ -46,7 +46,7 @@
     // Heads are a smaller wedge with the visible face turned three-quarter.
     g.save();g.translate(3,-44+y);g.rotate(.07-strike*.12);
     fill(g,p=>{p.moveTo(-10,-5);p.quadraticCurveTo(-12,5,-5,8);p.quadraticCurveTo(2,12,8,7);p.quadraticCurveTo(14,4,13,-4);p.quadraticCurveTo(4,-12,-10,-5);},flesh);
-    fill(g,p=>{p.moveTo(-10,-2);p.quadraticCurveTo(-8,-5,-5,-4);p.quadraticCurveTo(-7,2,-4,6);p.quadraticCurveTo(-11,5,-10,-2);},tint(flesh,-.12));
+    fill(g,p=>{p.moveTo(-10,-2);p.quadraticCurveTo(-8,-5,-5,-4);p.quadraticCurveTo(-7,2,-4,6);p.quadraticCurveTo(-11,5,-10,-2);},tint(flesh,-.12),-.18,.12,false);
     if(elf||orc)fill(g,polygon([-9,-2,-16,-7,-14,2,-9,4]),flesh);
     if(troop){
       fill(g,p=>{p.moveTo(-12,0);p.bezierCurveTo(-16,-10,-7,-17,3,-16);p.quadraticCurveTo(13,-16,15,-6);p.lineTo(11,4);p.lineTo(5,3);p.lineTo(4,-2);p.lineTo(-10,0);},metal);
@@ -56,7 +56,7 @@
       fill(g,p=>{p.moveTo(-5,-15);p.quadraticCurveTo(-7,-24,1,-22);p.quadraticCurveTo(8,-19,10,-22);p.lineTo(8,-14);p.quadraticCurveTo(2,-16,-5,-15);},cloth);
     }else{
       fill(g,p=>{p.moveTo(-12,0);p.quadraticCurveTo(-17,-10,-8,-14);p.lineTo(-2,-17);p.lineTo(1,-14);p.lineTo(6,-16);p.quadraticCurveTo(16,-12,14,-3);p.lineTo(8,-1);p.lineTo(7,-5);p.lineTo(1,-1);p.lineTo(0,-6);p.lineTo(-5,-2);p.lineTo(-7,-5);p.lineTo(-12,0);},hair);
-      fill(g,p=>{p.moveTo(-10,-9);p.quadraticCurveTo(-5,-14,4,-12);p.lineTo(0,-9);p.lineTo(-5,-7);},tint(hair,.25));
+      fill(g,p=>{p.moveTo(-10,-9);p.quadraticCurveTo(-5,-14,4,-12);p.lineTo(0,-9);p.lineTo(-5,-7);},tint(hair,.25),-.18,.16,false);
       const blink=Math.sin(t*2.7)>.993?.1:1;
       // Narrow eyes and heavy brows, with a larger near eye than far eye.
       oval(g,-1,2,1.3,1.1*blink,'#eee1c1');oval(g,7,1,2,1.15*blink,'#eee1c1');oval(g,0,2,0.7,1*blink,'#35484b');oval(g,8,1,.8,1*blink,'#35484b');stroke(g,[-3,-.7,1,-1.3],1,hair);stroke(g,[5,-1.6,10,-.7],1.2,hair);
@@ -72,9 +72,9 @@
     fill(g,p=>{p.moveTo(8,-37+y);p.quadraticCurveTo(19,-39+y,19,-30+y);p.lineTo(13,-27+y);p.lineTo(6,-31+y);},orc?'#655d4d':dwarf?'#777369':elf?'#587847':mage?cloth:metal);
     if(!elf&&!mage&&!orc)stroke(g,[9,-35+y,16,-35+y,18,-32+y],.9,tint(metal,.28));
     const hx=18+strike*7,hy=-24+y-strike*6;
-    stroke(g,[14,-30+y,18,-26+y,hx,hy],5.7,elf||mage?flesh:orc?'#675544':metal);oval(g,hx,hy,2.8,3.0,elf||mage?flesh:'#564437');
+    stroke(g,[14,-30+y,18,-26+y,hx,hy],5.7,elf||mage?flesh:orc?'#675544':metal);oval(g,hx,hy,2.8,3.0,elf||mage?flesh:'#564437',false);
     g.save();g.translate(hx,hy);g.rotate(k==='knight'?.5+strike*1.7:orc?.55+strike*1.7:elf?-.13:0);
-    if(k==='knight'){stroke(g,[0,4,0,-5],2.1,'#5c4632');fill(g,polygon([-2,-4,-2,-23,1,-27,3,-23,3,-4]),'#bacad0');fill(g,polygon([1,-24,2,-22,2,-5,1,-5]),'#e0e4d8');stroke(g,[-5,-4,5,-4],2.1,gold);}
+    if(k==='knight'){stroke(g,[0,4,0,-5],2.1,'#5c4632');fill(g,polygon([-2,-4,-2,-23,1,-27,3,-23,3,-4]),'#bacad0');fill(g,polygon([1,-24,2,-22,2,-5,1,-5]),'#e0e4d8',-.18,.16,false);stroke(g,[-5,-4,5,-4],2.1,gold);}
     if(orc){stroke(g,[0,7,0,-25],2.7,'#735736');fill(g,p=>{p.moveTo(0,-24);p.lineTo(9,-29);p.quadraticCurveTo(17,-19,11,-12);p.lineTo(6,-15);p.lineTo(0,-16);},'#898d80');stroke(g,[10,-27,13,-21,11,-15],.7,'#c7c6b5');}
     if(elf){stroke(g,[1,-19,7,-12,9,0,4,10],2,'#a88c4d');stroke(g,[1,-19,4,10],.6,'#e7d7a2');stroke(g,[-5,-4,13,-4],.8,'#d8ccb0');fill(g,polygon([14,-4,10,-6,10,-2]),'#a6b6b2');}
     if(mage){stroke(g,[0,9,0,-31],2.5,'#80663d');fill(g,polygon([0,-40,4,-32,0,-26,-4,-32]),'#9576b4');fill(g,polygon([0,-39,0,-28,-3,-32]),'#c7b3dc');stroke(g,[-4,-30,0,-26,4,-30],1.3,gold);}
@@ -88,6 +88,8 @@
     const smooth=x=>x*x*(3-2*x);
     const swing=a<0?0:a<.3?-.42*smooth(a/.3):a<.55?-.42+1.35*smooth((a-.3)/.25):.93*(1-smooth((a-.55)/.45));
     const linen='#d9c99d',shade='#ab976a',blue='#326c8d',brass='#d1a34e';
+    const paint=(path,col)=>fill(g,path,col,-.18,.16,false);
+    function seam(pts,w,col){g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.strokeStyle=col;g.lineWidth=w;g.stroke();}
     g.save();g.lineJoin='round';g.lineCap='round';
     g.translate(swing*1.6,P.w>=0?-Math.abs(w)*.6:Math.sin(t*2.2)*.24);
     if(P.d!==undefined){g.translate(0,P.d*3);g.rotate(P.d*1.25);g.globalAlpha*=1-P.d*.65;}
@@ -96,17 +98,21 @@
       const [x0,y0,x1,y1,x2,y2]=points,dx=x2-x0,dy=y2-y0,l=Math.hypot(dx,dy),nx=-dy/l,ny=dx/l;
       fill(g,p=>{p.moveTo(x0+nx*r0,y0+ny*r0);p.quadraticCurveTo(x1+nx*r0,y1+ny*r0,x2+nx*r1,y2+ny*r1);p.quadraticCurveTo(x2+dx/l*r1,y2+dy/l*r1,x2-nx*r1,y2-ny*r1);p.quadraticCurveTo(x1-nx*r0,y1-ny*r0,x0-nx*r0,y0-ny*r0);p.quadraticCurveTo(x0-dx/l*r0,y0-dy/l*r0,x0+nx*r0,y0+ny*r0);},col);
     }
-    limb([-6,-18,-9+w*2,-10,-10+w*2,-3],3.7,2.8,shade);
-    fill(g,p=>{p.moveTo(-14+w*2,-5);p.quadraticCurveTo(-8+w*2,-7,-6+w*2,-2);p.lineTo(-6+w*2,0);p.quadraticCurveTo(-15+w*2,2,-17+w*2,-1);p.quadraticCurveTo(-18+w*2,-3,-14+w*2,-5);},'#b39a65');
-    limb([7,-18,10-w*2,-11,11-w*2,-3],4,3,linen);
-    fill(g,p=>{p.moveTo(7-w*2,-5);p.quadraticCurveTo(12-w*2,-7,15-w*2,-3);p.quadraticCurveTo(22-w*2,-1,19-w*2,1);p.lineTo(9-w*2,1);p.quadraticCurveTo(6-w*2,0,7-w*2,-5);},'#c3aa71');
-    stroke(g,[-12+w*2,-9,-7+w*2,-8],.65,'#e2d2a3');stroke(g,[8-w*2,-10,13-w*2,-9],.7,'#aa9264');
-    // Far arm is bent towards the waist, behind the chest.
-    limb([-10,-34,-18,-29,-16,-21],3.5,2.5,shade);oval(g,-15,-20,3.3,3.6,linen);
-    stroke(g,[-18,-29,-13,-28],.65,'#e4d6b0');
+    // Feet and shins share one outline; no ankle discs or cut edges.
+    function leg(x,shift,col){
+      g.save();g.translate(x,0);
+      fill(g,p=>{p.moveTo(-3.6,-20);p.quadraticCurveTo(-5+shift,-12,-4+shift,-6);p.quadraticCurveTo(-7+shift,-4,-6+shift,-1);p.quadraticCurveTo(-3+shift,2,6+shift,1);p.quadraticCurveTo(8+shift,-1,3+shift,-4);p.quadraticCurveTo(3+shift,-11,3.6,-20);},col);
+      paint(p=>{p.moveTo(-3,-17);p.quadraticCurveTo(-3+shift,-10,-2+shift,-5);p.lineTo(1+shift,-4);p.quadraticCurveTo(0+shift,-11,1,-17);},'#ead9ab');
+      seam([-4+shift,-10,2+shift,-9],.65,'#aa936b');seam([-4+shift,-7,2+shift,-6],.55,'#aa936b');
+      seam([-4+shift,-1,5+shift,0],.6,'#8b794f');g.restore();
+    }
+    leg(-9,w*2,shade);leg(10,-w*2,linen);
+    // The far arm ends in a single rounded fist, without a wrist seam.
+    limb([-10,-34,-18,-29,-15,-20],3.5,3.1,shade);
+    seam([-18,-29,-13,-28],.65,'#e4d6b0');seam([-17,-20,-13,-20],.55,'#8f7951');
     // A single torso silhouette avoids a stack of disconnected plates.
     fill(g,p=>{p.moveTo(-10,-38);p.quadraticCurveTo(-2,-41,9,-37);p.quadraticCurveTo(14,-32,11,-24);p.lineTo(10,-17);p.quadraticCurveTo(0,-14,-10,-18);p.quadraticCurveTo(-14,-29,-10,-38);},linen);
-    fill(g,p=>{p.moveTo(-10,-35);p.quadraticCurveTo(-6,-31,-7,-23);p.lineTo(-4,-17);p.lineTo(-10,-18);p.quadraticCurveTo(-14,-29,-10,-35);},shade);
+    paint(p=>{p.moveTo(-10,-35);p.quadraticCurveTo(-6,-31,-7,-23);p.lineTo(-4,-17);p.lineTo(-10,-18);p.quadraticCurveTo(-14,-29,-10,-35);},shade);
     for(let i=0;i<4;i++){
       const y=-34+i*4;
       g.beginPath();g.moveTo(-9,y);g.quadraticCurveTo(0,y+2.3,10,y-1.1);g.strokeStyle='#a79368';g.lineWidth=.7;g.stroke();
@@ -116,15 +122,15 @@
     fill(g,p=>{p.moveTo(-10,-19);p.quadraticCurveTo(0,-17,11,-20);p.lineTo(15,-8);p.quadraticCurveTo(11,-5,7,-7);p.lineTo(0,-5);p.quadraticCurveTo(-9,-5,-13,-9);},blue);
     fill(g,p=>{p.moveTo(-3,-18);p.lineTo(5,-19);p.quadraticCurveTo(5,-11,7,-7);p.quadraticCurveTo(2,-5,-3,-7);p.lineTo(-3,-18);},brass);
     stroke(g,[-10,-19,-1,-18,11,-20],2.3,brass);oval(g,2,-19,2,1.7,'#387caa');
-    stroke(g,[-8,-15,-8,-9],.7,'#204e68');stroke(g,[10,-15,12,-9],.7,'#204e68');
+    seam([-8,-15,-8,-9],.7,'#204e68');seam([10,-15,12,-9],.7,'#204e68');
     // Head, jaw and nemes are curved volumes, with asymmetric eyes for 3/4 view.
     g.save();g.translate(1,-43);g.rotate(-swing*.045);
     fill(g,p=>{p.moveTo(-12,-9);p.quadraticCurveTo(-9,-18,1,-18);p.quadraticCurveTo(12,-18,15,-8);p.lineTo(17,10);p.quadraticCurveTo(14,15,9,12);p.lineTo(6,5);p.lineTo(-6,6);p.lineTo(-9,14);p.quadraticCurveTo(-14,15,-16,10);p.lineTo(-12,-9);},blue);
     fill(g,p=>{p.moveTo(-12,-8);p.quadraticCurveTo(-15,1,-14,9);p.lineTo(-10,10);p.lineTo(-8,-4);},brass);
     fill(g,p=>{p.moveTo(11,-8);p.quadraticCurveTo(15,0,15,9);p.lineTo(11,11);p.lineTo(8,-4);},brass);
-    for(let i=0;i<3;i++){stroke(g,[-14,-2+i*4,-10,-3+i*4],.95,blue);stroke(g,[11,-2+i*4,15,-1+i*4],.95,blue);}
+    for(let i=0;i<3;i++){seam([-14,-2+i*4,-10,-3+i*4],.95,blue);seam([11,-2+i*4,15,-1+i*4],.95,blue);}
     fill(g,p=>{p.moveTo(-8,-7);p.quadraticCurveTo(0,-12,9,-6);p.quadraticCurveTo(12,1,8,7);p.quadraticCurveTo(3,12,-3,8);p.quadraticCurveTo(-10,5,-8,-7);},linen);
-    fill(g,p=>{p.moveTo(-8,-4);p.lineTo(-3,-6);p.quadraticCurveTo(-5,3,-1,8);p.quadraticCurveTo(-10,5,-8,-4);},shade);
+    paint(p=>{p.moveTo(-8,-4);p.quadraticCurveTo(-6,-6,-3,-6);p.quadraticCurveTo(-5,3,-1,8);p.quadraticCurveTo(-10,5,-8,-4);},shade);
     g.beginPath();g.moveTo(-7,-3);g.quadraticCurveTo(0,-1,9,-4);g.strokeStyle='#9f8b60';g.lineWidth=.7;g.stroke();
     // Deep sockets rather than rectangular robot eyes; a restrained blue glint.
     fill(g,p=>{p.moveTo(-5,-1);p.quadraticCurveTo(-2,-2.2,0,0);p.quadraticCurveTo(-2,2.8,-5,1);},'#4d4938');
@@ -136,16 +142,19 @@
     fill(g,p=>{p.moveTo(-1,-11);p.quadraticCurveTo(-3,-19,1,-20);p.quadraticCurveTo(6,-20,4,-16);p.lineTo(2,-15);p.lineTo(2,-11);},brass);oval(g,2,-18,.65,.5,'#345b65');
     g.restore();
     // Arm and weapon share a local pivot, so the hand never loses its grip.
-    g.save();g.translate(10,-34);g.rotate(-.10+swing*.92);
-    limb([0,0,6,5,10,5],3.7,2.8,linen);
-    stroke(g,[2,3,5,-1],.7,'#aa9367');stroke(g,[6,7,8,2],.7,'#aa9367');
+    g.save();g.translate(8,-33);g.rotate(-.10+swing*.92);
     g.save();g.translate(11,5);g.rotate(.38);
     stroke(g,[0,3,0,-6],2,'#81603a');
     fill(g,p=>{p.moveTo(-1.8,-6);p.quadraticCurveTo(-3,-17,5,-26);p.quadraticCurveTo(9,-30,13,-30);p.lineTo(12,-25);p.quadraticCurveTo(5,-24,2,-7);},'#ddb56c');
-    fill(g,p=>{p.moveTo(0,-7);p.quadraticCurveTo(1,-20,11,-28);p.lineTo(12,-29);p.quadraticCurveTo(5,-24,2,-7);},'#f1d69a');
+    paint(p=>{p.moveTo(0,-7);p.quadraticCurveTo(1,-20,11,-28);p.lineTo(12,-29);p.quadraticCurveTo(5,-24,2,-7);},'#f1d69a');
     stroke(g,[-4,-6,4,-6],1.9,brass);
-    oval(g,0,0,3,3.2,linen);g.beginPath();g.moveTo(-1,0);g.lineTo(2,-.8);g.strokeStyle='#a48b61';g.lineWidth=.65;g.stroke();
-    g.restore();g.restore();g.restore();
+    g.restore();
+    // One uninterrupted arm-to-knuckle contour, then only short finger marks.
+    fill(g,p=>{p.moveTo(-2,-3);p.bezierCurveTo(2,-4,5,1,8,1.5);p.quadraticCurveTo(10,0,13,2);p.quadraticCurveTo(16,3,14,7);p.quadraticCurveTo(11,10,8,7.5);p.quadraticCurveTo(2,8,-2,3);p.quadraticCurveTo(-4,0,-2,-3);},linen);
+    paint(p=>{p.moveTo(-1,-2);p.quadraticCurveTo(4,0,8,3);p.lineTo(7,4.5);p.quadraticCurveTo(2,3,-1,0);},'#ecddb7');
+    seam([3,4,5,1],.6,'#ad986b');seam([6,6,7,3],.6,'#ad986b');
+    seam([11,4,13,4.4],.55,'#a48b61');seam([10.8,6,13,6.2],.55,'#a48b61');
+    g.restore();g.restore();
   }
 
 

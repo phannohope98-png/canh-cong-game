@@ -6,7 +6,7 @@
   let current=list.find(d=>d.id===q.get('c'))||list[0],tier=+q.get('t')||4,mode='idle',face=1,time=0,speed=1,small=false;
   const modes={idle:'Đứng',walk:'Đi',atk:'Đánh',skill:'Kỹ năng',die:'Ngã'};
   function pose(t){return {t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
-  function picture(id,w,h,phase,dir){const c=document.createElement('canvas');c.width=w;c.height=h;const p=c.getContext('2d');p.translate(w/2,h*.88);p.scale(dir||1,1);ArtStylized.draw(p,id,phase,Math.min(h*.74,w*.70));return c;}
+  function picture(id,w,h,phase,dir){const c=document.createElement('canvas');c.width=w;c.height=h;const p=c.getContext('2d');p.translate(w/2,h*.88);p.scale(dir||1,1);ArtStylized.draw(p,id,phase,Math.min(h*.74,w*.46));return c;}
   function download(c,name){c.toBlob(blob=>{if(!blob)return;const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});}
   function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent='Nét vẽ 2D, hình khối gọn và chuyển động theo từng bộ phận. Giữ màu, trang phục và vũ khí đặc trưng.';
     $('sh-pal').replaceChildren();for(const {c:col,l:name} of (d.palette||[])){const s=document.createElement('span');s.textContent=name+' '+col;s.style.borderLeft='18px solid '+col;s.style.padding='5px';$('sh-pal').append(s);}

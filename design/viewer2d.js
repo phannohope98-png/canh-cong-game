@@ -4,6 +4,7 @@
   await ArtStylized.ready;
   const aliases={wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight'};
   const list=Chars3D.list.filter(d=>ArtStylized.kind(d.id)||ArtStylized.originals[d.id]||ArtStylized.originals[aliases[d.id]]);
+  list.push({id:'nara',name:'Nara Mầm Sống',race:'Tinh linh rừng',role:'Hồi phục · Trói chân',palette:[]});
   let current=list.find(d=>d.id===q.get('c'))||list[0],tier=+q.get('t')||4,mode='idle',face=1,time=0,speed=1,small=false;
   const modes={idle:'Đứng',walk:'Đi',atk:'Đánh',skill:'Kỹ năng',die:'Ngã'};
   function pose(t){return {t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
@@ -12,7 +13,7 @@
   function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent=d.id==='pharaoh'?'Pharaoh chiến đấu: băng vải ngà, giáp vàng–lam, mắt xanh và kiếm cong. Nét vẽ có khối, với các tư thế bước đi và chém kiếm nối thành hoạt ảnh.':'Sprite vẽ có khối và chất liệu riêng. Bộ đứng, di chuyển và tấn công dùng cùng renderer với nhân vật trong trận.';
     $('sh-pal').replaceChildren();for(const {c:col,l:name} of (d.palette||[])){const s=document.createElement('span');s.textContent=name+' '+col;s.style.borderLeft='18px solid '+col;s.style.padding='5px';$('sh-pal').append(s);}
     $('sh-turn').replaceChildren();for(const [label,dir]of [['Phải',1],['Trái',-1]]){const f=document.createElement('figure'),im=document.createElement('img');im.src=picture(d.id,160,190,{t:0,w:-1,a:-1},dir).toDataURL();im.alt=label;const c=document.createElement('figcaption');c.textContent=label;f.append(im,c);$('sh-turn').append(f);}
-    $('sh-stats').textContent=d.id==='pharaoh'?'24 khung vẽ · 2 hướng · đứng, đi, đánh và ngã':'18 khung vẽ · 2 hướng · đứng, đi, đánh và ngã';$('sh-bones').textContent=d.id==='pharaoh'?'6 khung đứng · 12 khung bước đi · 6 khung chém kiếm':'6 khung đứng · 6 khung di chuyển · 6 khung tấn công';
+    $('sh-stats').textContent='2D vẽ tay · chuyển động khớp liên tục · 2 hướng';$('sh-bones').textContent=['warg','frostWolf','wolfRider'].includes(d.id)?'4 chân độc lập · chân chạm đất và nâng chân · IK hai khớp':'Nội suy nét vẽ · bước theo quãng đường · đứng và tấn công';
     history.replaceState(null,'','?c='+d.id+'&t='+tier);for(const b of $('roster').children)b.classList.toggle('on',b.dataset.id===d.id);
   }
   for(const d of list){const b=document.createElement('button');b.dataset.id=d.id;const im=document.createElement('img');im.src=picture(d.id,96,100,{t:0,w:-1,a:-1},1).toDataURL();const s=document.createElement('span');s.textContent=d.name;b.append(im,s);b.onclick=()=>select(d);$('roster').append(b);}

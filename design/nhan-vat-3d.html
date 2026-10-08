@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#120c18">
-<title>Xưởng Nhân Vật 3D – Canh Cổng</title>
+<title>Xưởng Nhân Vật 2D – Canh Cổng</title>
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <style>
 @font-face { font-family: "Alegreya SC"; src: url("../assets/fonts/AlegreyaSC-Black.woff2") format("woff2"); font-weight: 900; font-display: swap; }
@@ -100,12 +100,13 @@ select { font: inherit; font-size: 14px; color: var(--text); background: var(--p
   header .sub { display: none; }
   .hint { display: none; }
 }
+.exp [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <h1>Xưởng Nhân Vật 3D</h1>
+    <h1>Xưởng Nhân Vật 2D</h1>
     <span class="sub">Canh Cổng · mô hình 3D chuyển động · Xưởng 42 · phong cách thủ thành</span>
     <span class="sp"></span>
     <a class="btn" href="../index.html">← Về game</a>
@@ -124,7 +125,7 @@ select { font: inherit; font-size: 14px; color: var(--text); background: var(--p
         </div>
       </div>
       <div class="hud bot" id="anims"></div>
-      <div class="hint">Kéo để xoay · lăn / chụm để phóng to</div>
+      <div class="hint">Đổi hướng · thử chuyển động · xem cỡ trong trận</div>
     </section>
     <aside id="sheet">
       <h2 id="sh-name">…</h2>
@@ -132,9 +133,9 @@ select { font: inherit; font-size: 14px; color: var(--text); background: var(--p
       <p class="desc" id="sh-desc"></p>
       <div class="sec"><h3 id="sh-tiername">Cấp</h3><div class="seg" id="sh-tiers"></div></div>
       <div class="sec"><h3>Bảng màu</h3><div class="swatches" id="sh-pal"></div></div>
-      <div class="sec"><h3>Bảng quay 4 góc</h3><div class="turn" id="sh-turn"></div></div>
-      <div class="sec"><h3>Thông số mô hình</h3><div class="stats" id="sh-stats"></div></div>
-      <div class="sec"><h3>Khớp xương (tên node trong .glb)</h3><div class="tags" id="sh-bones"></div></div>
+      <div class="sec"><h3>Hai hướng trong game</h3><div class="turn" id="sh-turn"></div></div>
+      <div class="sec"><h3>Thông số hình vẽ</h3><div class="stats" id="sh-stats"></div></div>
+      <div class="sec"><h3>Bộ phận chuyển động</h3><div class="tags" id="sh-bones"></div></div>
       <div class="sec">
         <h3>Xuất file</h3>
         <div class="exp">
@@ -147,7 +148,7 @@ select { font: inherit; font-size: 14px; color: var(--text); background: var(--p
           <button class="btn green wide" id="ex-sheet">Sprite sheet 8 hướng</button>
           <button class="btn wide" id="ex-all">Tải tất cả .GLB (mọi nhân vật, cấp cao nhất)</button>
         </div>
-        <p class="note">.GLB có sẵn khung khớp + mọi clip hoạt ảnh và viền mực, mở được bằng Blender, Unity, Godot, three.js. Sprite sheet: 8 hàng hướng (Nam, ĐN, Đông, ĐB, Bắc, TB, Tây, TN) × 8 khung, nền trong suốt, góc nhìn chéo kiểu Kingdom Rush.</p>
+        <p class="note">Nhân vật vẽ bằng Canvas 2D. PNG và sprite sheet có nền trong suốt, hai hướng trái/phải và 12 khung chuyển động mỗi hướng.</p>
       </div>
     </aside>
   </div>
@@ -157,8 +158,14 @@ select { font: inherit; font-size: 14px; color: var(--text); background: var(--p
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
 <script src="vendor/GLTFExporter.js"></script>
-<script src="chars3d.js?v=friendly43"></script>
-<script src="towers3d.js?v=friendly43"></script>
-<script src="viewer3d.js?v=friendly43"></script>
+<script src="chars3d.js?v=painted44"></script>
+<script src="towers3d.js?v=painted44"></script>
+<script src="../js/config.js?v=painted44"></script>
+<script src="../js/art-kit.js?v=painted44"></script>
+<script src="../js/art-chars.js?v=painted44"></script>
+<script src="../js/art-stylized.js?v=painted44"></script>
+<script src="../js/chibi.js?v=painted44"></script>
+<script>ArtStylized.captureLegacy();</script>
+<script src="viewer2d.js?v=painted44"></script>
 </body>
 </html>

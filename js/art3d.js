@@ -66,6 +66,47 @@
     });
   }
 
+  // One skinned draw per material. Armour remains rigid to its joint; organic
+  // upper/lower limb surfaces blend near elbows and knees to close hard seams.
+  function skinRig(root,rig){
+    const bones=[...new Set(Object.values(rig.n))],base=new T.Bone();base.name='skin-base';root.add(base);bones.push(base);
+    const owners=new Set(bones),index=new Map(bones.map((b,i)=>[b,i]));
+    bones.forEach(b=>{b.isBone=true;});
+    root.updateMatrixWorld(true);
+    const invRoot=root.matrixWorld.clone().invert(),jointPos=new Map(bones.map(b=>[b,new T.Vector3().setFromMatrixPosition(b.matrixWorld).applyMatrix4(invRoot)]));
+    const buckets=new Map(),meshes=[],v=new T.Vector3();
+    root.traverse(o=>{
+      if(!o.isMesh||o.isInstancedMesh)return;
+      meshes.push(o);let owner=o.parent;while(owner&&!owners.has(owner))owner=owner.parent;owner=owner||base;
+      const geo=(o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone()).applyMatrix4(invRoot.clone().multiply(o.matrixWorld));
+      if(geo.attributes.uv&&!o.material.map)geo.deleteAttribute('uv');
+      if(o.material.userData.tex){if(!geo.attributes.tpos)Chars3D.kit.texCoords(geo);}else{geo.deleteAttribute('tpos');geo.deleteAttribute('tnrm');}
+      const count=geo.attributes.position.count,si=new Uint16Array(count*4),sw=new Float32Array(count*4);
+      const soft=!o.material.userData.metal&&!o.material.userData.ink&&!/weapon|shield/.test(owner.name);
+      let parent=owner.parent;while(parent&&!owners.has(parent))parent=parent.parent;
+      const child=bones.find(b=>b.parent===owner&&/^(elbow|knee)/.test(b.name));
+      for(let i=0;i<count;i++){
+        si[i*4]=index.get(owner);sw[i*4]=1;
+        if(soft){
+          v.fromBufferAttribute(geo.attributes.position,i);
+          const neighbor=/^(elbow|knee)/.test(owner.name)?parent:child;
+          const pivot=neighbor===parent?jointPos.get(owner):jointPos.get(neighbor);
+          if(neighbor&&pivot){const distance=v.distanceTo(pivot),weight=.34*Math.max(0,1-distance/.072);if(weight>0){si[i*4+1]=index.get(neighbor);sw[i*4]=1-weight;sw[i*4+1]=weight;}}
+        }
+      }
+      geo.setAttribute('skinIndex',new T.Uint16BufferAttribute(si,4));geo.setAttribute('skinWeight',new T.Float32BufferAttribute(sw,4));
+      const key=o.material.uuid;if(!buckets.has(key))buckets.set(key,{material:o.material,geos:[]});buckets.get(key).geos.push(geo);
+    });
+    meshes.forEach(o=>o.removeFromParent());
+    const skeleton=new T.Skeleton(bones);root.userData.skeleton=skeleton;
+    buckets.forEach(b=>{
+      const merged=T.BufferGeometryUtils.mergeBufferGeometries(b.geos,false);b.geos.forEach(g=>g.dispose());
+      if(!merged)throw Error('Could not merge skinned character geometry');
+      const mesh=new T.SkinnedMesh(merged,b.material);mesh.frustumCulled=false;mesh.renderOrder=b.material.transparent?1:0;root.add(mesh);root.updateMatrixWorld(true);mesh.bind(skeleton,mesh.matrixWorld);mesh.normalizeSkinWeights();
+    });
+    root.userData.skinDraws=buckets.size;return root;
+  }
+
   /* ---------- bản dựng 3D theo (nhân vật, cấp) ---------- */
   const insts = new Map();
   function inst(cid, tier, tall) {
@@ -301,7 +342,7 @@
     if (window.Painter) Painter.clear();
   };
   Art3D.available = () => !!gl();
-  Art3D.optimizeRig=(root,rig)=>optimize(root,rig);
+  Art3D.optimizeRig=(root,rig)=>skinRig(root,rig);
   Art3D.optimize = root => { optimize(root, { n: {} }); root.updateMatrixWorld(true); return root; };
   Art3D.lightTheme = () => theme;
   Art3D.lights = () => LIGHT[theme] || LIGHT.forest;

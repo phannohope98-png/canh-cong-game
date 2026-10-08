@@ -5,7 +5,7 @@
   if(!window.THREE||!window.Art3D)return;
   const T=THREE,EL=.34,se=Math.sin(EL),ce=Math.cos(EL),TAU=Math.PI*2;
   const WX=x=>x/40,WZ=y=>y/(40*se);
-  function release(root){if(!root)return;root.removeFromParent();root.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
+  function release(root){if(!root)return;root.removeFromParent();if(root.userData.skeleton)root.userData.skeleton.dispose();root.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
   function identity(o){
     if(o.isHero)return {id:o.heroId,tier:Math.min(4,2+Math.floor((o.tiers||[0,0,0,0]).reduce((s,v)=>s+v,0)/4)),height:o.heroId==='borin'?52:66};
     if(o.tower){const k=o.art||'soldier1',shield=/s([0-4])/.exec(k);return{id:shield?'soldierS'+shield[1]:/^orct/.test(k)?'orc':k.replace(/[1-4].*$/,''),tier:o.tower.level,height:o.art==='wolfRider'?90:50};}

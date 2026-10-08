@@ -178,13 +178,13 @@
       scene.add(part(cliffGeo,theme==='chaos'?'#3b315b':theme==='desert'?'#b07849':theme==='ice'?'#8497ab':'#6a705f',{tex:'rock',ink:false}));
       const nrm = geo.attributes.normal, col = new Float32Array(nx * ny * 3);
       for (let k = 0; k < nx * ny; k++) { // đổ bóng theo độ dốc: bờ dốc gắt thì phân tông kiểu toon, gò thoải thì chuyển mềm
-        const d = nrm.getX(k) * LDIR.x + nrm.getY(k) * LDIR.y + nrm.getZ(k) * LDIR.z, f = 1 + (d - FLAT) * 1.6;
+        const d = nrm.getX(k) * LDIR.x + nrm.getY(k) * LDIR.y + nrm.getZ(k) * LDIR.z, f = 1 + (d - FLAT) * .55;
         const q = f < 0.72 ? 0.66 : f < 0.86 ? 0.8 : Math.min(1.12, 0.8 + (f - 0.86) * 1.4);
         col[k * 3] = col[k * 3 + 1] = col[k * 3 + 2] = q;
       }
       geo.setAttribute('color', new T.BufferAttribute(col, 3));
       const tx = new T.CanvasTexture(tex); tx.encoding = T.sRGBEncoding; tx.anisotropy = 4;
-      scene.add(new T.Mesh(geo, new T.MeshBasicMaterial({ map: tx, vertexColors: true })));
+      scene.add(new T.Mesh(geo, new T.MeshStandardMaterial({ map: tx, vertexColors: true, roughness:.95, metalness:0 })));
       /* --- chi tiết 3D trên mặt đất: cỏ, hoa, sỏi, đá viền & đá lát đường --- */
       const hAt = (x, y) => { const fi = Math.max(0, Math.min(nx - 1.001, x / cell)), fj = Math.max(0, Math.min(ny - 1.001, (y + 30) / cell)), i = fi | 0, j = fj | 0, u = fi - i, v = fj - j, P = (a, b) => pos[((j + b) * nx + i + a) * 3 + 1]; return (P(0, 0) * (1 - u) + P(1, 0) * u) * (1 - v) + (P(0, 1) * (1 - u) + P(1, 1) * u) * v; };
       if (map.det) details(scene, map.det, hAt, TH, theme);

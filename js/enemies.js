@@ -13,7 +13,7 @@
       const d = CONFIG.enemies[type], art = ArtChars[type];
       this.uid = ++uid; this.type = type; this.def = d; this.name = d.name;
       this.maxHp = Math.round(d.hp * (hpMul || 1)); this.hp = this.maxHp;
-      this.armor = d.armor; this.mres = d.mres; this.speed = d.speed; this.radius = d.radius;
+      this.armor = d.armor; this.mres = d.mres; this.speed = d.speed * CONFIG.match.enemySpeedScale; this.radius = d.radius;
       this.flying = !!d.flying; this.boss = !!d.boss; this.reward = d.reward;
       this.art = type; this.pathIndex = pathIndex; this.rateMul = 1; this.speedMul = 1; this.chargeT = 0;
       this.scale = d.radius / art.dr * (CONFIG.unitScale || 1); this.height = (art.tall ? art.tall * 0.95 : art.box[3] * 0.78) * this.scale + (this.flying ? 18 : 0);

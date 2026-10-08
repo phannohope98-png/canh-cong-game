@@ -3,7 +3,7 @@
  * Trụ không bị tấn công. Nâng cấp đổi hình dạng (4 cấp).
  * ========================================================= */
 (function () {
-  const TS = 1.1; // tỉ lệ vẽ trụ
+  const TS = 1.3; // trụ lớn, rõ hơn trên bản đồ gọn
   const FALL = 0.42, SQUASH = 0.34, DROP_H = 620; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
   const TARGET = {
     first(T, air) { let b = null, bd = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.dist > bd) { bd = e.dist; b = e; } return b; },
@@ -27,7 +27,7 @@
     }
     get stats() {
       const lv = this.def.levels[this.level - 1], M = Items.mods(this.type);
-      const dm = (1 + Progress.bonus(this.type, 'damage')) * (1 + M.damage), rm = (1 + Progress.bonus(this.type, 'range')) * (1 + M.range), am = (1 + Progress.bonus(this.type, 'aoe')) * (1 + M.aoe);
+      const dm = (1 + M.damage), rm = (1 + M.range), am = (1 + M.aoe);
       return { damage: lv.damage ? [lv.damage[0] * dm, lv.damage[1] * dm] : null, range: (lv.range || 0) * rm, rate: (lv.rate || 1) / (1 + M.rate), aoe: (lv.aoe || 0) * am, special: lv.special,
         crit: M.crit, poison: M.poison, root: M.root, slow: M.slow, pen: M.pen, burn: M.burn, stun: M.stun };
     }

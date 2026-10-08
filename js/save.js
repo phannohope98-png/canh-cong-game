@@ -1,12 +1,12 @@
 /* =========================================================
  * save.js – Tiến trình người chơi (localStorage)
- * Sao → nâng cấp trụ. Xu → mở khoá anh hùng & mua trang bị.
+ * Sao ghi thành tích màn chơi. Xu → mở khoá anh hùng & mua trang bị.
  * ========================================================= */
 (function () {
   const KEY = 'canhcong_v4';
   const SLOTS = ['weapon', 'gloves', 'armor', 'boots'];
   function defaults() {
-    const upgrades = {}; Object.keys(CONFIG.upgrades).forEach(k => { upgrades[k] = 0; });
+    const upgrades = {}; // legacy save payload retained, no permanent tower bonuses
     const heroXp = {}, equip = {}; Object.keys(CONFIG.heroes).forEach(k => { heroXp[k] = 0; equip[k] = { weapon: 0, gloves: 0, armor: 0, boots: 0 }; });
     const loadout = {}; ['barracks', 'archer', 'mage', 'artillery'].forEach(t => { loadout[t] = [0, 0, 0, 0, 0, 0]; });
     return { stars: {}, unlocked: 1, upgrades, heroXp, seen: {}, settings: { music: true, sound: true, shake: true, art3d: true },
@@ -42,16 +42,6 @@
   const Progress = {
     SLOTS,
     totalStars() { return Object.values(Save.data.stars).reduce((a, b) => a + b, 0); },
-    spentStars() { let n = 0; for (const k in Save.data.upgrades) { const c = CONFIG.upgrades[k] && CONFIG.upgrades[k].cost; if (!c) continue; for (let i = 0; i < Save.data.upgrades[k]; i++) n += c[i]; } return n; },
-    freeStars() { return this.totalStars() - this.spentStars(); },
-    upLevel(type) { return Save.data.upgrades[type] || 0; },
-    bonus(type, stat) { const u = CONFIG.upgrades[type]; return u && u.perLevel[stat] ? u.perLevel[stat] * this.upLevel(type) : 0; },
-    buyUpgrade(type) {
-      const u = CONFIG.upgrades[type], lv = this.upLevel(type);
-      if (lv >= u.cost.length || this.freeStars() < u.cost[lv]) return false;
-      Save.data.upgrades[type] = lv + 1; Save.save(); return true;
-    },
-
     /* ---- Anh hùng ---- */
     selectedHero() { return Save.data.hero; },
     heroLevel(id) { id = id || Save.data.hero; const t = CONFIG.heroLevelXp, xp = Save.data.heroXp[id] || 0; let lv = 1; while (lv < t.length && xp >= t[lv]) lv++; return lv; },

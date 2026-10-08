@@ -43,7 +43,6 @@
         case 'region-locked': this.toast('Hạ boss map 6 của vùng trước để mở vùng này'); AudioSys.play('error'); break;
         case 'map-locked': this.toast('Thắng map trước để mở map này'); AudioSys.play('error'); break;
         case 'start-level': this.closeOverlay(); Game.start(+d.index); break;
-        case 'buy-up': if (Progress.buyUpgrade(d.type)) { AudioSys.play('build'); this.toast('Đã nâng cấp!'); } else { AudioSys.play('error'); this.toast('Không đủ sao'); } this.renderUpgrades(); break;
         case 'codex-tab': this.codexTab = d.tab; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === d.tab)); this.renderCodex(); break;
         case 'hero-pick': this.viewHero = d.id; if (Save.data.heroes[d.id]) Progress.selectHero(d.id); this.renderHeroes(); break;
         case 'hero-unlock': if (Progress.unlockHero(d.id)) { Progress.selectHero(d.id); AudioSys.play('build'); this.toast('Đã mở khoá anh hùng!'); } else { AudioSys.play('error'); this.toast('Không đủ Xu'); } this.renderHeroes(); break;
@@ -92,7 +91,7 @@
       if (id !== 'screen-game') { AudioSys.playMusic('menu'); if (AudioSys.stopAmbient) AudioSys.stopAmbient(); }
       document.querySelectorAll('.star-count').forEach(e => { e.textContent = Progress.totalStars(); });
       this.refreshCoins();
-      ({ 'screen-menu': () => this.paintMenu(), 'screen-map': () => this.renderMap(), 'screen-upgrades': () => this.renderUpgrades(), 'screen-heroes': () => { this.viewHero = Progress.selectedHero(); this.renderHeroes(); },
+      ({ 'screen-menu': () => this.paintMenu(), 'screen-map': () => this.renderMap(), 'screen-heroes': () => { this.viewHero = Progress.selectedHero(); this.renderHeroes(); },
         'screen-codex': () => this.renderCodex(), 'screen-items': () => this.renderItems(), 'screen-settings': () => this.renderSettings() }[id] || (() => {}))();
     },
 
@@ -205,20 +204,6 @@
         <p class="sub" style="margin:8px 0 0;color:#d8c8f0">Xu kiếm được sau mỗi trận. Trang bị mặc lên người anh hùng và đổi hình dạng nhân vật.</p></div>`;
       this.paintCanvases($('screen-heroes'), tiers);
       this.refreshCoins();
-    },
-
-    /* ================= NÂNG CẤP TRỤ ================= */
-    renderUpgrades() {
-      $('free-stars').textContent = Progress.freeStars();
-      $('upgrades-list').innerHTML = Object.keys(CONFIG.upgrades).map(k => {
-        const U = CONFIG.upgrades[k], T = CONFIG.towers[k], own = Progress.upLevel(k), free = Progress.freeStars();
-        return `<div class="card up-card"><div class="up-stage"><canvas class="up-art" data-tower="${k}" data-tier="${Math.min(4, own + 1)}" data-fit="0.92" width="300" height="300"></canvas><span class="up-lv">${own}/${U.cost.length}</span></div>
-          <h3>${T.name}</h3><div class="sub">${T.role}</div><div class="sub up-txt">Mỗi cấp: ${U.text}</div>
-          <div class="up-nodes">${U.cost.map((c, i) => i < own ? `<div class="up-node own">${I('check')}</div>`
-            : i === own ? `<button class="up-node ${free >= c ? 'buy' : ''}" data-action="buy-up" data-type="${k}"><span>Cấp ${i + 1}</span><span>${I('star')} ${c}</span></button>`
-            : `<div class="up-node">${I('star')} ${c}</div>`).join('')}</div></div>`;
-      }).join('');
-      this.paintCanvases($('upgrades-list'));
     },
 
     /* ================= KHO ĐỒ: 6 vị trí lắp trên mỗi trụ ================= */

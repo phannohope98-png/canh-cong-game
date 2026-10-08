@@ -87,7 +87,7 @@
       this.perfWatch(raw);
       Camera.update(dt);
       if (this.state === 'playing' && !this.paused) {
-        let sim = dt * this.speed;
+        let sim = dt * this.speed * CONFIG.match.timeScale;
         while (sim > 1e-6 && this.state === 'playing') { const s = Math.min(STEP, sim); this.update(s); sim -= s; }
       } else if (this.state === 'ended') Effects.update(dt);
       this.render();

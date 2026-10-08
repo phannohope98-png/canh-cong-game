@@ -1,5 +1,5 @@
 /* =========================================================
- * level.js – Dựng màn chơi (6 vùng đất, bản đồ NGANG 1800×900)
+ * level.js – Dựng màn chơi (6 vùng đất, bản đồ NGANG 1280×640)
  *  - Đường đi: spline mềm; ô xây tự chọn theo độ phủ đường
  *  - Nền vẽ 1 lần: rừng, thành cổ, sa mạc, băng giá, núi lửa, cổng hỗn mang
  * ========================================================= */
@@ -306,10 +306,11 @@
     build(index) {
       const L = CONFIG.levels[index], PW = CONFIG.pathWidth, B = L.bg && L.ipaths ? L.bg : null;
       let W = CONFIG.world.width, H = CONFIG.world.height, sc = 1;
-      // Map ảnh thật: thế giới cao 900, rộng theo tỉ lệ ảnh; đường đi đổi từ toạ độ ảnh gốc
+      // Map ảnh thật: thế giới cao 640, rộng theo tỉ lệ ảnh; đường đi đổi từ toạ độ ảnh gốc
       if (B) { sc = H / (B.y1 - B.y0); W = Math.round((B.x1 - B.x0) * sc); }
-      const theme = CONFIG.themes[L.theme], F = B ? { rivers: [] } : (FEATURES[index] || { rivers: [] });
-      const ctrl = B ? L.ipaths.map(c => c.map(p => [(p[0] - B.x0) * sc, (p[1] - B.y0) * sc])) : L.paths;
+      const theme = CONFIG.themes[L.theme], legacyScale = H / 900, sourceF = FEATURES[index] || { rivers: [] };
+      const F = B ? { rivers: [] } : Object.assign({}, sourceF, { rivers: sourceF.rivers.map(r => r.map(p => p.map(v => v * legacyScale))), pond: (sourceF.pond || []).map(p => p.map(v => v * legacyScale)) });
+      const ctrl = B ? L.ipaths.map(c => c.map(p => [(p[0] - B.x0) * sc, (p[1] - B.y0) * sc])) : L.paths.map(c => c.map(p => p.map(v => v * legacyScale)));
       const paths = ctrl.map(c => new Path(smooth(c, 10)));
       const rivers = F.rivers.map(c => new Path(smooth(c, 12)));
       const chaos = L.theme === 'chaos';

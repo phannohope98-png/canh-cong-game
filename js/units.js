@@ -215,7 +215,7 @@
       this.refresh(T, true); this.placePosts(T);
     },
     refresh(T, full) {
-      const lv = T.def.levels[T.level - 1], M = Items.mods(T.type), hb = (1 + Progress.bonus(T.type, 'hp')) * (1 + M.hp), db = (1 + Progress.bonus(T.type, 'damage')) * (1 + M.damage);
+      const lv = T.def.levels[T.level - 1], M = Items.mods(T.type), hb = (1 + M.hp), db = (1 + M.damage);
       const sh = M.list[1], art = sh && ArtChars[lv.art + 's' + sh.r] ? lv.art + 's' + sh.r : lv.art; // có Khiên gắn trụ → lính cầm khiên (màu theo bậc)
       for (const u of this.list) if (u.tower === T) {
         const r = full || !u.maxHp ? 1 : u.hp / u.maxHp;

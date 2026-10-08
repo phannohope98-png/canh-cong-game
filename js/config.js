@@ -4,12 +4,14 @@
  * Giáp (armor) & kháng phép (mres) tính theo % giảm sát thương (0 – 0.8).
  * ========================================================= */
 window.CONFIG = {
-  world: { width: 1800, height: 900 },
+  world: { width: 1280, height: 640 },
   pathWidth: 88,
-  unitScale: 0.72,            // tỉ lệ vẽ nhân vật (nhỏ so với đường & trụ như Kingdom Rush)
+  unitScale: 1.0,             // nhân vật rõ hơn trên màn hình điện thoại
 
   match: {
     lives: 20,
+    timeScale: 0.85,           // nhịp trận chậm hơn ở chế độ 1x
+    enemySpeedScale: 0.68,     // đường ngắn hơn nhưng có thêm thời gian chặn quái
     firstWaveDelay: 0,          // 0 = chờ người chơi bấm nút bắt đầu
     nextWaveDelay: 14,
     earlyCallBonusPerSec: 2,    // vàng thưởng / giây khi gọi đợt sớm
@@ -225,14 +227,6 @@ window.CONFIG = {
     dropPerLife: 0.03,   // + mỗi mạng quái lấy đi (quái to rơi đồ nhiều hơn)
     maxPerMatch: 8,      // tối đa đồ rơi / trận (không tính boss)
     bag: 80              // sức chứa túi đồ (đầy thì tự phân rã đồ tệ nhất lấy Xu)
-  },
-
-  /* ---------------- NÂNG CẤP BẰNG SAO ---------------- */
-  upgrades: {
-    barracks:  { name: 'Người',     icon: 'shield', cost: [1, 1, 2, 2], perLevel: { hp: 0.1, damage: 0.06 },   text: '+10% máu kiếm sĩ, +6% sát thương' },
-    archer:    { name: 'Elf',       icon: 'bow',    cost: [1, 1, 2, 2], perLevel: { damage: 0.08, range: 0.04 }, text: '+8% sát thương, +4% tầm' },
-    artillery: { name: 'Người Lùn', icon: 'bomb',   cost: [1, 1, 2, 2], perLevel: { damage: 0.08, aoe: 0.06 }, text: '+8% sát thương đại bác, +6% vùng nổ' },
-    mage:      { name: 'Phù Thủy',  icon: 'staff',  cost: [1, 1, 2, 2], perLevel: { damage: 0.08, aoe: 0.05 }, text: '+8% sát thương, +5% vùng phép' }
   },
 
   /* ---------------- CHIẾN DỊCH: 6 vùng đất ----------------

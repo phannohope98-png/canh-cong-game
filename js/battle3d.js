@@ -39,7 +39,7 @@
     reset(){for(const a of this.actors.values()){a.mixer.stopAllAction();a.mixer.uncacheRoot(a.root);release(a.root);release(a.shadow);}for(const a of this.towers.values())release(a.root);this.actors.clear();this.towers.clear();if(this.group)this.group.removeFromParent();this.group=null;this.active=false;},
     sync(game,time){
       const alive=new Set(),workers=Towers.list.filter(t=>t.type!=='barracks').map(t=>({uid:'worker'+t.spot.id,worker:true,tower:t,art:({archer:'elf',mage:'mage',artillery:'dwarf',orc:'orct'}[t.type])+t.level,x:t.x,y:t.y,radius:10,scale:.55,state:'post',atk:t.anim.a===undefined?-1:t.anim.a,idleT:time,face:t.anim.face||1,target:t.pending}));
-      for(const [prefix,list]of [['u',Units.list.concat(workers)],['e',Enemies.list]])for(const o of list){
+      if(!window.ArtStylized)for(const [prefix,list]of [['u',Units.list.concat(workers)],['e',Enemies.list]])for(const o of list){
         if(o.state==='dead'||o.alive===false)continue;
         const key=prefix+o.uid,signature=identity(o);let a=this.actors.get(key);
         if(a&&(a.spec.id!==signature.id||a.spec.tier!==signature.tier)){release(a.root);release(a.shadow);a.mixer.uncacheRoot(a.root);this.actors.delete(key);a=null;}
@@ -69,14 +69,16 @@
     drawTitle(g,map,time){
       if(!map.live3d||!Art3D.enabled)return false;
       const live=map.live3d;
-      if(!live.titleActors){
+      if(!window.ArtStylized&&!live.titleActors){
         live.titleActors=['borin','lyra','aldric','selene'].map((id,i)=>{const o={isHero:true,heroId:id,uid:'title'+id,radius:15,art:ArtChars.heroKey(id),idleT:0,atk:-1,state:'post'},a=make(o);a.root.position.set(WX(map.W*.29+(i-1.5)*56),.1,WZ(map.H*.61+(i===2?24:0)));a.root.scale.setScalar(a.size*4.0);a.root.rotation.y=.28+i*.14;live.scene.add(a.root);return{a,o};});
       }
-      live.titleActors.forEach(({a,o},i)=>{o.idleT=time+i*.6;pose(a,o,time);});Chars3D.fx.uTime.value=time;
+      (live.titleActors||[]).forEach(({a,o},i)=>{o.idleT=time+i*.6;pose(a,o,time);});Chars3D.fx.uTime.value=time;
       live.scene.traverse(o=>{if(o.material&&o.material.userData.shader&&o.material.userData.shader.uniforms.uWaterTime)o.material.userData.shader.uniforms.uWaterTime.value=time;});
       const r=Art3D.renderer(),m=g.getTransform(),W=g.canvas.width,H=g.canvas.height,z=m.a,cam=live.cam;
       cam.left=WX(-m.e/z);cam.right=WX((W-m.e)/z);cam.top=m.f/(z*40);cam.bottom=-(H-m.f)/(z*40);cam.updateProjectionMatrix();r.setSize(W,H,false);r.setViewport(0,0,W,H);r.setScissorTest(false);r.shadowMap.enabled=!!live.sun;r.shadowMap.autoUpdate=false;
-      if(!live.shadowsReady){r.shadowMap.needsUpdate=true;live.shadowsReady=true;}r.render(live.scene,cam);g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(r.domElement,0,0,W,H);g.restore();r.shadowMap.enabled=false;return true;
+      if(!live.shadowsReady){r.shadowMap.needsUpdate=true;live.shadowsReady=true;}r.render(live.scene,cam);g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(r.domElement,0,0,W,H);g.restore();r.shadowMap.enabled=false;
+      if(window.ArtStylized){for(const [id,x,y,scale]of [['lyra',-65,-12,.88],['selene',65,-18,.88],['aldric',0,12,1]]){g.save();g.translate(map.W*.29+x,map.H*.61+y);ArtStylized.draw(g,id,{t:time,w:-1,a:-1},190*scale);g.restore();}}
+      return true;
     },
     draw(g,game,time){
       if(!Art3D.enabled||!this.setup(game.map))return this.active=false;
@@ -89,7 +91,11 @@
       if(!live.shadowsReady){r.shadowMap.needsUpdate=true;live.shadowsReady=true;}
       r.render(live.scene,cam);
       g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(r.domElement,0,0,W,H);g.restore();r.shadowMap.enabled=false;
-      this.stats={drawCalls:r.info.render.calls,triangles:r.info.render.triangles,actors:this.actors.size};game.canvas.dataset.renderMode='live-webgl';game.canvas.dataset.liveActors=this.actors.size;game.canvas.dataset.drawCalls=this.stats.drawCalls;game.canvas.dataset.liveFrame=+(game.canvas.dataset.liveFrame||0)+1;this.active=true;return true;
+      if(window.ArtStylized){
+        const L=Units.list.filter(u=>u.state!=='dead').concat(Enemies.list);L.sort((a,b)=>a.drawY-b.drawY);for(const o of L)o.draw(g,game.time);
+        for(const t of Towers.list)if(t.type!=='barracks'){const id=({archer:'elf',mage:'mage',artillery:'dwarf',orc:'orc'})[t.type];if(!id)continue;const top=((Towers3D.TOPS[t.type]||[])[t.level]||35)*Towers.TS;g.save();g.translate(t.x,t.y-top);g.scale(t.anim.face||1,1);ArtStylized.draw(g,id,{t:time,w:-1,a:t.anim.a===undefined?-1:t.anim.a},30);g.restore();}
+      }
+      this.stats={drawCalls:r.info.render.calls,triangles:r.info.render.triangles,actors:this.actors.size};game.canvas.dataset.renderMode=window.ArtStylized?'painted-2d-characters':'live-webgl';game.canvas.dataset.liveActors=this.actors.size;game.canvas.dataset.drawCalls=this.stats.drawCalls;game.canvas.dataset.liveFrame=+(game.canvas.dataset.liveFrame||0)+1;this.active=true;return true;
     }
   };
 })();

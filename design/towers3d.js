@@ -358,7 +358,25 @@
   }
 
   const MAKERS = { orc:ORCDEN, archer: ARCHER, mage: MAGE, barracks: BARRACKS, artillery: DWARFHALL };
-  function build(type, tier) { const f = MAKERS[type]; if (!f) return null; const r = f(Math.max(1, Math.min(4, tier || 1))); r.name = 'root'; return r; }
+  function masterTower(root,type,tier){
+    // Ornamental architecture from the master sheet; actual depth and materials.
+    const H=HY(({barracks:[0,42,52,64,78],archer:ARCH_TOP,mage:MAGE_TOP,artillery:[0,44,55,67,80],orc:[0,42,54,66,80]}[type]||[0,45,55,65,75])[tier]);
+    const stone=type==='mage'?'#a29ab4':type==='orc'?'#685448':'#c5c0aa';
+    for(const side of [-1,1]){
+      if(type==='barracks'||type==='mage'){
+        const g=node('reference-buttress',root,side*.52,0,-.15);
+        add(g,part(G.cyl(.09,.12,H*.85,18),stone,{tex:'brick',ink:.003}),0,H*.43,0);
+        add(g,part(G.bentCone(.15,.42,.06),type==='mage'?'#5b378f':'#244f99',{tex:'roof',ink:.003}),0,H*.86+.20,0);
+        add(g,part(G.cone(.02,.12),GOLD,{metal:true,ink:false}),0,H*.86+.45,0);
+      }
+      if(type==='archer'){
+        add(root,part(G.tube([[side*.60,.08,-.1],[side*.42,H*.42,-.2],[side*.50,H*.86,-.22],[side*.25,H+.15,-.20]],.045,24),'#8a7846',{tex:'wood',ink:.003}),0,0,0);
+        for(let j=0;j<8;j++)add(root,part(leafShape(.055,.16),'#497637',{tex:'leaf',ds:true,ink:false}),side*(.47+.07*S(j*2.4)),H*(.35+j*.065),-.12,0,side*.7,side*.5);
+      }
+    }
+    if(type==='mage')for(let j=0;j<3+tier;j++){const a=j/(3+tier)*TAU;add(root,part(G.oct(.065,2.4),'#a165f0',{glow:.8,ink:false}),S(a)*.55,H+.18+C(a)*.08,C(a)*.55);}
+  }
+  function build(type, tier) { const f = MAKERS[type]; if (!f) return null; const r = f(Math.max(1, Math.min(4, tier || 1))); r.name = 'root'; masterTower(r,type,Math.max(1,Math.min(4,tier||1))); return r; }
 
   // đưa vào Xưởng 3D (nhóm "Công trình")
   const pal = (...a) => a.map(([c, l]) => ({ c, l }));

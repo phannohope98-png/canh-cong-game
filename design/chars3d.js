@@ -594,7 +594,7 @@ float surf(){
 
   /** Orc (quái) – biến thể 1..3 */
   function ORC(t) {
-    const skin = '#7a9a62', leather = '#6a3e26', steel = t >= 3 ? '#c8ccd6' : '#8a8e98';
+    const skin = '#81965a', leather = '#5c3426', steel = '#4b4642';
     const rig = humanoid({ R: 0.47, torsoH: 0.5, torsoW: 0.62, torsoD: 0.42, legL: 0.27, legR: 0.12, bootH: 0.12, armL: 0.4, armR: 0.12,
       skin, legs: '#4a2e20', boots: '#2a1a14', sleeve: skin, glove: '#4a2e20' });
     const { n } = rig, d = rig.o, R = d.R;
@@ -614,16 +614,12 @@ float surf(){
       onHead(n.head, R, part(G.cone(R * 0.075, R * 0.3), '#fff8e0', { ink: 0.012 }), s * 0.28, -0.4, 1.0);
       add(n.head, part(G.cone(R * 0.16, R * 0.5).scale(1, 1, 0.5), skin), s * R * 1.02, R * 0.08, -R * 0.05, 0, 0, -s * (Math.PI / 2 - 0.35));
     }
-    if (t >= 3) {
-      add(n.head, part(G.ball(R * 1.08, 1.03, 0.8, 1.04), steel, { metal: 1 }), 0, R * 0.28, -R * 0.04);
-      add(n.head, part(G.torus(R * 1.05, R * 0.07).rotateX(Math.PI / 2), GOLD, { metal: 1 }), 0, R * 0.38, -R * 0.03, -0.05);
-      for (const s of [-1, 1]) add(n.head, part(G.tube([[s * R * 0.8, R * 0.55, 0], [s * R * 1.5, R * 0.8, 0], [s * R * 1.5, R * 1.5, -R * 0.1]], R * 0.12, 14), '#f2ead6'), 0, 0, 0);
-    } else {
+
       add(n.head, part(G.ball(R * 1.06, 1.02, 0.8, 1.02), '#2a1e22'), 0, R * 0.22, -R * 0.16);
       add(n.head, part(G.ball(R * 0.32), '#2a1e22'), 0, R * 1.05, -R * 0.25);
       add(n.head, part(G.torus(R * 1.03, R * 0.07).rotateX(Math.PI / 2), '#b02a24'), 0, R * 0.3, -R * 0.06, -0.12);
-    }
-    add(n.handR, WEAP.axe(t >= 3 ? '#d8dce6' : '#a8aab4', t >= 2), 0, 0, 0, 1.1);
+
+    add(n.handR, WEAP.axe('#6c6660', true), 0, 0, 0, 1.1);
     return { rig, anim: { kind: 'melee', skill: null } };
   }
 
@@ -1333,7 +1329,7 @@ float surf(){
       palette: pal(['#3a2ea0', 'Mũ'], ['#4a3ec4', 'Áo choàng'], ['#d8d4f8', 'Tóc'], ['#7fd8ff', 'Viền phép'], ['#9ae6ff', 'Pha lê']),
       make: t => MAGE(t) },
     { id: 'dwarf', name: 'Chiến Binh Lùn', group: 'Trụ', role: 'Trụ Lùn · rìu hai tay, đập đất gây choáng', tiers: 4, tierName: 'Cấp trụ',
-      desc: 'Thấp, cực béo chắc, râu cam khổng lồ che miệng, mũ sắt có sống mũi (cấp 3 thêm sừng + khoen vàng ở râu), vai thép to, rìu hai lưỡi. Kỹ năng nhảy lên bổ rìu xuống đất.',
+      desc: 'Thấp, cực béo chắc, râu cam khổng lồ che miệng, mũ sắt có sống mũi (cấp 3 thêm sừng + khoen vàng ở râu), vai thép to, kính xanh và pháo đồng cầm tay. Kỹ năng nhảy lên bổ rìu xuống đất.',
       palette: pal(['#d4581e', 'Râu'], ['#9ea4b0', 'Mũ & vai'], ['#7a6a5a', 'Giáp da'], ['#aeb2bc', 'Rìu'], [GOLD, 'Khoá vàng']),
       make: t => DWARF(t) },
     { id: 'aldric', name: 'Aldric', group: 'Anh hùng', role: 'Hiệp sĩ · Thánh Quang', tiers: 4, tierName: 'Bậc trang bị',
@@ -1507,9 +1503,9 @@ float surf(){
   function ANIME(id, tier) {
     const archer = id === 'elf' || id === 'lyra', caster = id === 'mage' || id === 'selene';
     const dwarf = id === 'dwarf' || id === 'borin', female = archer || caster, hero = ['aldric','lyra','selene','borin'].includes(id);
-    const cloth = id === 'aldric' ? '#243d70' : id === 'lyra' ? '#2f6243' : id === 'selene' ? '#513979' : archer ? '#365d43' : caster ? '#51467e' : dwarf ? '#584236' : '#76353b';
-    const steel = dwarf ? '#687383' : '#8795a7', trim = tier >= 3 ? '#bc9855' : '#b6b8c1';
-    const hair = id === 'aldric' ? '#70442d' : id === 'lyra' ? '#e8d18b' : caster ? '#8e6cbd' : archer ? '#dec489' : dwarf ? '#b3612f' : '#282735';
+    const cloth = id === 'aldric' || /^soldier/.test(id) ? '#244a8e' : id === 'lyra' ? '#2f6243' : id === 'selene' ? '#513979' : archer ? '#365d43' : caster ? '#51467e' : dwarf ? '#584236' : '#76353b';
+    const steel = dwarf ? '#343139' : '#c3cad4', trim = '#c99b42';
+    const hair = id === 'aldric' ? '#70442d' : id === 'lyra' ? '#e8d18b' : caster ? '#8e6cbd' : archer ? '#dec489' : dwarf ? '#cd6427' : '#70442d';
     const o = {R:dwarf ? .22 : .19, torsoH:dwarf ? .53 : .70, torsoW:dwarf ? .58 : female ? .40 : .54, torsoD:dwarf ? .32 : .25,
       legL:dwarf ? .43 : .80, legR:dwarf ? .095 : .073, bootH:.115, armL:dwarf ? .51 : .62, armR:dwarf ? .079 : female ? .058 : .074,
       skin:'#f3c6ac',legs:archer ? '#303d35' : '#34333f',boots:'#302d34',sleeve:cloth,glove:caster||archer ? '#f3c6ac':'#48515e',neck:.76};
@@ -1527,7 +1523,7 @@ float surf(){
     if (!caster) {
       // Fitted breastplate with sloping clavicles and waist, rather than a box.
       const plate=G.lathe([[0,h*.93],[w*.64,h*.93],[w*.95,h*.79],[w*1.015,h*.63],[w*.95,h*.47],[w*.77,h*.22],[w*.72,.11],[0,.11]],24,o.torsoD/o.torsoW*1.08);
-      add(n.torso,part(plate,archer?'#596854':id==='aldric'?'#526d91':steel,{metal:!archer,ink:.007}),0,0,0);
+      add(n.torso,part(plate,archer?'#237347':steel,{metal:!archer,ink:.007}),0,0,0);
       add(n.torso,part(G.sbox(.026,h*.63,.012,.65),trim,{metal:true,ink:false}),0,h*.49,o.torsoD*.59);
       for (const side of [-1, 1]) add(n.torso,new T.Mesh(G.tube([[0,h*.60,o.torsoD*.56],[side*w*.36,h*.67,o.torsoD*.54],[side*w*.70,h*.75,o.torsoD*.42]],.005,8),mat(trim)),0,0,0);
     } else {
@@ -1539,7 +1535,7 @@ float surf(){
     // Collar, cape clasp and split cloth skirt establish layered clothing.
     add(n.torso,part(G.torus(w*.58,.014).rotateX(Math.PI/2).scale(1,1,.7),trim,{metal:true,ink:.004}),0,h*.94,0);
     n.cape=node('cape',n.torso,0,h*.88,-o.torsoD*.45);
-    add(n.cape,part(G.cape(o.torsoW*.96,caster?.88:archer?.55:.66,.55),hero?'#243047':cloth,{tex:'cloth',ds:true,ink:.008}),0,0,0);
+    add(n.cape,part(G.cape(o.torsoW*.96,caster?.88:archer?.55:.66,.55),caster?'#514088':archer?'#527d46':dwarf?'#583c2b':'#2256a5',{tex:'cloth',ds:true,ink:.008}),0,0,0);
     if(!caster) for(const side of [-1,1]) add(n.torso,part(G.ext([0,0,side*.13,0,side*.15,-.24,side*.025,-.20],.012,.004),cloth,{tex:'cloth',ink:.006}),side*.015,.045,o.torsoD*.5);
     for(const [side,k] of [[-1,'R'],[1,'L']]) {
       const arm=n['arm'+k], leg=n['leg'+k];
@@ -1584,21 +1580,31 @@ float surf(){
     if(caster) {
       // Narrow crown and flowing pointed hat; no enormous toy brim.
       const hat=node('hat',n.head,0,R*.72,-R*.10);
-      add(hat,part(G.cyl(R*1.38,R*1.40,.025,24),cloth,{tex:'cloth',ink:.007}),0,0,0);
-      add(hat,part(G.bentCone(R*.82,R*1.8,.20),cloth,{tex:'cloth',ink:.008}),0,.015,0);
+      add(hat,part(G.cyl(R*2.0,R*2.05,.025,32),cloth,{tex:'cloth',ink:.007}),0,0,0);
+      add(hat,part(G.bentCone(R*1.10,R*2.8,.35),cloth,{tex:'cloth',ink:.008}),0,.015,0);
       add(hat,part(G.cyl(R*.77,R*.82,.035,20),trim,{metal:true,ink:.004}),0,.046,0);
       n.staff=WEAP.staff(id==='selene'?'#92c8dd':'#aaa1e0',tier,n);add(n.handR,n.staff,0,0,0,.12);
     } else if(archer) {
       for(const side of [-1,1]) add(n.head,part(G.ext([0,.02,side*.11,.085,side*.035,-.045],.025,.004),o.skin,{ink:.004}),side*R*.91,0,-.012,0,side*.3);
       quiver(n,o,'#c7ad74');add(n.handL,WEAP.bow(tier,n,{wood:'#947648'}),0,0,.02);
     } else if(dwarf) {
-      const helmet=new T.SphereGeometry(R*1.08,Q(20),Q(12),0,TAU,0,Math.PI*.50).scale(1,.88,.98);
-      add(n.head,part(helmet,steel,{metal:true,ink:.007}),0,R*.24,-R*.03);
-      add(n.head,part(G.sbox(.025,.15,.021,.6),trim,{metal:true,ink:.004}),0,R*.25,R*.99);
-      add(n.handR,id==='borin'?WEAP.warhammer(steel):WEAP.axe(steel,true),0,0,0,1.1);
+      // Reference identity: orange braided beard, blue goggles, portable cannon.
+      for(const side of [-1,1]) {
+        const goggles=node('goggle',n.head,side*R*.43,R*.74,R*.70);
+        add(goggles,part(G.torus(R*.25,R*.065),trim,{metal:true,ink:.002}),0,0,0);
+        add(goggles,part(G.cyl(R*.19,R*.19,.025,20).rotateX(Math.PI/2),'#327c9a',{metal:true,ink:false}),0,0,.008);
+        for(let j=0;j<6;j++)add(n.head,part(G.ball(.034,.9,1.2,.75),hair,{tex:'hair',ink:.001}),side*.075,-R*.72-j*.034,R*.70+.008*Math.sin(j));
+        add(n.head,part(G.cyl(.038,.038,.035,16),trim,{metal:true,ink:false}),side*.075,-R*.72-.18,R*.70);
+      }
+      const cannon=node('weapon',n.handR,0,0,0);cannon.rotation.x=1.1;
+      add(cannon,part(G.cyl(.14,.17,.66,24).rotateX(Math.PI/2),'#343238',{metal:true,ink:.003}),0,.12,.22);
+      for(const z of [-.08,.10,.32,.54])add(cannon,part(G.torus(.15,.022),trim,{metal:true,ink:false}),0,.12,z);
+      add(cannon,part(G.cyl(.108,.108,.012,24).rotateX(Math.PI/2),'#211918',{ink:false}),0,.12,.556);
+      add(cannon,part(G.cyl(.077,.077,.014,24).rotateX(Math.PI/2),'#ffb542',{glow:1.3,ink:false}),0,.12,.565);
+      for(let j=0;j<8;j++){const a=j/8*TAU;add(cannon,part(G.ball(.012),trim,{metal:true,ink:false}),Math.sin(a)*.13,.12+Math.cos(a)*.13,.54);}
     } else {
       add(n.handR,WEAP.sword(hero?.88:.75,hero?.11:.085,'#bac8d5',trim,{core:hero?'#9ac2dd':null,grip:'#40343a'}),0,0,0,1.15);
-      const shield=id==='aldric'||/^soldierS/.test(id);if(shield){n.shield=WEAP.shield(['#7a5a3a','#76353b','#355477','#665183','#ae8549'][+id.slice(-1)]||cloth,tier,trim);add(n.handL,n.shield,.045,.10,.03,0,.35);}
+      const shield=id==='aldric'||/^soldier/.test(id);if(shield){n.shield=WEAP.shield(['#7a5a3a','#76353b','#355477','#665183','#ae8549'][+id.slice(-1)]||cloth,tier,trim);add(n.handL,n.shield,.045,.10,.03,0,.35);}
     }
     if(hero||tier>=3){
       const front=o.torsoD*.60;
@@ -1614,6 +1620,23 @@ float surf(){
       }
     }
     if(hero||tier>=3) add(n.torso,part(G.oct(.025,1.25).scale(1,1,.4),archer?'#8cb89c':caster?'#aba3d7':'#aa665f',{ink:.003}),0,h*.79,o.torsoD*.57);
+    // Master reference motifs, built as geometry rather than painted billboards.
+    if(archer){
+      for(const side of [-1,1])for(let j=0;j<3;j++)add(n.head,part(G.ext([0,0,.028,.026,.012,.075,-.009,.034],.006,.001),'#588b40',{tex:'leaf',ds:true,ink:false}),side*R*.87,R*.5+j*.018,0,0,side*.6,side*(.6+j*.3));
+      add(n.head,part(G.ball(.016), '#f8e9c0',{ink:false}),-R*.82,R*.58,.06);
+      for(const side of [-1,1])for(let j=0;j<3;j++)add(n.torso,part(G.ext([0,0,side*.07,-.06,side*.1,-.22,side*.035,-.18],.007,.001),'#2b7046',{tex:'cloth',ds:true,ink:false}),side*.06,.09-j*.04,.13,0,0,side*.14);
+    }
+    if(caster){
+      const hat=n.head.getObjectByName('hat');
+      for(let j=0;j<7;j++)add(hat,part(G.ext([0,.018,.006,.006,.02,0,.006,-.006,0,-.018,-.006,-.006,-.02,0,-.006,.006],.003,0),trim,{metal:true,ink:false}),Math.sin(j*2.4)*R*.7,R*(.45+j*.18),R*.75*(1-j*.09));
+      for(const side of [-1,1])add(n.staff,part(G.oct(.07,2.0),'#9561ed',{glow:.65,ink:false}),side*.12,.76,0,0,0,side*.35);
+    }
+    if(!female&&!dwarf){
+      // Broad blue mantle and silver breastplate with the reference golden star.
+      const star=[];for(let j=0;j<10;j++){const a=j*Math.PI/5,r=j%2?.023:.06;star.push(Math.sin(a)*r,Math.cos(a)*r);}
+      add(n.torso,part(G.ext(star,.009,.002),trim,{metal:true,ink:false}),0,h*.72,o.torsoD*.60);
+      for(const side of [-1,1])for(let j=0;j<3;j++)add(n['arm'+(side<0?'R':'L')],part(G.ext([0,0,side*.12,.03,side*.09,-.035,side*.015,-.08],.012,.002),cloth,{metal:true,ink:.002}),side*.012,-j*.037,0);
+    }
     rig.extra = (t, dur, name) => {
       const cycle = S(t * TAU), strike = name === 'attack' || name === 'skill', blink=name==='idle'?1-.94*Math.exp(-Math.pow((t-.78)/.025,2)):1;
       return {eyeR:{sy:blink},eyeL:{sy:blink}, elbowR: { rx: archer && strike ? -1.25 : strike ? -.45 * Math.sin(t * Math.PI) : -.12 + cycle * .035 },
@@ -1621,7 +1644,7 @@ float surf(){
         kneeR: {rx: name==='walk'?Math.max(0,-cycle)*.95: strike?.18*Math.sin(t*Math.PI):.035},
         kneeL: {rx: name==='walk'?Math.max(0,cycle)*.95: strike?.12*Math.sin(t*Math.PI):.035} };
     };
-    return {rig,anim:{kind:caster?'staff':archer?'bow':dwarf?'two':'melee',shield:!!n.shield,skill:caster?'meteor':archer?'triple':dwarf?'slam':n.shield?'block':'holy'}};
+    return {rig,anim:{kind:caster?'staff':archer?'bow':dwarf?'fist':'melee',shield:!!n.shield,skill:caster?'meteor':archer?'triple':dwarf?'slam':n.shield?'block':'holy'}};
   }
 
   function ANIME_ENEMY(id, tier) {
@@ -1634,7 +1657,7 @@ float surf(){
       made.anim.skill=null; return made;
     }
     const armor=id==='deathKnight'?'#36364e':tier>=3?'#532e39':'#31313f';
-    const rim=id==='deathKnight'?'#8675b1':'#98655e', eye=id==='deathKnight'?'#85c8d4':'#d8765e';
+    const rim=id==='deathKnight'?'#b79751':'#745493', eye=id==='deathKnight'?'#d0aa54':'#ad5cf0';
     for(const ch of [...n.head.children]) n.head.remove(ch);delete n.eyeR;delete n.eyeL;
     const R=o.R;
     add(n.head,part(G.lathe([[0,-R],[R*.68,-R],[R*.95,-R*.40],[R,R*.42],[R*.72,R*.91],[0,R*1.10]],16,.87),armor,{metal:true,ink:.009}),0,0,0);
@@ -1657,15 +1680,50 @@ float surf(){
     return made;
   }
 
+  function masterCreature(made,id){
+    const {n,o}=made.rig;if(!n.head||!n.torso)return;
+    const R=o.R||.3;
+    if(id==='orc'||id==='blackOrc'){
+      // White layered shoulder pelt, black topknot and red leather from the sheet.
+      for(const side of [-1,1])for(let j=0;j<15;j++){
+        const a=j*2.399,x=side*(o.torsoW*.28+Math.sin(a)*.09),y=o.torsoH+.025-Math.floor(j/5)*.034,z=Math.cos(a)*.12;
+        add(n.torso,part(G.cone(.023,.12).scale(1,1,.4),'#d9d0bc',{tex:'fur',ink:.001}),x,y,z,0,0,side*.35+Math.sin(a)*.25);
+      }
+      add(n.head,part(G.tube([[0,R*.45,-R*.4],[0,R*1.07,-R*.45],[0,R*.9,-R*.8]],R*.14,16),'#29272a',{tex:'hair',ink:.002}),0,0,0);
+      for(const side of [-1,1])add(n.torso,part(G.ext([0,0,side*.12,-.02,side*.13,-.26,side*.035,-.20],.014,.002),'#932d30',{tex:'cloth',ink:.002}),side*.035,.04,o.torsoD*.54);
+    }
+    if(id==='deathKnight'){
+      n.head.children.slice().forEach(c=>n.head.remove(c));
+      add(n.head,part(skull(R).scale(1,.92,.82),'#d1b880',{tex:'stone',ink:.003}),0,0,0);
+      for(const side of [-1,1])add(n.head,part(G.ball(R*.24,1,.8,.4),'#282019',{ink:false}),side*R*.35,R*.02,R*.72);
+      add(n.head,part(G.ext([0,.015,.028,-.035,-.028,-.035],.012,0),'#38261b',{ink:false}),0,-R*.22,R*.77);
+      for(let j=0;j<7;j++)add(n.head,part(G.sbox(.016,.032,.019,.25),'#e0c99a',{ink:false}),(j-3)*.02,-R*.51,R*.66);
+      for(let j=0;j<5;j++)for(const side of [-1,1])add(n.torso,part(G.tube([[0,o.torsoH*(.78-j*.105),o.torsoD*.58],[side*o.torsoW*.32,o.torsoH*(.81-j*.105),o.torsoD*.60],[side*o.torsoW*.40,o.torsoH*(.75-j*.105),o.torsoD*.40]],.009,12),'#cdb886',{ink:false}),0,0,0);
+    }
+    if(id==='darkKnight'||id==='darkLord'){
+      for(const side of [-1,1])for(let j=0;j<3;j++)add(n['arm'+(side<0?'R':'L')],part(G.cone(.028,.13+j*.025),'#4b355f',{metal:true,ink:.002}),side*(.07+j*.027),.05-j*.012,-.02,0,0,-side*.55);
+    }
+    if(id==='iceGolem'){
+      for(const side of [-1,1])for(let j=0;j<5;j++)add(n.torso,part(G.oct(.055,2.6),'#75cfee',{metal:true,ink:.002}),side*(o.torsoW*.34+j*.017),o.torsoH*.85+j*.026,-.04,0,0,-side*(.2+j*.08));
+    }
+    if(id==='treant'||id==='treantKing'){
+      for(let j=0;j<9;j++){const a=j*2.399;add(n.torso,part(G.tube([[Math.sin(a)*o.torsoW*.25,.04,o.torsoD*.5],[Math.sin(a+1)*o.torsoW*.34,o.torsoH*.45,o.torsoD*.56],[Math.sin(a+2)*o.torsoW*.3,o.torsoH*.85,o.torsoD*.4]],.014,16),'#665536',{tex:'wood',ink:.001}),0,0,0);}
+    }
+    if(id==='bandit'){
+      add(n.head,part(G.torus(R*.99,.022).rotateX(Math.PI/2),'#e5d2a6',{tex:'cloth',ink:.002}),0,R*.32,0);
+      add(n.head,part(G.ext([-.10,.03,.10,.03,.09,-.07,-.08,-.09],.012,.002),'#e7d5ac',{tex:'cloth',ink:.001}),0,-R*.38,R*.86);
+    }
+  }
+
   const ANIME_DESCRIPTIONS = {
     soldier: 'Kiếm sĩ tóc đen, giáp bạc ôm thân, vai giáp gọn, áo choàng đỏ và kiếm dài. Tỷ lệ người, mặt anime và khuỷu tay có khớp.',
-    aldric: 'Hiệp sĩ tóc bạc, giáp xanh thép ôm thân với đường viền vàng, áo choàng xanh sẫm và kiếm thánh lõi lam.',
+    aldric: 'Hiệp sĩ tóc nâu, giáp bạc và xanh hoàng gia ôm thân với đường viền vàng, áo choàng xanh sẫm và kiếm thánh lõi lam.',
     elf: 'Cung thủ tai nhọn, tóc vàng dài từng lọn, giáp nhẹ xanh rêu, áo choàng ngắn và cung gỗ. Dáng mảnh, mắt anime.',
-    lyra: 'Xạ thủ tóc xanh ngọc dài, giáp nhẹ xanh rêu và áo choàng xanh sẫm. Tay giương cung có khớp khuỷu.',
+    lyra: 'Xạ thủ tóc vàng dài, giáp nhẹ xanh rêu và áo choàng xanh sẫm. Tay giương cung có khớp khuỷu.',
     mage: 'Pháp sư tóc bạc tím, váy áo nhiều lớp, mũ nhọn gọn, đường viền vàng và gậy pha lê.',
     selene: 'Pháp sư tóc bạc tím, áo lam nhiều lớp có eo, mũ nhọn và gậy pha lê băng. Mặt anime, tay có khớp khuỷu.',
-    dwarf: 'Chiến binh lùn vai rộng, râu tết từng lọn, mũ sắt gọn, giáp ôm thân và rìu hai lưỡi.',
-    borin: 'Chiến thần lùn râu đỏ, mũ sắt và giáp nhiều lớp; cầm búa chiến, tay có khớp khuỷu.',
+    dwarf: 'Chiến binh lùn vai rộng, râu tết từng lọn, mũ sắt gọn, giáp ôm thân và kính xanh và pháo đồng cầm tay.',
+    borin: 'Chiến thần lùn râu đỏ, mũ sắt và giáp nhiều lớp; đeo kính xanh, ôm pháo đồng lớn, tay có khớp khuỷu.',
     bandit: 'Cướp sa mạc dạng người, tóc đen từng lọn, khăn buộc đầu, giáp nhẹ, áo choàng và kiếm.',
     deathKnight: 'Kỵ sĩ tỷ lệ người với mũ kín có khe mắt lam, giáp tím đen ôm thân, áo choàng và kiếm ma thuật.',
     darkKnight: 'Kỵ sĩ hắc ám tỷ lệ người, mũ kín có sừng và khe mắt đỏ, giáp đen ôm thân, áo choàng và kiếm lõi đỏ.',
@@ -1681,6 +1739,7 @@ float surf(){
     let made;
     try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); realize(made.rig); }
     finally { REAL.cur = null; BUILD_ID = null; }
+    masterCreature(made,def.id);
     const rig = made.rig;
     rig.root.name = 'root';
     if (def.scale) rig.root.scale.setScalar(def.scale);

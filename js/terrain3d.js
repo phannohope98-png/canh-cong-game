@@ -202,6 +202,19 @@
         const waterMat=new T.MeshPhongMaterial({color:lava?'#e96e22':TH.water,transparent:true,opacity:lava?.88:.78,shininess:120,specular:lava?'#ffba77':'#c5edee',depthWrite:false});
         waterMat.onBeforeCompile=shader=>{shader.uniforms.uWaterTime={value:0};waterMat.userData.shader=shader;shader.vertexShader='uniform float uWaterTime;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed.y += .012*sin(position.x*4.+uWaterTime*1.6)+.006*cos(position.z*5.-uWaterTime*1.2);');};
         const waterMesh=new T.Mesh(wg,waterMat);waterMesh.name='live-water';scene.add(waterMesh);
+        // Real spillways where the river crosses the edge of the elevated terrain.
+        const falls=[];
+        for(const y of [-30,H+30])for(let x=0;x<W;x+=step){
+          if(!MapArt.wetAt(F_,x+step*.5,y,-3))continue;
+          const a=WX(x),b=WX(Math.min(W,x+step)),z=WZ(y),bottom=-1.25;
+          falls.push(a,WATER_Y,z,b,WATER_Y,z,a,bottom,z,b,WATER_Y,z,b,bottom,z,a,bottom,z);
+        }
+        if(falls.length){const fg=new T.BufferGeometry();fg.setAttribute('position',new T.Float32BufferAttribute(falls,3));fg.computeVertexNormals();
+          const fm=new T.MeshPhongMaterial({color:lava?'#ff8130':'#a0dce8',emissive:lava?'#ac3114':'#18323c',transparent:true,opacity:.78,side:T.DoubleSide,depthWrite:false});
+          fm.onBeforeCompile=shader=>{shader.uniforms.uWaterTime={value:0};fm.userData.shader=shader;shader.fragmentShader='uniform float uWaterTime;\n'+shader.fragmentShader.replace('#include <dithering_fragment>','gl_FragColor.rgb *= .84+.16*sin(vViewPosition.y*22.+uWaterTime*5.);\n#include <dithering_fragment>');};
+          scene.add(new T.Mesh(fg,fm));
+        }
+
       }
       /* --- cầu 3D --- */
       const tmp = {}, Chars = Chars3D; Chars.setInk(1.0);

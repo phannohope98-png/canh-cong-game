@@ -29,7 +29,12 @@
   const types=['barracks','archer','mage','artillery','orc'];
   const api=window.PaintedWorld={enabled:true,sheets,blit,icon,names,ready:Promise.all(Object.values(sheets).map(s=>s.ready)),
     prop(g,d,theme){
-      const n=slots[d.k];if(n===undefined)return false;
+      let n=slots[d.k];if(n===undefined)return false;
+      if(d.k==='tree'&&['forest','castle'].includes(theme))n=(d.v||0)%2;
+      if(theme==='castle'&&d.k==='pine')n=1;
+      if(theme==='ice'&&d.k==='tree')n=1;
+      if(theme==='ice'&&d.k==='bush')n=2;
+      if(['lava','chaos'].includes(theme)&&d.k==='deadtree')n=0;
       const h=(heights[d.k]||48)*(d.prop?1:d.s||1),flip=!d.prop&&d.flip<0;
       return blit(g,'env-'+theme,n,d.x,d.y+3,h,flip);
     },

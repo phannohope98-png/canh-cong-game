@@ -42,7 +42,7 @@
 
   function load(id, tier) {
     if (cur) { scene.remove(cur.root); cur.root.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
-    C3.setInk(.28);
+    C3.setInk(.7);
     cur = C3.build(id, tier); st.id = cur.def.id; st.tier = cur.tier;
     scene.add(cur.root);
     const k = cur.def.scale || 1; plinth.scale.setScalar(Math.max(1, k * 0.85));
@@ -125,7 +125,7 @@
   }
   /** dựng bản tạm, đặt tư thế clip ở thời điểm t */
   function posed(id, tier, anim, frac) {
-    C3.setInk(.28);
+    C3.setInk(.7);
     const b = C3.build(id, tier), m = new T.AnimationMixer(b.root), clip = b.clips.find(c => c.name === anim) || b.clips[0];
     const a = m.clipAction(clip); if (!clip.userData.loop) { a.setLoop(T.LoopOnce, 1); a.clampWhenFinished = true; } a.play();
     m.setTime(Math.min(clip.duration * 0.999, clip.duration * (frac || 0)));

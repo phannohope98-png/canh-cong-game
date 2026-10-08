@@ -14,7 +14,7 @@
 
   const INK = '#1b0f16', GOLD = '#f5c542', SKIN = '#ffd9b8', OUT = 0.018;
   let INKK = 1; // hệ số độ dày viền (trong trận dùng dày hơn cho rõ ở cỡ nhỏ)
-  let BUILD_ID = null;
+  let BUILD_ID = null, SOFT_BUILD=false;
   let DET = 1; // mức chi tiết (trong trận < 1 cho nhẹ máy)
   const Q = n => Math.max(5, Math.round(n * DET));
 
@@ -164,7 +164,7 @@ float surf(){
     o = o || {};
     // Sculpt large character surfaces before generating their matching outline.
     // Effects, eyes, props and tower geometry keep their original shapes.
-    if (BUILD_ID && !o.sculpted && geo.type === 'SphereGeometry' && !o.op && !o.glow && !o.tex) {
+    if (BUILD_ID && !SOFT_BUILD && !o.sculpted && geo.type === 'SphereGeometry' && !o.op && !o.glow && !o.tex) {
       geo.computeBoundingBox();
       const b = geo.boundingBox, size = b.getSize(new T.Vector3());
       if (Math.max(size.x, size.y, size.z) > 0.22) {
@@ -1970,6 +1970,8 @@ float surf(){
     borin:{desc:'Người lùn râu cam tết, kính xanh gọng đồng, giáp da và kim loại tối, pháo đồng lớn.',palette:pal(['#cd6427','Râu'],['#327c9a','Kính'],['#343139','Giáp'],['#c99b42','Đồng'])}
   };
   LIST.forEach(def=>{if(MASTER_META[def.id])Object.assign(def,MASTER_META[def.id]);});
+  const FRIENDLY_META={soldier:'Ki?m s? m? th?p tr?n, m?o xanh, gi?p li?n, khi?n xanh v? gi?y da. M?t t?i gi?n, d?ng g?n ?? nh?n r? trong tr?n.',aldric:'Hi?p s? m? th?p tr?n, gi?p xanh b?c v? khi?n v?ng, chuy?n ??ng c? kh?p.',elf:'Elf t?c v?ng th?nh m?ng, tai nh?n, ?o xanh l? v? gi?y da; m?t t?i gi?n.',lyra:'X? th? Elf t?c v?ng, ?o xanh l?, cung v?ng v? d?ng nh? g?n.',mage:'Ph? th?y t?c t?m, m? l?n, ?o t?m li?n v? g?y pha l?; m?t t?i gi?n.',selene:'Ph?p s? t?c t?m, m? cong, v?y ?o t?m m?m v? g?y ph?p.',dwarf:'Ng??i l?n r?u cam th?nh m?ng, k?nh xanh, ?o gi?p n?u v? ph?o ??ng.',borin:'Chi?n binh l?n r?u cam, k?nh xanh, gi?p n?u v? ph?o ??ng.',orc:'Orc xanh, t?c ?en, nanh tr?ng, l?ng vai v? v?t ??; m?t t?i gi?n.'};
+  LIST.forEach(def=>{if(FRIENDLY_META[def.id])def.desc=FRIENDLY_META[def.id];});
   const SKILL_NAME = { trollKing: 'Nện đất', voidLord: 'Xé không gian', soldier: 'Giơ khiên', elf: '3 mũi tên', mage: 'Mưa thiên thạch', dwarf: 'Đập đất', aldric: 'Thánh Quang', lyra: 'Mưa Tên', selene: 'Bão Băng', borin: 'Địa Chấn', wolfRider: 'Sói húc', darkKnight: 'Triệu hồi bóng tối', darkLord: 'Cắm kiếm' };
   function readableSilhouette(rig,id){
     const n=rig.n;if(!n.head||!n.torso||!n.legR||!n.legL)return;
@@ -1982,13 +1984,94 @@ float surf(){
     n.head.scale.multiplyScalar(1.15);
     n.head.position.y+=rig.o.R*.11;
   }
+  // A small-screen silhouette pass: soft continuous clothing, restrained faces
+  // and a few large identity shapes. Existing joint and weapon nodes survive.
+  function friendlyFinish(rig,id,tier){
+    if(!/^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin|orc)$/.test(id))return;
+    SOFT_BUILD=true;
+    const {n,o}=rig,elf=/elf|lyra/.test(id),mage=/mage|selene/.test(id),dwarf=/dwarf|borin/.test(id),orc=id==='orc';
+    const cloth=elf?'#397b42':mage?'#7650a5':dwarf?'#59432f':orc?'#7b352b':'#3265ac';
+    const skin=orc?'#879952':'#eec39d',hair=elf?'#dfc57c':mage?'#a18bc4':dwarf?'#bd602c':orc?'#34382e':'#70472e',R=o.R;
+    // Keep the recognisable hat and animated side/back hair pivots. Replace the
+    // sculpted face entirely: no layered iris, lashes, nose bridge or lips.
+    const hat=n.head.getObjectByName('hat');
+    for(const child of [...n.head.children])n.head.remove(child);
+    for(const key of ['eyeR','eyeL','hairR','hairL','hairBack'])delete n[key];
+    add(n.head,part(G.ball(R,1.04,.89,.91,28),skin,{sculpted:true,ink:.003}),0,0,0);
+    for(const side of [-1,1]){
+      const eye=n[side<0?'eyeR':'eyeL']=node(side<0?'eyeR':'eyeL',n.head,side*R*.34,-R*.07,R*.87);
+      add(eye,part(G.ball(R*.052,.85,1.25,.35,12),'#302f2a',{ink:false}),0,0,0);
+      if(elf)add(n.head,part(G.ext([0,-.045,side*R*.42,R*.15,side*R*.17,-R*.15],.025,.006),skin,{ink:.003}),side*R*.94,0,-.03);
+    }
+    if(!elf&&!mage&&!dwarf&&!orc){
+      // Rounded steel helmet and broad blue crest read clearly at 40 pixels.
+      const cap=new T.SphereGeometry(R*1.06,28,18,0,TAU,0,Math.PI*.53);cap.scale(1,.95,.97);
+      add(n.head,part(cap,'#a6b8c6',{metal:true,ink:.005}),0,R*.15,-R*.05);
+      for(const side of [-1,1])add(n.head,part(G.sbox(R*.23,R*.68,R*.39,.75),'#a6b8c6',{metal:true,ink:.003}),side*R*.95,-R*.10,-R*.08);
+      add(n.head,part(G.tube([[-R*.95,R*.12,R*.4],[0,R*.29,R*.97],[R*.95,R*.12,R*.4]],R*.065,24),'#647787',{ink:false}),0,0,0);
+      add(n.head,part(G.lathe([[0,0],[R*.18,0],[R*.19,R*.36],[R*.12,R*.64],[0,R*.72]],12,.72),'#3265ac',{tex:'cloth',ink:.004}),0,R*.94,-R*.19);
+    }else{
+      const cap=new T.SphereGeometry(R*1.04,24,16,0,TAU,0,Math.PI*.48);cap.scale(1,1,.97);
+      add(n.head,part(cap,hair,{ink:.003}),0,R*.19,-R*.10);
+      for(let j=0;j<3;j++){
+        const x=(j-1)*R*.47;
+        add(n.head,lockMesh([[x*.4,R*.93,R*.30],[x,R*.60,R*.84],[x+R*.12,R*.18,R*.90]],R*.24,R*.09,hair,''),0,0,0);
+      }
+      if(elf||mage){
+        const back=n.hairBack=node('hairBack',n.head,0,R*.12,-R*.65);
+        for(const side of [-1,0,1])add(back,lockMesh([[side*R*.50,R*.25,0],[side*R*.75,-R*1.0,-R*.22],[side*R*.94,-R*2.6,-R*.28]],R*.32,R*.12,hair,''),0,0,0);
+      }
+      if(hat)n.head.add(hat);
+    }
+    if(dwarf){
+      add(n.head,part(G.lathe([[0,-R*1.34],[R*.32,-R*1.31],[R*.70,-R*.86],[R*.84,-R*.44],[R*.64,-R*.27],[0,-R*.27]],22,.63),hair,{ink:.004}),0,0,R*.57);
+      for(const side of [-1,1]){
+        add(n.head,part(G.ball(R*.30,1.25,.48,.48,16),hair,{ink:.002}),side*R*.32,-R*.30,R*.84);
+        add(n.head,part(G.torus(R*.24,R*.057),'#c49848',{metal:true,ink:.003}),side*R*.40,R*.80,R*.61);
+        add(n.head,part(G.ball(R*.18,1,1,.2,16),'#578494',{ink:false}),side*R*.40,R*.80,R*.64);
+      }
+    }
+    if(orc){
+      for(const side of [-1,1])add(n.head,part(G.cone(R*.07,R*.24),'#e9dfbf',{ink:.002}),side*R*.35,-R*.34,R*.77,0,0,-side*.12);
+    }
+    // Remove lace, rivets and overlapping torso plates. One broad upper body
+    // and one belt establish a continuous, rounded character silhouette.
+    for(const child of [...n.torso.children])if(child.isMesh)n.torso.remove(child);
+    const w=o.torsoW*.5,h=o.torsoH,d=o.torsoD/o.torsoW;
+    add(n.torso,part(G.lathe([[0,-.10],[w*.74,-.10],[w*.93,.02],[w*1.02,h*.27],[w,h*.65],[w*.81,h*.91],[w*.48,h],[0,h]],26,d),orc?skin:cloth,{ink:.004}),0,0,0);
+    if(!elf&&!mage&&!orc)add(n.torso,part(G.lathe([[0,.12],[w*.70,.12],[w*.89,h*.40],[w*.84,h*.75],[w*.52,h*.89],[0,h*.89]],24,d*.60),dwarf?'#655342':'#a6b8c6',{metal:true,ink:.003}),0,0,o.torsoD*.24);
+    add(n.torso,part(G.cyl(w*.95,w*.93,.075,24).scale(1,1,d),'#574432',{ink:.003}),0,.07,0);
+    add(n.torso,part(G.sbox(.075,.068,.028,.75),'#d3af62',{metal:true,ink:.002}),0,.07,o.torsoD*.51);
+    if(mage)add(n.torso,part(G.lathe([[0,.16],[w*.82,.16],[w*1.08,-.10],[w*1.42,-.41],[w*1.36,-.46],[0,-.46]],24,.80),cloth,{tex:'cloth',ink:.004}),0,0,0);
+    if(elf)for(const side of [-1,1])add(n.torso,part(G.ext([0,.05,side*.13,.01,side*.18,-.25,side*.07,-.33],.02,.012),'#c5d596',{ink:.002}),side*.04,.03,.065,0,side*.1);
+    // Compact mitts, continuous sleeves and broad leather boots; the elbow
+    // and knee still articulate without shiny separate joint balls.
+    if(!orc)for(const k of ['R','L']){
+      const arm=n['arm'+k],elbow=n['elbow'+k],leg=n['leg'+k],knee=n['knee'+k];
+      for(const child of [...arm.children])if(child.isMesh)arm.remove(child);
+      for(const child of [...elbow.children])if(child.isMesh)elbow.remove(child);
+      const upper=elf?skin:cloth,lower=elf||mage?skin:dwarf?'#655342':'#a6b8c6';
+      add(arm,part(G.cap(o.armR*1.10,o.armL*.33),upper,{ink:.003}),0,-o.armL*.23,0);
+      add(elbow,part(G.cap(o.armR*.93,o.armL*.32),lower,{metal:!elf&&!mage,ink:.003}),0,-o.armL*.24,0);
+      add(arm,part(G.ball(o.armR*1.48,1,.80,1.08,20),cloth,{ink:.004}),0,-.03,0);
+      const hand=n['hand'+k];for(const child of [...hand.children])if(child.isMesh||/^finger/.test(child.name))hand.remove(child);
+      add(hand,part(G.ball(.055,1,.93,.82,16),elf||mage?skin:'#66523d',{ink:.003}),0,-.026,0);
+      for(const child of [...leg.children])if(child.isMesh)leg.remove(child);
+      for(const child of [...knee.children])if(child.isMesh)knee.remove(child);
+      add(leg,part(G.cap(o.legR*1.06,o.legL*.40),mage?cloth:'#645340',{ink:.003}),0,-o.legL*.24,0);
+      add(knee,part(G.cap(o.legR*1.02,o.legL*.33),elf?'#5b6a38':'#66523d',{ink:.003}),0,-o.legL*.23,0);
+      add(knee,part(G.ball(o.legR*1.10,1.13,.74,1.78,20),elf?'#5b6a38':'#66523d',{ink:.003}),0,-o.legL*.48+.025,.047);
+    }
+    rig.root.userData.artStyle='friendly-tower-defense';SOFT_BUILD=false;
+  }
+
   function build(id, tier) {
     const def = LIST.find(c => c.id === id) || LIST[0];
     const t = Math.max(1, Math.min(def.tiers, tier || def.tiers));
     REAL.cur = realK(def.id); BUILD_ID = def.id;
     let made;
-    try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); sculptCreature(made.rig,def.id);atelierSpecies(made.rig,def.id);masterCreature(made,def.id);realize(made.rig);readableSilhouette(made.rig,def.id); }
-    finally { REAL.cur = null; BUILD_ID = null; }
+    try { made = /^(soldier(S[0-4])?|elf|mage|dwarf|aldric|lyra|selene|borin)$/.test(def.id) ? ANIME(def.id, t) : /^(bandit|deathKnight|darkKnight|darkLord)$/.test(def.id) ? ANIME_ENEMY(def.id, t) : def.make(t); sculptCreature(made.rig,def.id);atelierSpecies(made.rig,def.id);masterCreature(made,def.id);realize(made.rig);readableSilhouette(made.rig,def.id);friendlyFinish(made.rig,def.id,t); }
+    finally { REAL.cur = null; BUILD_ID = null; SOFT_BUILD=false; }
     const rig = made.rig;
     rig.root.name = 'root';
     if (def.scale) rig.root.scale.setScalar(def.scale);

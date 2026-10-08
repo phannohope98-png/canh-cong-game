@@ -16,9 +16,9 @@
   /* ---------------- Bảng màu theo vùng ---------------- */
   const TH = {
     forest: { g0: '#72966b', g1: '#547751', g2: '#a0b982', road: '#d8c4a3', roadD: '#ad9779', roadL: '#eddfc2', edge: '#796b52', water: '#438f9c', waterL: '#a4dbd5', bank: '#5a4a30',
-      tree: ['#426d58', '#62846b', '#355b4c'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
+      tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
     castle: { g0: '#829975', g1: '#637c58', g2: '#aebe91', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
-      tree: ['#426d58', '#62846b', '#355b4c'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
+      tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
     desert: { g0: '#dca85e', g1: '#c08440', g2: '#f2cc88', road: '#f6deae', roadD: '#d2aa70', roadL: '#fff2d4', edge: '#a8743e', water: '#2fa0b8', waterL: '#8ae0e8', bank: '#7a9a3a',
       tree: ['#6a9a3a', '#5a8a32', '#7aaa42'], flowers: ['#ffe080', '#ff8a5a'], mix: [['cactus', 0.24], ['rock', 0.3], ['deadtree', 0.1], ['bones', 0.1], ['palm', 0.08], ['drybush', 0.12], ['barrel', 0.06]] },
     ice: { g0: '#e4eef8', g1: '#bccee2', g2: '#ffffff', road: '#c4d8ea', roadD: '#98b0c8', roadL: '#e8f2fa', edge: '#7088a4', water: '#8ad0ee', waterL: '#e0f6ff', bank: '#9ab0c8',
@@ -154,7 +154,7 @@
       } else if (kind === 'ice') {
         paint(it, 12, '#ffffff', 4); paint(it, 5, '#8aa4c0', 0); paint(it, 0, '#9ad6f0', 0); paint(it, -4, '#c8ecfa', 3);
       } else {
-        paint(it, 12, T.bank, 3); paint(it, 6, K.alpha('#3a3020', 0.6), 0); paint(it, 2.5, 'rgba(255,255,255,0.75)', 0);
+        paint(it,12,K.alpha(T.bank,.45),6);paint(it,5,K.alpha('#5b7762',.55),2);paint(it,1.5,'rgba(190,231,213,.40)',1);
         paint(it, 0, T.water, 0); paint(it, -(it.r ? it.r.w * 0.3 : 12), K.alpha(T.waterL, 0.55), 5);
       }
     }

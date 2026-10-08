@@ -8,7 +8,7 @@
   function defaults() {
     const upgrades = {}; // legacy save payload retained, no permanent tower bonuses
     const heroXp = {}, equip = {}; Object.keys(CONFIG.heroes).forEach(k => { heroXp[k] = 0; equip[k] = { weapon: 0, gloves: 0, armor: 0, boots: 0 }; });
-    const loadout = {}; ['barracks', 'archer', 'mage', 'artillery'].forEach(t => { loadout[t] = [0, 0, 0, 0, 0, 0]; });
+    const loadout = {}; Object.keys(CONFIG.towers).forEach(t => { loadout[t] = [0, 0, 0, 0, 0, 0]; });
     return { stars: {}, unlocked: 1, upgrades, heroXp, seen: {}, settings: { music: true, sound: true, shake: true, art3d: true },
       coins: CONFIG.startCoins, heroes: { aldric: true }, hero: 'aldric', gear: { weapon: 0, gloves: 0, armor: 0, boots: 0 }, equip,
       items: [], itemN: 0, loadout, mapv: 2 };

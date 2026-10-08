@@ -46,12 +46,12 @@
     root.updateMatrixWorld(true);
     const buckets = new Map(), meshes = [], inv = new Map(), m4 = new T.Matrix4();
     root.traverse(o => {
-      if (!o.isMesh) return;
+      if (!o.isMesh || o.isInstancedMesh) return;
       meshes.push(o);
       let ow = o.parent; while (!owners.has(ow)) ow = ow.parent;
       if (!inv.has(ow)) inv.set(ow, ow.matrixWorld.clone().invert());
       const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(m4.copy(inv.get(ow)).multiply(o.matrixWorld));
-      if (g.attributes.uv) g.deleteAttribute('uv');
+      if (g.attributes.uv && !o.material.map) g.deleteAttribute('uv');
       if (o.material.userData.tex) { if (!g.attributes.tpos) Chars3D.kit.texCoords(g); } else if (g.attributes.tpos) { g.deleteAttribute('tpos'); g.deleteAttribute('tnrm'); }
       const k = ow.uuid + '|' + o.material.uuid;
       if (!buckets.has(k)) buckets.set(k, { ow, mat: o.material, geos: [], order: o.material.transparent ? 1 : 0 });
@@ -301,6 +301,7 @@
     if (window.Painter) Painter.clear();
   };
   Art3D.available = () => !!gl();
+  Art3D.optimizeRig=(root,rig)=>optimize(root,rig);
   Art3D.optimize = root => { optimize(root, { n: {} }); root.updateMatrixWorld(true); return root; };
   Art3D.lightTheme = () => theme;
   Art3D.lights = () => LIGHT[theme] || LIGHT.forest;

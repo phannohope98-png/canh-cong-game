@@ -11,7 +11,7 @@
   if (!window.THREE || !window.Chars3D || !window.MapArt || !window.Art3D) return;
   const T = THREE, { part, G, add, node, mat } = Chars3D.kit, EL = 0.34, cE = Math.cos(EL), sE = Math.sin(EL);
   const WX = x => x / 40, WZ = y => y / (40 * sE);           // toạ độ màn hình (mặt đất) → mét
-  const DEPTH = 0.32, WATER_Y = -0.11, ROAD = 0.035, RELIEF = 0.07;
+  const DEPTH = 0.32, WATER_Y = -0.11, ROAD = 0.035, RELIEF = 0.24;
   const LDIR = new T.Vector3(-1.5, 5, 4).normalize(), FLAT = LDIR.y, SDIR = new T.Vector3(-2.4, 3.2, -1.1).normalize();
 
   function bridge(scene, p, d0, d1, theme, PW) {
@@ -114,10 +114,10 @@
 
   window.Terrain3D = {
     /** màn này có dựng mặt đất 3D không (để mapart.js biết mà gom chi tiết thay vì vẽ 2D) */
-    will(map) { return !!(Art3D.enabled && Art3D.available() && !map.feat.void); },
+    will(map) { return !!(Art3D.enabled && Art3D.available()); },
     /** tex: canvas đã vẽ mặt đất + nước + đường (W*res × H*res) → canvas mới đã dựng 3D (hoặc null) */
     render(map, res, tex, TH) {
-      if (!Art3D.enabled || !Art3D.available() || map.feat.void) return null;
+      if (!Art3D.enabled || !Art3D.available()) return null;
       const W = map.W, H = map.H, F_ = map.feat, PW = CONFIG.pathWidth, theme = map.def.theme;
       const renderer = Art3D.renderer(); if (!renderer) return null;
       const tA = performance.now();
@@ -162,10 +162,20 @@
         else if (h === 0) h = RELIEF * rl(x, y) * sm(PW / 2 + 20, PW / 2 + 90, mr[k]) * sm(20, 70, w) * sm(40, 80, ms[k]);
         pos[k * 3] = WX(x); pos[k * 3 + 1] = h; pos[k * 3 + 2] = WZ(y);
         uv[k * 2] = x / W; uv[k * 2 + 1] = 1 - y / H;
-        if (i < nx - 1 && j < ny - 1) idx.push(k, k + nx, k + 1, k + 1, k + nx, k + nx + 1);
+        if (i < nx - 1 && j < ny - 1 && (!F_.void || mr[k]<100 || ms[k]<72)) idx.push(k, k + nx, k + 1, k + 1, k + nx, k + nx + 1);
       }
       const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3)); geo.setAttribute('uv', new T.BufferAttribute(uv, 2)); geo.setIndex(idx);
       geo.computeVertexNormals();
+      // Physical cliff sides, including floating islands in the void region.
+      const walls=[],land=(i,j)=>i>=0&&j>=0&&i<nx-1&&j<ny-1&&(!F_.void||mr[j*nx+i]<100||ms[j*nx+i]<72);
+      const corner=(i,j)=>{const k=j*nx+i;return[pos[k*3],pos[k*3+1],pos[k*3+2]];};
+      const edge=(a,b)=>{const depth=F_.void?1.5:1.15,da=-depth-.16*Math.sin(a[0]*4+a[2]),db=-depth-.16*Math.sin(b[0]*4+b[2]);walls.push(...a,a[0],da,a[2],...b,...b,a[0],da,a[2],b[0],db,b[2]);};
+      for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++)if(land(i,j)){
+        if(!land(i-1,j))edge(corner(i,j+1),corner(i,j));if(!land(i+1,j))edge(corner(i+1,j),corner(i+1,j+1));
+        if(!land(i,j-1))edge(corner(i,j),corner(i+1,j));if(!land(i,j+1))edge(corner(i+1,j+1),corner(i,j+1));
+      }
+      const cliffGeo=new T.BufferGeometry();cliffGeo.setAttribute('position',new T.Float32BufferAttribute(walls,3));cliffGeo.computeVertexNormals();
+      scene.add(part(cliffGeo,theme==='chaos'?'#3b315b':theme==='desert'?'#b07849':theme==='ice'?'#8497ab':'#6a705f',{tex:'rock',ink:false}));
       const nrm = geo.attributes.normal, col = new Float32Array(nx * ny * 3);
       for (let k = 0; k < nx * ny; k++) { // đổ bóng theo độ dốc: bờ dốc gắt thì phân tông kiểu toon, gò thoải thì chuyển mềm
         const d = nrm.getX(k) * LDIR.x + nrm.getY(k) * LDIR.y + nrm.getZ(k) * LDIR.z, f = 1 + (d - FLAT) * 1.6;
@@ -189,7 +199,9 @@
           waterPos.push(a,WATER_Y,c,a,WATER_Y,d,b,WATER_Y,c,b,WATER_Y,c,a,WATER_Y,d,b,WATER_Y,d);
         }
         const wg=new T.BufferGeometry();wg.setAttribute('position',new T.Float32BufferAttribute(waterPos,3));wg.computeVertexNormals();
-        scene.add(new T.Mesh(wg, new T.MeshBasicMaterial({ color: lava ? '#ff8a2a' : TH.water, transparent: true, opacity: lava ? 0.3 : 0.42, depthWrite: false })));
+        const waterMat=new T.MeshPhongMaterial({color:lava?'#e96e22':TH.water,transparent:true,opacity:lava?.88:.78,shininess:120,specular:lava?'#ffba77':'#c5edee',depthWrite:false});
+        waterMat.onBeforeCompile=shader=>{shader.uniforms.uWaterTime={value:0};waterMat.userData.shader=shader;shader.vertexShader='uniform float uWaterTime;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed.y += .012*sin(position.x*4.+uWaterTime*1.6)+.006*cos(position.z*5.-uWaterTime*1.2);');};
+        const waterMesh=new T.Mesh(wg,waterMat);waterMesh.name='live-water';scene.add(waterMesh);
       }
       /* --- cầu 3D --- */
       const tmp = {}, Chars = Chars3D; Chars.setInk(1.0);
@@ -228,9 +240,14 @@
         renderer.render(scene, cam);
         og.drawImage(renderer.domElement, px, py);
       }
-      if (renderer.shadowMap.enabled) { renderer.shadowMap.enabled = false; renderer.shadowMap.autoUpdate = true; if (sunL && sunL.shadow.map) { sunL.shadow.map.dispose(); sunL.shadow.map = null; } }
-      scene.traverse(o => { if (o.geometry) o.geometry.dispose(); });
-      tx.dispose(); renderer.setScissorTest(false); renderer.setSize(256, 256, false); // trả bộ đệm về cỡ nhỏ: khung nhân vật đọc lại nhanh hơn
+      const retain=!!window.Battle3D;
+      if(retain){
+        Art3D.optimize(scene);
+        scene.traverse(o=>{if(o.isMesh){o.castShadow=!o.material.transparent&&!o.material.isMeshBasicMaterial;o.receiveShadow=o.material.isShadowMaterial;}});
+        map.live3d={scene,geo,tx,cam,hAt,sun:sunL,water:scene.getObjectByName('live-water'),merged:true};
+      }else{scene.traverse(o=>{if(o.geometry)o.geometry.dispose();});tx.dispose();}
+      if(renderer.shadowMap.enabled){renderer.shadowMap.enabled=false;renderer.shadowMap.autoUpdate=true;if(!retain&&sunL&&sunL.shadow.map){sunL.shadow.map.dispose();sunL.shadow.map=null;}}
+      renderer.setScissorTest(false);renderer.setSize(256,256,false);
       placed.forEach(d => { d._in3d = true; }); // mapart.js khỏi vẽ lại các vật này
       Terrain3D.timing = { build: Math.round(tB - tA), render: Math.round(performance.now() - tB) };
       return out;

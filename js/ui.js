@@ -110,14 +110,14 @@
       const render=(now)=>{
         if(this.current!=='screen-menu')return;
         this._menuFrame=reduced?null:requestAnimationFrame(render);
-        if(now-last<50)return;last=now;
+        if(now-last<33)return;last=now;
         const t=now*.001, drift=reduced?0:Math.sin(t*.13)*12;
         g.setTransform(z,0,0,z,(c.width-map.W*z)/2+drift,(c.height-map.H*z)/2);
-        g.drawImage(bg,0,0,map.W,map.H);Painter.res=z;
-        g.setTransform(dpr,0,0,dpr,0,0);Painter.res=dpr;
-        const baseX=r.width*.25, baseY=r.height*.57, size=Math.min(5.5,r.height/95);
-        for(const [type,dx,dy,phase,sc] of [['lyra',-65,-12,.3,.88],['selene',65,-18,.65,.88],['aldric',0,12,0,1]])
-          Painter.char(g,ArtChars.heroKey(type),baseX+dx,baseY+dy,size*sc,1,'idle',reduced?phase:t+phase*2.618);
+        if(!(window.Battle3D&&Battle3D.drawTitle(g,map,t))){
+          g.drawImage(bg,0,0,map.W,map.H);g.setTransform(dpr,0,0,dpr,0,0);Painter.res=dpr;
+          const baseX=r.width*.25,baseY=r.height*.57,size=Math.min(5.5,r.height/95);
+          for(const [type,dx,dy,phase,sc]of [['lyra',-65,-12,.3,.88],['selene',65,-18,.65,.88],['aldric',0,12,0,1]])Painter.char(g,ArtChars.heroKey(type),baseX+dx,baseY+dy,size*sc,1,'idle',reduced?phase:t+phase*2.618);
+        }
         g.setTransform(1,0,0,1,0,0);
         // Warm motes and drifting leaves give depth without covering the controls.
         for(let i=0;i<22;i++){
@@ -288,7 +288,7 @@
 
     renderSettings() {
       const s = Save.data.settings, row = (k, label) => `<div class="setting"><span>${label}</span><button class="switch ${s[k] ? 'on' : ''}" data-action="toggle" data-key="${k}"><i></i></button></div>`;
-      $('settings-list').innerHTML = `<div class="card">${row('music', 'Nhạc nền')}${row('sound', 'Âm thanh')}${row('shake', 'Rung màn hình')}${window.Art3D ? row('art3d', 'Nhân vật 3D (tắt nếu máy yếu)') : ''}</div>
+      $('settings-list').innerHTML = `<div class="card">${row('music', 'Nhạc nền')}${row('sound', 'Âm thanh')}${row('shake', 'Rung màn hình')}${window.Art3D ? row('art3d', 'Hiệu ứng 3D (tắt nếu máy yếu)') : ''}</div>
         <div class="card"><h3>Cách chơi</h3><p class="sub" style="line-height:1.55;font-size:14px">• Chạm ô đất có cọc gỗ để chọn 1 trong 4 trụ: Người (2 kiếm sĩ), Elf (bắn nhanh), Phù thủy (tầm xa, sát thương lan), Người Lùn (đại bác tầm xa nhất, nổ lan).<br>• Chạm trụ để nâng cấp (4 cấp đổi hình) hoặc bán.<br>• Kéo để di chuyển bản đồ, chụm 2 ngón để phóng to.<br>• Chạm anh hùng rồi chạm bản đồ để di chuyển; nút kỹ năng ở bên cạnh.<br>• Chạm đầu lâu đỏ để gọi đợt quái, gọi sớm được thưởng vàng.<br>• Xu kiếm được dùng mua anh hùng & trang bị.<br>• Chiến dịch có 6 vùng, mỗi vùng 6 map; map 6 là boss – hạ boss mới sang vùng mới.<br>• Quái chết có thể rơi đồ (5 bậc: Tệ, Bình thường, Cao, Cao cấp, Huyền thoại). Vào <b>Kho đồ</b> để gắn đồ vào 6 vị trí của mỗi trụ; ghép 3 món giống nhau thành 1 món bậc cao hơn.</p></div>
         <div class="row"><button class="gbtn red sm" data-action="reset">${I('trash')}<span>Xoá dữ liệu</span></button></div>`;
     },

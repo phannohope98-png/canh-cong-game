@@ -22,6 +22,13 @@ window.CONFIG = {
   /* ---------------- 5 TRỤ = 5 NHÂN VẬT ----------------
      cost[i] = giá xây (i=0) / giá nâng lên cấp i+1. Cấp 4 có kỹ năng đặc biệt. */
   towers: {
+    orc: {
+      name:'Orc',short:'Kỵ binh Orc',role:'TRỤ THÚ · TRIỆU HỒI ORC CƯỠI SÓI',icon:'axe',color:'#a24738',kind:'barracks',
+      art:'orct',palette:['#56784a','#784c36','#a34f43','#d7cab0','#50545b'],soldiers:1,respawn:13,engage:110,rallyRange:190,
+      cost:[100,130,180,250],tierNames:['Trại Sói','Đồn Chiến Thú','Thành Lũy Orc','Pháo Đài Huyết Nha'],
+      levels:[{hp:160,damage:[8,12],armor:.10,rate:1.10,art:'wolfRider'},{hp:250,damage:[14,20],armor:.22,rate:1.02,art:'wolfRider'},{hp:380,damage:[23,31],armor:.35,rate:.95,art:'wolfRider'},{hp:560,damage:[34,46],armor:.48,rate:.9,art:'wolfRider',special:'slam'}],
+      gear:['Rìu chiến','Giáp sắt','Áo lông thú','Chiến sói'],desc:'Triệu hồi một chiến binh Orc cưỡi sói ra giữ đường. Giáp sắt, rìu chiến và thú cưỡi có mô hình 3D; nâng cấp mở thêm tháp canh và cờ huyết nha.'
+    },
     barracks: {
       name: 'Người', short: 'Kiếm sĩ', role: 'TRỤ NGƯỜI - TRIỆU HỒI 2 KIẾM SĨ', icon: 'shield', color: '#8a1e24', kind: 'barracks',
       art: 'soldier', palette: ['#6a1218', '#8a1e24', '#c8ccd6', '#1a1418', '#f2c14e'],
@@ -297,3 +304,13 @@ window.CONFIG = {
 
   audioFiles: { music: null }
 };
+
+CONFIG.towers=Object.fromEntries(['barracks','archer','artillery','mage','orc'].map(k=>[k,CONFIG.towers[k]]));
+CONFIG.items.gear.orc=[
+ {name:'Ng?c Huy?t Nha',icon:'gem',stat:'hp',base:.07,text:'m?u chi?n th?'},
+ {name:'R?u Chi?n',icon:'axe',stat:'damage',base:.07,text:'s?t th??ng'},
+ {name:'Gi?p S?t',icon:'armor',stat:'armor',base:.025,text:'gi?p'},
+ {name:'?o L?ng Th?',icon:'helmet',stat:'block',base:.025,text:'ch?n s?t th??ng'},
+ {name:'B?a S?i',icon:'potion',stat:'respawn',base:.04,text:'h?i sinh nhanh'},
+ {name:'Tr?ng Orc',icon:'drum',stat:'rate',base:.04,text:'t?c ?? ??nh'}
+];

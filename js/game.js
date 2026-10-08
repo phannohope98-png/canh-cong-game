@@ -40,7 +40,7 @@
       UI.setupBattle();
       AudioSys.playMusic('battle_' + L.theme); if (AudioSys.playAmbient) AudioSys.playAmbient(L.theme);
       UI.story(L.name + (L.sub ? ' · ' + L.sub : ''), L.story);
-      if (window.Art3D && Art3D.warm) setTimeout(() => { // dựng sẵn khung 3D của quái trong màn + anh hùng
+      if (!window.Battle3D && window.Art3D && Art3D.warm) setTimeout(() => { // dựng sẵn khung 3D của quái trong màn + anh hùng
         const keys = new Set(); L.waves.join(',').split(',').forEach(s => keys.add(s.split(':')[0].trim()));
         if (keys.has('darkKnight')) { keys.add('darkKnight2'); keys.add('shade'); } if (keys.has('darkLord')) { keys.add('darkLord3'); keys.add('goblin'); keys.add('orc'); }
         const list = [], h = Units.list.find(u => u.isHero); if (h) list.push({ key: h.art, scale: h.scale, modes: ['walk', 'atk', 'idle'] });
@@ -105,7 +105,8 @@
       if (!this.map) return;
       Painter.res = z * d;
       c.setTransform(d * z, 0, 0, d * z, d * (this.viewW / 2 - (Camera.x - Effects.shakeX) * z), d * (this.viewH / 2 - (Camera.y - Effects.shakeY) * z));
-      c.drawImage(this.bg, 0, 0, this.map.W, this.map.H);
+      const live=window.Battle3D&&Battle3D.draw(c,this,performance.now()/1000);
+      if(!live)c.drawImage(this.bg,0,0,this.map.W,this.map.H);
       if (window.WaterFx) WaterFx.draw(c, performance.now() / 1000);
       c.lineJoin = 'round'; c.lineCap = 'round';
       const t = this.time, now = performance.now() / 1000;
@@ -120,7 +121,7 @@
       for (const u of Units.list) if (u.state !== 'dead') L.push(u);
       for (const e of Enemies.list) L.push(e);
       L.sort((a, b) => a.drawY - b.drawY);
-      for (const o of L) o.draw(c, t);
+      if(!live)for(const o of L)o.draw(c,t);
       Combat.draw(c); Spells.draw(c); Effects.draw(c); Loot.draw(c, now);
       if (window.Lights) Lights.draw(c, now);
       this.drawAtmosphere(c, now);

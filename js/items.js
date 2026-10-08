@@ -7,7 +7,7 @@
  * ========================================================= */
 (function () {
   const C = () => CONFIG.items;
-  const TYPES = ['barracks', 'archer', 'mage', 'artillery'];
+  const TYPES = Object.keys(CONFIG.towers);
   const STATS = ['damage', 'range', 'rate', 'aoe', 'hp', 'armor', 'block', 'respawn', 'crit', 'poison', 'slow', 'pen', 'burn', 'stun', 'root'];
   let cache = {};
 

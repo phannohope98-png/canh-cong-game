@@ -23,7 +23,7 @@
   }
 
   window.addEventListener('error', e => console.error('Lỗi game:', e.message));
-  const go = () => (window.ArtImg ? ArtImg.load() : Promise.resolve()).then(boot, boot);
+  const go = () => (window.ArtImg ? ArtImg.load() : Promise.resolve()).then(boot,boot);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
   else go();
 })();

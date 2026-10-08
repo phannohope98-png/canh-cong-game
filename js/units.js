@@ -211,7 +211,7 @@
 
     /** Doanh trại vừa xây: tạo lính 1 lần */
     createFor(T) {
-      for (let i = 0; i < T.def.soldiers; i++) this.list.push(new Unit({ tower: T, idx: i, x: T.x, y: T.y + 12, alpha: 0, radius: 12, speed: 95, rate: 1.0, engage: T.def.engage }));
+      for (let i = 0; i < T.def.soldiers; i++) this.list.push(new Unit({ tower: T, idx: i, x: T.x, y: T.y + 12, alpha: 0, radius: T.type==='orc'?16:12, speed: 95, rate: 1.0, engage: T.def.engage }));
       this.refresh(T, true); this.placePosts(T);
     },
     refresh(T, full) {
@@ -220,7 +220,7 @@
       for (const u of this.list) if (u.tower === T) {
         const r = full || !u.maxHp ? 1 : u.hp / u.maxHp;
         u.maxHp = Math.round(lv.hp * hb); u.hp = Math.max(1, Math.round(u.maxHp * r)); u.damage = [lv.damage[0] * db, lv.damage[1] * db];
-        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = art; u.special = lv.special; u.scale = 12 / ArtChars[art].dr * 1.05 * (CONFIG.unitScale || 1); u.regen = u.maxHp * 0.08;
+        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = art; u.special = lv.special; u.scale = u.radius / ArtChars[art].dr * 1.05 * (CONFIG.unitScale || 1); u.regen = u.maxHp * 0.08;
       }
     },
     remove(T) { for (let i = this.list.length - 1; i >= 0; i--) if (this.list[i].tower === T) this.list.splice(i, 1); },

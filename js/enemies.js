@@ -111,7 +111,7 @@
       }
       this.state = 'walk';
       const step = this.speed * (this.slowMul || 1) * this.speedMul * (this.chargeT > 0 ? this.def.charge.mul : 1) * dt;
-      this.dist += step; this.walk += step / (this.radius * 2.8);
+      this.dist += step; this.walk += step / (window.ArtStylized?.stride(this.art,this.height)||this.radius*2.8);
       if (this.dist >= this.path.length) { Game.enemyEscaped(this); return; }
       this.place();
     }

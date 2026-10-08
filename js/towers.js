@@ -37,10 +37,10 @@
     muzzle() {
       const T = ArtTowers, f = this.anim.face;
       if(window.PaintedWorld?.enabled){
-        const h=94+this.level*14;
-        if(this.type==='archer')return{x:this.x+(12+14*f)*TS,y:this.y+(7-h*.45-21)*TS};
-        if(this.type==='mage')return{x:this.x+(12+13*f)*TS,y:this.y+(7-h*.24-23)*TS};
-        return{x:this.x+35*TS,y:this.y+(7-h*.7)*TS};
+        const h=(94+this.level*14)*.7;
+        if(this.type==='archer')return{x:this.x+(8.4+9.8*f)*TS,y:this.y+(4.9-h*.45-14.7)*TS};
+        if(this.type==='mage')return{x:this.x+(8.4+9.1*f)*TS,y:this.y+(4.9-h*.24-16.1)*TS};
+        return{x:this.x+24.5*TS,y:this.y+(4.9-h*.7)*TS};
       }
       if (this.type === 'archer') return { x: this.x + ((this.anim.k % 2 ? 9 : -9) + 10 * f) * TS, y: this.y + (T.ARCH_TOP[this.level] - 14) * TS };
       if (this.type === 'mage') return { x: this.x + 6 * f * TS, y: this.y + (T.MAGE_TOP[this.level] - 30) * TS };
@@ -128,7 +128,7 @@
       this.drawItems(ctx);
     }
     /** đồ đang gắn: huy hiệu nhỏ đúng vị trí lắp trên thân trụ (đỉnh, tầng trên, mặt trước, 2 cánh, nền) */
-    topY() { const TP = window.Towers3D && Towers3D.TOPS && Towers3D.TOPS[this.type]; return -(TP ? TP[this.level] : this.type === 'barracks' ? 34 + this.level * 7 : 70) * TS; }
+    topY() { if(window.PaintedWorld?.enabled)return (4.9-(94+this.level*14)*.7)*TS; const TP = window.Towers3D && Towers3D.TOPS && Towers3D.TOPS[this.type]; return -(TP ? TP[this.level] : this.type === 'barracks' ? 34 + this.level * 7 : 70) * TS; }
     drawItems(ctx) {
       const M = Items.mods(this.type); if (!M.list.some(Boolean)) return;
       const top = this.topY(), now = performance.now() / 1000;

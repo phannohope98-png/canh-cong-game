@@ -173,6 +173,8 @@
         }
       }g.restore();
     }
+    const surface=window.PaintedWorld?.texture(g,Object.keys(TH).find(k=>TH[k]===T)||'forest',2,256);
+    if(surface)for(const it of items)paint(it,0,surface,0);
     // chi tiết bề mặt
     for (const it of items) {
       const kind = (it.r || it.l).kind;
@@ -201,14 +203,17 @@
     for (const p of map.paths) { polyPath(r, p.points); r.lineWidth = PW + 6; r.strokeStyle = T.edge; r.stroke(); }
     for (const p of map.paths) { polyPath(r, p.points); r.lineWidth = PW; r.strokeStyle = T.roadD; r.stroke(); }
     for (const p of map.paths) { polyPath(r, p.points); r.lineWidth = PW - 8; r.strokeStyle = T.road; r.stroke(); }
+
+    const roadSurface=window.PaintedWorld?.texture(r,map.def.theme,1,384);
+    if(roadSurface){for(const p of map.paths){polyPath(r,p.points);r.lineWidth=PW-6;r.strokeStyle=roadSurface;r.stroke();}}
     r.globalCompositeOperation = 'source-atop';
-    patches(r, W, H, T.roadD, 46, 0.55, map.index * 7 + 1, 0.5, 1);
-    patches(r, W, H, T.roadL, 30, 0.5, map.index * 7 + 2, 0.55, 1);
-    r.save(); r.filter = 'blur(6px)'; for (const p of map.paths) { polyPath(r, p.points); r.lineWidth = PW * 0.42; r.strokeStyle = K.alpha(T.roadL, 0.55); r.stroke(); } r.restore();
+    if(!roadSurface)patches(r, W, H, T.roadD, 46, 0.55, map.index * 7 + 1, 0.5, 1);
+    if(!roadSurface)patches(r, W, H, T.roadL, 30, 0.5, map.index * 7 + 2, 0.55, 1);
+    if(!roadSurface){r.save(); r.filter = 'blur(6px)'; for (const p of map.paths) { polyPath(r, p.points); r.lineWidth = PW * 0.42; r.strokeStyle = K.alpha(T.roadL, 0.55); r.stroke(); } r.restore();}
     // mảng đá lát ngẫu nhiên trên đường đất (kiểu KR)
     if (!T.cobble) for (const p of map.paths) for (let d = 40; d < p.length; d += 70 + rnd() * 90) { p.pointAt(d, tmp); const cx = tmp.x + tmp.nx * (rnd() - 0.5) * PW * 0.4, cy = tmp.y + tmp.ny * (rnd() - 0.5) * PW * 0.4, n = 4 + (rnd() * 6 | 0);
       for (let i = 0; i < n; i++) { const x = cx + (rnd() - 0.5) * 30, y = cy + (rnd() - 0.5) * 18, w = 5 + rnd() * 5; if (det) { det.slab.push([x, y, w]); continue; } r.fillStyle = K.alpha(sh(T.roadD, -0.05), 0.85); r.beginPath(); r.ellipse(x, y + 1, w, w * 0.62, 0, 0, TAU); r.fill(); r.fillStyle = sh(T.roadL, -0.02); r.beginPath(); r.ellipse(x, y, w * 0.9, w * 0.55, 0, 0, TAU); r.fill(); } }
-    if (T.cobble) { // đường lát đá
+    if (T.cobble&&!roadSurface) { // đường lát đá
       for (const p of map.paths) for (let d = 0; d < p.length; d += 9) { p.pointAt(d, tmp);
         for (let o = -PW / 2 + 6, k = 0; o <= PW / 2 - 5; o += 9, k++) { const x = tmp.x + tmp.nx * (o + ((d / 9 | 0) % 2) * 4.5), y = tmp.y + tmp.ny * (o + ((d / 9 | 0) % 2) * 4.5), c = rnd();
           r.fillStyle = c < 0.33 ? sh(T.road, 0.12) : c < 0.66 ? T.road : sh(T.road, -0.1); r.strokeStyle = K.alpha(T.edge, 0.55); r.lineWidth = 1;
@@ -292,7 +297,9 @@
       g.strokeStyle=grad;g.lineWidth=stone?12:6.5;g.beginPath();g.moveTo(q.x-q.nx*half,q.y-q.ny*half);g.lineTo(q.x+q.nx*half,q.y+q.ny*half);g.stroke();
       g.strokeStyle=shade(color,-.32);g.lineWidth=1;g.beginPath();g.moveTo(q.x-q.nx*half-q.tx*3,q.y-q.ny*half-q.ty*3);g.lineTo(q.x+q.nx*half-q.tx*3,q.y+q.ny*half-q.ty*3);g.stroke();
       if(!stone){g.strokeStyle='rgba(251,217,147,.25)';g.lineWidth=.65;for(const o of[-14,9]){g.beginPath();g.moveTo(q.x+q.nx*o,q.y+q.ny*o);g.lineTo(q.x+q.nx*(o+12),q.y+q.ny*(o+12));g.stroke();}}
-    }g.restore();
+    }
+    const deck=window.PaintedWorld?.texture(g,theme,3,240);if(deck){g.fillStyle=deck;g.fillRect(0,0,4096,2048);}
+    g.restore();
     for(const side of[-1,1]){
       const rail=[];
       for(let d=d0;d<=d1;d+=stone?20:24){p.pointAt(d,q);const x=q.x+q.nx*half*side,y=q.y+q.ny*half*side;rail.push({x,y:y-8});
@@ -491,7 +498,9 @@
     const W = map.W, H = map.H, T = TH[map.def.theme] || TH.forest, theme = map.def.theme, rnd = K.seeded(map.index * 97 + 13);
     let c = mk(W * res, H * res), g = c.getContext('2d'); g.scale(res, res); g.lineJoin = 'round'; g.lineCap = 'round';
     // 1) mặt đất
-    if (map.feat.void) chaosGround(g, map, T, rnd);
+    const paintedGround=window.PaintedWorld?.texture(g,theme,0,640);
+    if(paintedGround){g.fillStyle=paintedGround;g.fillRect(0,0,W,H);}
+    else if (map.feat.void) chaosGround(g, map, T, rnd);
     else {
       g.fillStyle = T.g0; g.fillRect(0, 0, W, H);
       patches(g, W, H, T.g1, 170, 0.75, map.index * 5 + 1, 0.35, 1);
@@ -508,13 +517,13 @@
     const det = map.det = !window.PaintedWorld?.enabled && window.Terrain3D && Terrain3D.will(map) ? { tuft: [], flower: [], peb: [], kerb: [], slab: [], tc: theme === "ice" ? "#ffffff" : theme === "desert" ? "#c8a050" : sh(T.g0, 0.08) } : null;
     const PW = CONFIG.pathWidth;
     const free = (x, y, m) => { for (const p of map.paths) if (p.nearest(x, y).perp < PW / 2 + m) return false; return !wetAt(map.feat, x, y, 4); };
-    if (theme !== 'chaos' && theme !== 'lava') {
+    if (!paintedGround&&theme !== 'chaos' && theme !== 'lava') {
       const tc = theme === 'ice' ? '#ffffff' : theme === 'desert' ? '#c8a050' : sh(T.g0, 0.08);
       for (let i = 0; i < 650; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (det) det.tuft.push([x, y, 0.7 + rnd() * 0.6, i % 3 ? 0 : 1]); else tuft(g, x, y, i % 3 ? tc : sh(tc, -0.1), 0.7 + rnd() * 0.6); }
       for (let i = 0; i < 38 && T.flowers.length; i++) { const cx = rnd() * W, cy = rnd() * H; if (!free(cx, cy, 14)) continue; const col = T.flowers[(rnd() * T.flowers.length) | 0];
         for (let j = 0; j < 5; j++) { const x = cx + (rnd() - 0.5) * 30, y = cy + (rnd() - 0.5) * 16; if (det) { det.flower.push([x, y, col]); continue; } K.dot(g, x, y, 2.2, INK); K.dot(g, x, y, 1.6, col); K.dot(g, x - 0.4, y - 0.4, 0.6, '#ffffff'); } }
     }
-    for (let i = 0; i < 160; i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (map.feat.void) { let d = Infinity; for (const p of map.paths) d = Math.min(d, p.nearest(x, y).perp); if (d > 130) continue; } if (det) { det.peb.push([x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2]); continue; } F(g, ell(x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2), theme === 'lava' ? '#2a2022' : theme === 'chaos' ? '#3a2a6a' : '#9a968e', { s: 0.6, h: 0.3, lw: 1 }); }
+    for (let i = 0; i < (paintedGround?30:160); i++) { const x = rnd() * W, y = rnd() * H; if (!free(x, y, 8)) continue; if (map.feat.void) { let d = Infinity; for (const p of map.paths) d = Math.min(d, p.nearest(x, y).perp); if (d > 130) continue; } if (det) { det.peb.push([x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2]); continue; } F(g, ell(x, y, 2 + rnd() * 2.5, 1.4 + rnd() * 1.2), theme === 'lava' ? '#2a2022' : theme === 'chaos' ? '#3a2a6a' : '#9a968e', { s: 0.6, h: 0.3, lw: 1 }); }
     // 4) đường đi + cầu
     drawRoad(g, map, T, res, rnd);
     const t3 = !window.PaintedWorld?.enabled && window.Terrain3D && Terrain3D.render(map, res, c, T); // mặt đất 3D: bờ sông dốc, đường trũng, cầu 3D

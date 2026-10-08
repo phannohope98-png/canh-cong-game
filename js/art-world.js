@@ -8,6 +8,24 @@
     s.ready=new Promise(resolve=>{img.onload=()=>{s.loaded=true;resolve(true);};img.onerror=()=>{console.warn('Painted asset unavailable:',id);resolve(false);};});
     img.src=new URL(spec.file,base).href;
   }
+
+  const materials={},patterns=new Map();
+  for(const theme of ['forest','castle','desert','ice','lava','chaos']){
+    const img=new Image(),item=materials[theme]={img,loaded:false};
+    item.ready=new Promise((resolve,reject)=>{img.onload=()=>{item.loaded=true;resolve(true);};img.onerror=()=>reject(new Error('Missing painted terrain '+theme));});
+    img.src=new URL('terrain-'+theme+'-painted53.webp',base).href;
+  }
+  function texture(g,theme,n,size){
+    const src=materials[theme];if(!src?.loaded)return null;
+    const key=theme+':'+n+':'+size;
+    if(!patterns.has(key)){
+      const c=document.createElement('canvas');c.width=c.height=512;
+      const w=src.img.naturalWidth/2,h=src.img.naturalHeight/2;
+      c.getContext('2d').drawImage(src.img,(n%2)*w+2,Math.floor(n/2)*h+2,w-4,h-4,0,0,512,512);
+      const p=g.createPattern(c,'repeat');p.setTransform(new DOMMatrix().scale(size/512));patterns.set(key,p);
+    }return patterns.get(key);
+  }
+
   function blit(g,id,n,x,y,h,flip){
     const s=sheets[id];if(!s||!s.loaded)return false;
     const f=s.frames[n];if(!f)return false;
@@ -27,10 +45,10 @@
     const u=c.toDataURL('image/png');icons.set(name,u);return u;
   }
   const types=['barracks','archer','mage','artillery','orc'];
-  const api=window.PaintedWorld={enabled:true,sheets,blit,icon,names,ready:Promise.all(Object.values(sheets).map(s=>s.ready)),
+  const api=window.PaintedWorld={enabled:true,sheets,materials,texture,blit,icon,names,ready:Promise.all([...Object.values(sheets),...Object.values(materials)].map(s=>s.ready)),
     prop(g,d,theme){
       let n=slots[d.k];if(n===undefined)return false;
-      if(d.k==='tree'&&['forest','castle'].includes(theme))n=(d.v||0)%2;
+      if(d.k==='tree'&&['forest','castle'].includes(theme))n=(d.v||0)<.5?0:1;
       if(theme==='castle'&&d.k==='pine')n=1;
       if(theme==='ice'&&d.k==='tree')n=1;
       if(theme==='ice'&&d.k==='bush')n=2;
@@ -53,15 +71,15 @@
       window.Icons3D={has:n=>names.includes(n)||!!(oldIcons&&oldIcons.has(n)),url:(n,...args)=>icon(n)||(oldIcons&&oldIcons.url(n,...args))};
       const oldTower=Painter.tower;
       Painter.tower=function(g,type,tier,x,y,scale,t,st){
-        const row=types.indexOf(type),h=(94+tier*14)*scale;
+        const row=types.indexOf(type),h=(94+tier*14)*scale*.7;
         if(row<0||!sheets.towers?.loaded)return oldTower.call(this,g,type,tier,x,y,scale,t,st);
-        g.save();g.translate(x,y+7*scale);
-        ArtKit.shadow(g,5*scale,3*scale,37*scale,11*scale,.23);
-        const recoil=st&&st.a>=0?Math.sin(Math.min(1,st.a)*Math.PI)*1.8*scale:0;
+        g.save();g.translate(x,y+4.9*scale);
+        ArtKit.shadow(g,3.5*scale,2.1*scale,26*scale,8*scale,.23);
+        const recoil=st&&st.a>=0?Math.sin(Math.min(1,st.a)*Math.PI)*1.26*scale:0;
         blit(g,'towers',row*4+Math.max(0,Math.min(3,tier-1)),0,recoil,h,false);
-        if(type==='mage')ArtKit.glow(g,0,-h*.77,15*scale,'#b284ff',.08+.04*Math.sin(t*2));
+        if(type==='mage')ArtKit.glow(g,0,-h*.77,10.5*scale,'#b284ff',.08+.04*Math.sin(t*2));
         const crew={archer:['elf',12,-.45],mage:['mage',12,-.24],artillery:['dwarf',-27,-.2]}[type];
-        if(crew){g.save();g.translate(crew[1]*scale,h*crew[2]);if(st&&st.face<0)g.scale(-1,1);ArtStylized.draw(g,crew[0],{w:-1,a:st?.a>=0?st.a:-1,t},30*scale);g.restore();}
+        if(crew){g.save();g.translate(crew[1]*scale*.7,h*crew[2]);if(st&&st.face<0)g.scale(-1,1);ArtStylized.draw(g,crew[0],{w:-1,a:st?.a>=0?st.a:-1,t},21*scale);g.restore();}
         g.restore();
       };
       Painter.clear();

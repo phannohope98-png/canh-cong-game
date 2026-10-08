@@ -21,7 +21,7 @@
       this.x += dx / d * step; this.y += dy / d * step;
       if (Math.abs(dx) > 0.8) this.face = dx > 0 ? 1 : -1;
       this.dvx = dx / d; this.dvy = dy / d;
-      this.moving = true; this.walk += step / 32;
+      this.moving = true; this.walk += step / (window.ArtStylized?.stride(this.art||'soldier',(ArtChars[this.art||'soldier']?.tall||50)*(this.scale||1))||32);
       return d - step < 1.5;
     }
 

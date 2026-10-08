@@ -289,6 +289,8 @@ float surf(){
   // A jaw and cheek planes replace the spherical skull while retaining the
   // forehead/eye surface used by onHead(), helmets and animation tracks.
   function skull(R) {
+    if (/Golem|magmaLord/.test(BUILD_ID || '')) return G.sbox(R * 1.9, R * 1.8, R * 1.85, 0.3);
+    if (/^treant/.test(BUILD_ID || '')) return G.lathe([[0, -R], [R * .58, -R], [R * .9, -R * .45], [R, R * .5], [R * .7, R], [0, R]], 9, .9);
     const g = G.ball(R, 1.04, 0.96, 1), p = g.attributes.position;
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i), y = p.getY(i), z = p.getZ(i), lower = Math.max(0, -y / R);
@@ -663,12 +665,13 @@ float surf(){
     o = o || {};
     const root = node('root'), n = {}, fur = o.fur || '#7a7680', furD = o.furD || '#4a4652', skin = '#7a9a62', W = o.big || 1;
     n.wolf = node('wolf', root, 0, 0.72, 0);
-    add(n.wolf, part(G.cap(0.3, 0.62).rotateX(Math.PI / 2), fur), 0, 0, 0);
+    add(n.wolf, part(limb(0.3, 1.1).rotateX(Math.PI / 2), fur), 0, 0, 0);
     add(n.wolf, new T.Mesh(G.ball(0.24, 1, 0.6, 1.4), mat(o.belly || '#c8c0c8')), 0, -0.14, 0.05);
     for (let i = 0; i < 4; i++) add(n.wolf, part(G.cone(0.07, 0.2), furD, { ink: 0.014 }), 0, 0.3, 0.3 - i * 0.16, -0.5);
     for (const [k, x, z] of [['wFL', 0.17, 0.36], ['wFR', -0.17, 0.36], ['wBL', 0.17, -0.38], ['wBR', -0.17, -0.38]]) {
       const lg = n[k] = node(k, n.wolf, x, -0.1, z);
-      add(lg, part(G.cap(0.085, 0.42), k[2] === 'R' ? furD : fur), 0, -0.28, 0);
+      add(lg, part(limb(0.085, 0.5), k[2] === 'R' ? furD : fur), 0, -0.28, 0);
+      add(lg, part(G.sbox(.10, .13, .12, .55), furD), 0, -.31, .035);
       add(lg, part(G.ball(0.09, 1.1, 0.7, 1.4), '#2a2630'), 0, -0.55, 0.04);
     }
     n.tail = node('tail', n.wolf, 0, 0.12, -0.6);
@@ -1064,7 +1067,8 @@ float surf(){
   function DRAKE() {
     const root = node('root'), n = {}, red = '#c8381e', dark = '#7a1a10', belly = '#f2c068', horn = '#f2ead6';
     n.body = node('body', root, 0, 1.25, 0);
-    add(n.body, part(G.cap(0.3, 0.5).rotateX(Math.PI / 2), red), 0, 0, 0);
+    add(n.body, part(limb(0.3, 1.05).rotateX(Math.PI / 2), red), 0, 0, 0);
+    for (let i = 0; i < 5; i++) add(n.body, part(G.sbox(.36 - Math.abs(i - 2) * .035, .035, .10, .5), belly, { ink: .008 }), 0, -.23, .30 - i * .14);
     add(n.body, part(G.ball(0.26, 1, 0.7, 1.4), belly, { ink: 0.012 }), 0, -0.1, 0.02);
     for (let i = 0; i < 5; i++) add(n.body, part(G.cone(0.05, 0.16), dark, { ink: 0.012 }), 0, 0.3, 0.3 - i * 0.16, -0.4);
     for (const [z, s] of [[0.2, 1], [0.2, -1], [-0.25, 1], [-0.25, -1]]) { add(n.body, part(G.cap(0.06, 0.18), red), s * 0.17, -0.28, z, 0.6); add(n.body, part(G.ball(0.06, 1.2, 0.6, 1.3), dark), s * 0.17, -0.4, z + 0.1); }

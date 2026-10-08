@@ -1,5 +1,5 @@
 /* service-worker.js – chơi offline. Đổi CACHE_NAME mỗi lần cập nhật. */
-const CACHE_NAME = 'canh-cong-depth48';
+const CACHE_NAME = 'canh-cong-paint49';
 const ASSETS = ['./js/battle3d.js', './', './index.html', './style.css', './manifest.json',
   './js/config.js', './js/maps-img.js', './js/campaign.js', './js/save.js', './js/items.js', './js/audio.js', './js/icons.js', './js/art-kit.js', './js/art-chars.js', './js/art-stylized.js', './js/art-towers.js', './js/art.js',
   './js/effects.js', './js/level.js', './js/mapart.js', './design/props3d.js', './js/map3d.js', './js/fx3d.js', './js/terrain3d.js', './js/water.js', './js/icons3d.js', './js/lights.js', './js/camera.js', './js/combat.js', './js/enemies.js', './js/units.js', './js/towers.js', './js/spells.js', './js/waves.js',

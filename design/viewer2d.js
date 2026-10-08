@@ -1,6 +1,7 @@
-(function(){
+(async function(){
   'use strict';
   const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),canvas=$('view'),g=canvas.getContext('2d');
+  await ArtStylized.ready;
   const aliases={wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight'};
   const list=Chars3D.list.filter(d=>ArtStylized.kind(d.id)||ArtStylized.originals[d.id]||ArtStylized.originals[aliases[d.id]]);
   let current=list.find(d=>d.id===q.get('c'))||list[0],tier=+q.get('t')||4,mode='idle',face=1,time=0,speed=1,small=false;
@@ -8,10 +9,10 @@
   function pose(t){return {t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
   function picture(id,w,h,phase,dir){const c=document.createElement('canvas');c.width=w;c.height=h;const p=c.getContext('2d');p.translate(w/2,h*.88);p.scale(dir||1,1);ArtStylized.draw(p,id,phase,Math.min(h*.74,w*.40));return c;}
   function download(c,name){c.toBlob(blob=>{if(!blob)return;const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});}
-  function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent='Nét vẽ 2D, hình khối gọn và chuyển động theo từng bộ phận. Giữ màu, trang phục và vũ khí đặc trưng.';
+  function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent=d.id==='pharaoh'?'Pharaoh chiến đấu: băng vải ngà, giáp vàng–lam, mắt xanh và kiếm cong. Nét vẽ có khối, với các tư thế bước đi và chém kiếm nối thành hoạt ảnh.':'Nét vẽ 2D, hình khối gọn và chuyển động theo từng bộ phận. Giữ màu, trang phục và vũ khí đặc trưng.';
     $('sh-pal').replaceChildren();for(const {c:col,l:name} of (d.palette||[])){const s=document.createElement('span');s.textContent=name+' '+col;s.style.borderLeft='18px solid '+col;s.style.padding='5px';$('sh-pal').append(s);}
     $('sh-turn').replaceChildren();for(const [label,dir]of [['Phải',1],['Trái',-1]]){const f=document.createElement('figure'),im=document.createElement('img');im.src=picture(d.id,160,190,{t:0,w:-1,a:-1},dir).toDataURL();im.alt=label;const c=document.createElement('figcaption');c.textContent=label;f.append(im,c);$('sh-turn').append(f);}
-    $('sh-stats').textContent='Canvas 2D · 5 hoạt ảnh · 2 hướng';$('sh-bones').textContent='Thân · đầu · áo choàng · tay · chân · vũ khí';
+    $('sh-stats').textContent=d.id==='pharaoh'?'18 khung vẽ · 2 hướng · đứng, đi, đánh và ngã':'Canvas 2D · 5 chế độ xem · 2 hướng';$('sh-bones').textContent=d.id==='pharaoh'?'6 khung đứng · 6 khung bước đi · 6 khung chém kiếm':'Thân · đầu · áo choàng · tay · chân · vũ khí';
     history.replaceState(null,'','?c='+d.id+'&t='+tier);for(const b of $('roster').children)b.classList.toggle('on',b.dataset.id===d.id);
   }
   for(const d of list){const b=document.createElement('button');b.dataset.id=d.id;const im=document.createElement('img');im.src=picture(d.id,96,100,{t:0,w:-1,a:-1},1).toDataURL();const s=document.createElement('span');s.textContent=d.name;b.append(im,s);b.onclick=()=>select(d);$('roster').append(b);}

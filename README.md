@@ -8,6 +8,14 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 62 — vật phẩm kiến trúc và hiệu ứng kỹ năng
+
+Hình vật phẩm trong kho và bộ phận gắn trên trụ dùng cùng nét vẽ: cờ, cửa gia cố, phù hiệu, mái, giá cung, rễ, tinh thể, vòng phép, cơ cấu pháo. Kính ngắm và vòng nòng đi theo nòng pháo khi xoay và giật. Thần Tích có khắc dấu trên phần gắn, không thêm vòng hào quang rời quanh trụ.
+
+Kỹ năng trong trận dùng hình học hoạt ảnh thay cho ảnh hiệu ứng cố định: đường phép chuyển động, vệt chém, vòng va chạm, tia sáng, lá, bụi và mảnh vỡ tan dần. Đòn rơi có dấu báo trên đất trước đúng thời điểm tác động. Ảnh minh họa vẫn dùng làm biểu tượng nút kỹ năng.
+
+Đã dựng 24 vật phẩm trên 16 kiểu trụ và kiểm tra 20 kỹ năng ở ba thời điểm khác nhau. Cả 20 kỹ năng được gọi trong trận thử với hồi chiêu hoạt động; 600 lượt render không ghi nhận lỗi game. Đây là kiểm tra trình duyệt desktop, chưa xác nhận trên mọi điện thoại thật.
+
 ## Bản 61 — chuyển động và điểm trúng đòn
 
 Hướng lệch ngang của quái được nội suy liên tục qua các đoạn đường, tránh nhảy vị trí khi rẽ. Chu kỳ bước theo quãng đường được rút ngắn cho từng nhóm quái. Lính xóa trạng thái đang di chuyển trước mỗi lượt cập nhật, nên khi đứng đánh không tiếp tục chạy tại chỗ.

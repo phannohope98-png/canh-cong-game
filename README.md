@@ -42,3 +42,14 @@ Cần điều khiển hoặc chọn tướng rồi chạm vị trí để di chu
 Kiểm tra bản 57: cú pháp JavaScript và đường dẫn tài nguyên; 30 màn và 25 điểm nối; bốn cấp của bốn trụ với bộ phận lắp; hai mươi lần sử dụng kỹ năng và lính Người thực sự di chuyển/đánh; quy tắc rơi, ghép và lưu Thần Tích; trận nhiều quái và khung điện thoại. Thử nghiệm trình duyệt không thay thế kiểm tra trên mọi mẫu điện thoại.
 
 Chạy local bằng máy chủ HTTP ở thư mục repository. Xưởng dùng `design/nhan-vat-3d.html` (tên đường dẫn cũ, nội dung là Canvas 2D). Các file `realm57.js`, `mounts56.js`, `battle57.js` và `equipment57.js` cập nhật thế giới, điểm lắp và hành vi chiến đấu sau các module nền.
+
+
+## Bản 58 — bố cục và chuyển động
+
+30 màn có 30 bố cục riêng, luân phiên một, hai hoặc ba lối; các nhánh nhập vào cửa ra và tọa độ ra/vào nối tiếp trong mỗi thế giới. Vị trí xây được xét theo toàn bộ vùng ảnh của trụ cấp cuối, không chỉ khoảng cách tâm tới đường. Chiều cao trụ từ 88 tới 98 đơn vị; nâng cấp thay thiết kế, không phóng to quá mức. Năm cổng cuối chặng dùng hình riêng cho từng chủng tộc, cửa gắn theo đúng cửa ra.
+
+Nòng pháo là phần riêng: xoay theo mục tiêu, giật lùi, lóe lửa và phát đạn cùng một tọa độ. Thân trụ giữ nguyên hướng trên đất. Doanh trại mở hai cánh cửa, lính ra từng lượt, có nhịp chờ mở cửa khi hồi sinh. Nền tiếp xúc dùng màu đất map, không có đĩa bóng tối phía dưới trụ.
+
+Hai lệnh tướng hiển thị bằng hình tròn có lớp đếm hồi chiêu xoay theo thời gian. Bỏ chữ trạng thái dưới hình. Hồi chiêu tăng 25%; sức mạnh kỹ năng tăng theo cấp được giới hạn, sát thương cơ bản giảm một nửa, tăng tài năng kỹ năng được giới hạn 35%. Lính gọi từ kỹ năng cao 32 đơn vị, thấp hơn lính doanh trại, máu và sát thương thấp hơn trước. Joystick không tạo cờ đích.
+
+Thần Tích có 24 hình vẽ riêng, khác cấu trúc đồ thông thường, dùng chung hình giữa bách khoa và bộ phận lắp trụ. Quy tắc hiếm, duy nhất, cốt truyện và không thể ghép lên Thần Tích giữ nguyên. Quái có mặt dữ và tư thế đánh riêng; chu kỳ đi tính theo quãng đường với bước riêng cho các nhóm, ba làn lệch ngang cố định, hạn chế tăng tốc bất ngờ. Cache hoạt ảnh lấy kích thước theo từng tư thế để không cắt đầu/chân/vũ khí.

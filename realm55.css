@@ -10,3 +10,6 @@ body:not(.battle55) #rotate{display:none!important}
 @media(max-width:600px){#hero-roster{height:112px;min-height:112px;overflow-y:hidden;scrollbar-width:none}.roster-item{flex:0 0 87px}.tabs{scrollbar-width:none}}
 
 #map-inner.six-worlds #map-nodes{grid-template-columns:repeat(6,1fr)}.world-card{grid-column:span 2}.world-card:nth-child(n+4){grid-column:span 3}.skill-card img{border-radius:9px}.skill-detail>img{width:82px;height:82px;border-radius:14px}
+
+/* Icon cooldown sweeps clockwise, without status text. */
+#hero-commands{grid-template-columns:repeat(2,54px)}#hero-commands button{position:relative;width:54px;height:54px;min-height:54px;border-radius:50%;overflow:hidden;padding:3px;border:2px solid #dfbd73}#hero-commands button img{width:44px;height:44px;border-radius:50%;margin:auto}#hero-commands button small{display:none}#hero-commands button.locked58 small{display:block;position:absolute;inset:17px 0;color:#fff;font-size:14px;z-index:3}#hero-commands button i{display:none}#hero-commands button.cooling58::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#101c36bf 0deg var(--cool-angle),transparent var(--cool-angle) 360deg);pointer-events:none}#hero-commands button:disabled{opacity:.85;filter:none}

@@ -154,7 +154,7 @@
     },
     tick(u, dt) {
       if (u.skillCd > 0) u.skillCd -= dt;
-      u.engage = u.state === 'post' ? (u.range ? u.range + 20 : 80) : 0;
+      u.engage = u.state === 'post' ? (u.range ? u.range + 20 : 135) : 0; // preserve the current hero melee leash
       const f = u.fx; if (!f) return;
       f.t += dt;
       if (f.kind === 'rain') {

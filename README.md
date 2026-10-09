@@ -1,44 +1,39 @@
 # Canh Cổng — Bảo Vệ Thế Giới
 
-Game thủ thành Canvas 2D dành cho màn hình ngang. Bộ hình hiện tại là nhân vật cartoon vẽ tay, dùng chung trong trận và xưởng nhân vật; trang chính không khởi tạo WebGL hay mô hình 3D.
+Game tower-defense Canvas 2D với nhân vật cartoon vẽ tay. Bộ hình và chuyển động dùng chung trong trận và xưởng nhân vật; trang chính không cần WebGL.
 
-## Chiến dịch
+## Năm thế giới
 
-Sáu thế giới: Rừng Xanh, Thành Cổ, Sa Mạc, Băng Giá, Núi Lửa và Cổng Hỗn Mang. Mỗi thế giới có sáu chặng liên tiếp trên cùng một tuyến đường. Chặng thứ sáu mới tới thành và boss; thắng để sang thế giới tiếp theo. Đoàn xe tìm sáu mảnh Chuông Bình Minh để mở lại các cổng.
+Vương Quốc Người → Rừng Cổ Elf → Cõi Phù Thủy → Sơn Thành Người Lùn → Hoang Địa Orc. Năm chủng tộc tìm lại năm Ấn Cổng để ngăn quân Hư Vô chiếm các thành trì.
 
-Màn chiến dịch có bản đồ sáu đảo. Ảnh xem trước từng chặng được dựng từ đúng địa hình có thể chơi. Mỗi màn có 5–6 vị trí xây trụ; máu quái và các nhóm hỗ trợ tăng theo tiến trình.
+Mỗi thế giới có sáu chặng nối tiếp trên cùng tuyến đường; chặng sáu mới tới thành và boss. Tổng cộng 30 màn. Bản đồ chiến dịch có năm vùng, ảnh xem trước dựng từ địa hình có thể chơi. Lối rừng là đường đất, các vùng còn lại có vật liệu và cây đá riêng. Vật thể lấy từ khung hình riêng theo kích thước thực, tránh cắt cây theo ô bằng nhau.
 
-## Trụ và vật phẩm
+## Công trình và vật phẩm
 
-Giữ bốn loại trụ: Người, Elf, Phù Thủy, Người Lùn; mỗi loại bốn cấp. Đã bỏ trụ Orc và toàn bộ kỹ năng tự kích hoạt riêng ở cấp tối đa. Công trình có nền đất, bóng tiếp xúc, lính đúng cỡ và các bộ phận gắn trực tiếp lên thân trụ.
+Bốn loại trụ Người, Elf, Phù Thủy, Người Lùn; mỗi loại bốn cấp. Lính Elf đứng kéo cung, phù thủy niệm phép và bay lên, pháo thủ nạp và giật lùi khi bắn. Động tác này tách khỏi chu kỳ đi bộ. Trụ có nền đất và bóng tiếp xúc. Không có trụ Orc hay kỹ năng tự kích hoạt ẩn ở cấp cuối.
 
-24 loại bộ phận công trình, mỗi loại có sáu bậc: Tệ, Bình thường, Cao, Cao cấp, Huyền thoại, Thần Tích. Tổng cộng 144 vật phẩm có thể xem trong bách khoa, sắp theo bậc; đồ chưa sở hữu tối màu nhưng vẫn đọc được chỉ số và nguồn gốc. Từ Huyền thoại trở lên có câu chuyện. Vật phẩm là cờ, cửa, mái, tường, pha lê, bộ ngắm, nòng pháo, bánh răng… đúng loại trụ và điểm lắp; không dùng trang phục của tướng làm bộ phận công trình.
+24 loại bộ phận công trình × sáu bậc = 144 vật phẩm. Cờ thay cờ trên cột; pha lê đặt vào ổ phép; cửa, mái, giằng, ống ngắm, nòng và bánh răng lắp theo hình từng cấp trụ. Bách khoa sắp theo bậc, đồ đã sở hữu sáng lên; đồ chưa có vẫn đọc được chỉ số và nguồn gốc.
+
+Thần Tích có 24 tên và câu chuyện riêng. Không thể ghép Huyền Thoại lên Thần Tích, mua hay phân rã Thần Tích. Chỉ boss ở chặng cuối của hai thế giới cuối có một lần xét rơi mỗi trận, yêu cầu tướng cấp 30, xác suất 0,2%. Di vật đã tìm được không rơi bản trùng. Bộ sưu tập lưu cùng tiến trình.
 
 ## Năm tướng
 
-| Tướng | Vai trò | Chính / Phụ |
+| Tướng | Chủng tộc | Kỹ năng chính / phụ |
 |---|---|---|
-| Mộc Khiên — rùa rừng | Đỡ đòn, bảo hộ | Mai Trấn Lối / Búa Rễ Cây |
-| Cáo Lửa — cáo thám hiểm | Truy kích, đánh dấu | Phi Tiêu Hồi Âm / Lướt Lá |
-| Bông Tuyết — chim cánh cụt | Băng, khống chế | Vườn Bông Băng / Đóng Băng |
-| Rêu Đồng — gấu trúc đỏ | Cơ khí, hỗ trợ | Trạm Hạt Đồng / Xả Hơi |
-| Đốm Sao — rồng rừng nhỏ | Hồi phục, rễ trói | Mưa Hạt Sao / Hơi Thở Mầm |
+| Caelan Giáo Thành | Người | Mũi Giáo Phá Trận / Khiên Chặn Tuyến |
+| Aelith Lá Bạc | Elf | Loạt Tên Xuyên Lá / Bước Gió Ghim Chân |
+| Mirelle Khắc Ấn | Phù Thủy | Sét Khắc Ấn / Lồng Ấn Hư Không |
+| Durik Nòng Đồng | Người Lùn | Chùm Pháo Xuyên Đá / Bãi Mìn Đồng |
+| Gorak Nanh Chiến | Orc | Rìu Xé Trận / Tiếng Gầm Chiến Trận |
 
-Mở tướng ở cấp hành trình 1/3/6/9/12. Tướng tăng tới cấp 60, có tối đa 60 điểm tài năng. Mỗi tướng có ba nhánh, mỗi nhánh tám nút × năm bậc = 40 điểm. Một bộ 60 điểm đủ một nhánh đầy và nửa nhánh khác. Các nút có điều kiện nối trước; có đặt lại điểm ngoài trận. Kỹ năng phụ mở ở cấp tướng 10, tăng hiệu lực ở cấp 35. Kỹ năng có biểu tượng, mô tả gọn và minh họa động.
+Mỗi tướng có sáu tư thế đi và tư thế đánh riêng, hai hình minh họa kỹ năng và hiệu ứng trong trận. Đâm giáo đẩy lùi, tên đánh dấu, sét nối mục tiêu, phong ấn giữ quái, mìn kích hoạt theo khoảng cách, rìu gây chảy máu theo quái và tiếng gầm tăng sát thương đồng đội.
 
-## Điều khiển và hiệu năng
+Mở tướng theo cấp hành trình 1/3/6/9/12. Tướng tối đa cấp 60, có 60 điểm tài năng; ba nhánh, mỗi nhánh tám nút × năm bậc = 40 điểm. Đủ một nhánh và nửa nhánh khác. Kỹ năng phụ mở cấp 10, chuyên sâu cấp 35. Giữ khóa lưu cũ để bảo toàn tiến trình khi cập nhật thiết kế.
 
-- Trong trận: cần điều khiển góc phải để di chuyển tướng, hoặc chọn tướng rồi chạm vị trí cần đến. Thả cần để dừng; hai nút riêng kích hoạt kỹ năng chính/phụ.
-- Trang tướng và bách khoa dùng được ở màn hình dọc; trận dùng màn hình ngang.
-- Quái, động tác đánh và đạn đã giảm tốc; đợt quái giãn nhịp để dễ nhìn.
-- Sói dùng bốn chân với các tư thế chạy nguyên vẹn, không nội suy bằng các dải ảnh bị xé.
-- Nấm Tụng Ca hồi phục quái gần nó; Bọ Khiên chống sát thương vật lý, yếu trước phép.
-- Bốn atlas nhân vật dùng chung, nền trận dựng một lần, bộ nhớ hoạt ảnh và hạt hiệu ứng có giới hạn; hình trang chủ tĩnh.
+## Điện thoại và kiểm tra
 
-## Chạy
+Cần điều khiển hoặc chọn tướng rồi chạm vị trí để di chuyển. Hai nút riêng dùng kỹ năng chính/phụ. Trận dùng màn ngang; trang tướng và bách khoa dùng được màn dọc. Tốc độ quái, đạn và nhịp đánh được giảm để dễ quan sát. Nền menu là ảnh tĩnh; atlas WebP và nền map được lưu đệm.
 
-Phục vụ thư mục này bằng một HTTP server tĩnh và mở `index.html`. Có thể triển khai GitHub Pages từ nhánh `main` / thư mục gốc. Service worker lưu bản chơi offline và đổi tên cache theo phiên bản. Xưởng 2D ở `design/nhan-vat-3d.html` (giữ đường dẫn cũ để các liên kết đã lưu tiếp tục dùng được).
+Kiểm tra bản 56: cú pháp JavaScript và đường dẫn tài nguyên; 30 màn và 25 điểm nối; bốn cấp của bốn trụ với bộ phận lắp; mười lần sử dụng kỹ năng; quy tắc rơi, ghép và lưu Thần Tích; trận nhiều quái và khung điện thoại. Thử nghiệm trình duyệt không thay thế kiểm tra trên mọi mẫu điện thoại.
 
-## Mã chính
-
-`realm55.js`: thiết lập chiến dịch/tướng/đồ/nhịp độ; `atlas55.js`, `cartoon-actors.js`, `painted-motion.js`: hình và chuyển động; `cartoon-world.js`, `landscape55.js`: công trình/vật phẩm/cảnh quan; `world-ui55.js`: bản đồ và trang chủ; `hero-progress.js`, `skill-art.js`: tài năng và kỹ năng; `mobile55.js`: điều khiển và giới hạn hiệu năng. Các file 3D cũ còn trong lịch sử/thư mục, không được trang game hiện tại tải.
+Chạy local bằng máy chủ HTTP ở thư mục repository. Xưởng dùng `design/nhan-vat-3d.html` (tên đường dẫn cũ, nội dung là Canvas 2D). Các file `realm56.js`, `mounts56.js` và `battle56.js` cập nhật thế giới, điểm lắp và hành vi chiến đấu sau các module nền.

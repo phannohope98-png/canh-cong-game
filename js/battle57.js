@@ -46,6 +46,7 @@
    if(z.damage&&z.impact===undefined&&!z.mine){z.pulse-=dt;if(z.pulse<=0){z.pulse=z.spin?.6:z.id==='selene'?.7:99;if(z.bleed)for(const e of near(z.x,z.y,z.r))if(!e.flying)e.bleed56={left:3,pulse:.65,damage:z.damage*.12};Combat.splash(z.x,z.y,z.r,z.damage,z.id==='selene'?'magic':'physical',{air:z.id==='selene'});}}
   }};
  const oldFx=SkillArt.fx;function fx(g,id,slot,x,y,r,t,life=1.5,z={}){
+  if(window.SkillFx59)return SkillFx59.draw(g,id,slot,x,y,r,t,life,z);
   if(!extra.includes(id)&&id!=='aldric'){oldFx(g,id,slot,x,y,r,t,life,z);return;}
   const fade=Math.min(1,t*9,(life-t)*5),p=Math.min(1,t/.5);g.save();g.translate(x,y);g.globalAlpha=Math.max(0,fade);g.lineCap='round';g.lineJoin='round';
   if(id==='aldric'&&!slot){g.strokeStyle='#b1d4e3';g.fillStyle='#84a5bd22';g.lineWidth=2;g.beginPath();g.ellipse(0,0,r*p,r*p*.32,0,0,7);g.fill();g.stroke();for(const q of [-1,1]){g.save();g.translate(q*18,-8);ArtStylized.draw(g,'soldier',{w:-1,a:-1,t},28);g.restore();}}

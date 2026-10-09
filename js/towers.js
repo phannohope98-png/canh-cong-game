@@ -50,7 +50,7 @@
       if (this.drop < FALL + SQUASH) this.drop += dt;
       if (!this.landed) { if (this.drop < FALL) return; this.land(); }
       if (this.def.kind === 'barracks') return;
-      const A = this.anim, st = this.stats;if(this.type==='artillery'&&this.pending?.alive){const L=PaintedWorld.layout(this.type,this.level,TS),dx=this.pending.x-this.x,dy=this.pending.y-(this.y-L.h*.64);A.face=dx>=0?1:-1;const goal=Math.max(-.5,Math.min(.5,Math.atan2(dy,Math.abs(dx))));A.cannonAngle=(A.cannonAngle||0)+(goal-(A.cannonAngle||0))*Math.min(1,dt*7);}
+      const A = this.anim, st = this.stats;if(this.type==='artillery'&&this.pending?.alive){const L=PaintedWorld.layout(this.type,this.level,TS),dx=this.pending.x-(this.x+L.h*.18),dy=this.pending.y-this.pending.height*.35-(this.y+2-L.h*.44);A.face=dx>=0?1:-1;const goal=Math.max(-.5,Math.min(.5,Math.atan2(dy,Math.abs(dx))));A.cannonAngle=(A.cannonAngle||0)+(goal-(A.cannonAngle||0))*Math.min(1,dt*7);}
       if (A.a >= 0) { const prev = A.a; A.a += dt / (this.type === 'artillery' ? 1.05 : this.type === 'mage' ? .95 : .8); const releaseAt=this.type==='mage'?2/3:.5;if(prev<releaseAt&&A.a>=releaseAt)this.release(); if (A.a >= 1) A.a = -1; }
       if (this.burstN > 0) { this.burstT -= dt; if (this.burstT <= 0) { const tg = TARGET.first(this, true); if (tg) { A.k++; this.shootArrow(tg, this.muzzle()); } this.burstN--; this.burstT = 0.09; } }
       this.cd -= dt;

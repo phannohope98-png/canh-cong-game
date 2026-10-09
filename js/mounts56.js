@@ -41,12 +41,12 @@
   }
   g.restore();
  }
- Painter.tower=function(g,type,tier,x,y,scale,time,st){const row=types.indexOf(type),L=PaintedWorld.layout(type,tier,scale),h=L.h,f=WORLD55.towers55.frames[row*4+tier-1],z=h/f.h;
+ Painter.tower=function(g,type,tier,x,y,scale,time,st){const row=types.indexOf(type),L=PaintedWorld.layout(type,tier,scale),h=L.h,f=type==='artillery'?WORLD55.artillery59.frames[tier-1]:WORLD55.towers55.frames[row*4+tier-1],z=h/f.h;
   g.save();g.translate(x,y+2);const flipped=false;if(type==='artillery'&&window.Cannon58)Cannon58.body(g,tier,h);else PaintedWorld.blit(g,'towers',row*4+tier-1,0,0,h,false);
   if(L.crew){const [id,cx,cy]=L.crew;g.save();g.translate(cx,cy);g.fillStyle='#3e362f44';g.beginPath();g.ellipse(0,1,10*scale,2*scale,0,0,7);g.fill();if(st?.face<0&&!flipped)g.scale(-1,1);ArtStylized.draw(g,id,{w:-1,a:st?.a>=0?st.a:-1,t:time},L.crewSize*scale);g.restore();}
   if(L.crew){const poly=type==='archer'?[[.15,.54],[.49,.62],[.83,.54],[.83,.76],[.15,.76]]:type==='mage'?[[.22,.56],[.49,.63],[.78,.56],[.78,.72],[.22,.72]]:[[.07,.47],[.25,.52],[.43,.47],[.43,.64],[.07,.64]];g.save();g.beginPath();poly.forEach(([px,py],i)=>i?g.lineTo((px-.5)*f.w*z,(py-1)*h):g.moveTo((px-.5)*f.w*z,(py-1)*h));g.closePath();g.clip();PaintedWorld.blit(g,'towers',row*4+tier-1,0,0,h,false);g.restore();}
   g.save();g.translate(-f.w*z/2,-h);g.scale(z,z);Items.mods(type).list.forEach(it=>{if(it&&!(type==='artillery'&&it.s<2))PaintedWorld.drawFitting(g,type,tier,it,time,f);});g.restore();
-  if(type==='artillery'&&window.Cannon58)Cannon58.barrel(g,tier,scale,st,time);if(type==='barracks'&&window.Cannon58)Cannon58.door(g,tier,f,z,st);if(Game.map){const C=PaintedWorld.colors[Game.map.def.theme];g.fillStyle=C[0];for(let i=0;i<5;i++){const px=(i-2)*12;g.beginPath();g.moveTo(px,2);g.lineTo(px-3,-2);g.lineTo(px+4,1);g.fill();}}g.restore();
+  if(type==='artillery'&&window.Cannon58)Cannon58.barrel(g,tier,scale,st,time);if(type==='barracks'&&window.Cannon58)Cannon58.door(g,tier,f,z,st);g.restore();
  };
  PaintedWorld.mounts=P;PaintedWorld.drawFitting=fitting;
 })();

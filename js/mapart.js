@@ -196,7 +196,7 @@
     // An irregular worn footprint with feathered dirt edges, never a forest pavement.
     for(const p of map.paths){
       const left=[],right=[],q={};for(let d=0;d<=p.length+6;d+=6){p.pointAt(Math.min(d,p.length),q);const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083));left.push([q.x+q.nx*w,q.y+q.ny*w]);right.push([q.x-q.nx*w,q.y-q.ny*w]);}
-      const path=()=>{g.beginPath();[...left,...right.reverse()].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
+      const path=()=>{g.beginPath();[...left,...right.slice().reverse()].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
       path();g.fillStyle=T.roadD;g.shadowColor=ArtKit.alpha(T.roadD,.42);g.shadowBlur=9;g.fill();g.shadowBlur=0;g.save();g.clip();
       const gr=g.createLinearGradient(0,0,0,map.H);gr.addColorStop(0,T.road);gr.addColorStop(1,T.roadD);g.fillStyle=gr;g.fillRect(0,0,map.W,map.H);
       // Broad brush variation, scattered soil only; stones belong to the city.
@@ -509,7 +509,7 @@
     // 6) cờ xuất phát & điểm phòng thủ
     const tmp = {};
     map.paths.forEach((p, i) => { p.pointAt(map.entry[i] - 30, tmp); Level.spawnFlag(g, tmp.x, tmp.y, theme); });
-    if(map.def.map===5&&!map.feat.props.some(p=>p.gate58))Level.defendFlag(g,map.W-90,map.def.route.exit[1]+3,theme);
+    if(map.def.map===5&&!map.feat.props.some(p=>p.gate58||p.gate59))Level.defendFlag(g,map.W-90,map.def.route.exit[1]+3,theme);
     // 7) ánh sáng
     g.save();g.globalAlpha=.35; g.globalCompositeOperation = 'soft-light';
     const sun = g.createLinearGradient(0, 0, W, H);

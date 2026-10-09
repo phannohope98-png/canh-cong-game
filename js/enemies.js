@@ -16,7 +16,7 @@
       this.armor = d.armor; this.mres = d.mres; this.speed = d.speed * CONFIG.match.enemySpeedScale; this.radius = d.radius;
       this.flying = !!d.flying; this.boss = !!d.boss; this.reward = d.reward;
       this.art = type; this.pathIndex = pathIndex; this.rateMul = 1; this.speedMul = 1; this.chargeT = 0;
-      this.scale = d.radius / art.dr * (CONFIG.unitScale || 1); this.height = (art.tall ? art.tall * 0.95 : art.box[3] * 0.78) * this.scale + (this.flying ? 18 : 0);
+      this.scale = d.drawHeight ? d.drawHeight / 48 : d.radius / art.dr * (CONFIG.unitScale || 1); this.height = (art.tall ? art.tall * 0.95 : art.box[3] * 0.78) * this.scale + (this.flying ? 18 : 0);
       this.path = Game.map.paths[pathIndex]; this.dist = 0; this.lat = [-6,0,6][this.uid%3];
       this.alive = true; this.state = 'walk'; this.cd = 0.4; this.atk = -1; this.flash = 0; this.slow = 0;
       this.walk = (this.uid%6)/6; this.anim = Math.random() * 3; this.face = 1; this.slamT = d.slam ? d.slam.every : 0; this.shootCd = 1;

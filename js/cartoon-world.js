@@ -35,7 +35,7 @@
   if(r>=2){g.fillStyle='#fff0b7';for(let i=0;i<r-1;i++){g.beginPath();g.arc(17+i*8,58,2.3,0,7);g.fill();}}g.restore();
  }
  const iconCache=new Map();
- function install(){Painter.char=function(g,type,x,y,scale,face,mode,phase){const d=ArtChars[type]||ArtChars.soldier,P={w:-1,a:-1,t:0};if(mode==='walk')P.w=phase;else if(mode==='atk')P.a=phase;else if(mode==='die')P.d=phase;else P.t=phase;g.save();g.translate(x,y);if(face<0)g.scale(-1,1);g.fillStyle='#283b3529';g.beginPath();g.ellipse(0,1,d.tall*scale*.25,3*scale,0,0,7);g.fill();ArtStylized.draw(g,type,P,d.tall*scale);g.restore();};Painter.clear();}
+ function install(){Painter.char=function(g,type,x,y,scale,face,mode,phase,actor){const d=ArtChars[type]||ArtChars.soldier,P={w:-1,a:-1,t:0,_actor:actor};if(mode==='walk')P.w=phase;else if(mode==='atk')P.a=phase;else if(mode==='die')P.d=phase;else P.t=phase;g.save();g.translate(x,y);if(face<0)g.scale(-1,1);g.fillStyle='#283b3529';g.beginPath();g.ellipse(0,1,d.tall*scale*.25,3*scale,0,0,7);g.fill();ArtStylized.draw(g,type,P,d.tall*scale);g.restore();};Painter.clear();}
  const api=window.PaintedWorld={enabled:true,sheets,world,blit,texture,install,colors,names:[],icon:()=>null,ready:Promise.all(Object.values(sheets).map(s=>s.ready)),
   prop(g,d,theme){const n=slots[d.k];if(n===undefined)return false;return blit(g,'env-'+theme,n,d.x,d.y+2,(heights[d.k]||45)*(d.prop?1:d.s||1),!d.prop&&d.flip<0);},
   layout(type,tier,scale=1){const h=([0,88,91,94,98][tier])*scale,crew={archer:['elf',0,-h*.39],mage:['mage',-h*.01,-h*.49],artillery:['dwarf',-h*.25,-h*.34]}[type];return{h,crew,base:2};},

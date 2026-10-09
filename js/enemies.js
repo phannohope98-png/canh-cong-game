@@ -61,10 +61,19 @@
       if (this.dots) { // độc / cháy từ vật phẩm trụ
         for (const k in this.dots) { const d = this.dots[k]; if (d.t <= 0) continue; d.t -= dt; d.acc += d.dps * dt; if (d.acc >= 1) { const n = Math.floor(d.acc); d.acc -= n; Combat.hitEnemy(this, n, 'true'); if (!this.alive) return; } }
       }
-      if (this.atk >= 0) { this.atk += dt / 0.5; if (this.atk >= 1) this.atk = -1; }
+      if(this.stunT>0){this.stunT-=dt;this.state='idle';this.atk=-1;this.meleeImpact=null;return;}
+      if (this.atk >= 0) { const prev=this.atk;this.atk += dt / 0.5;
+        if(prev<.5&&this.atk>=.5&&this.meleeImpact){const hit=this.meleeImpact,u=hit.target;this.meleeImpact=null;
+          if(u?.active&&Math.hypot(u.x-this.x,u.y-this.y)<this.radius+u.radius+10){
+            Combat.hitUnit(u,hit.charged?this.def.damage.map(v=>v*2):this.def.damage);
+            Effects.hit(u.x,u.y-14,'#ffb0a0');if(u.hitT!==undefined)u.hitT=.2;
+            if(hit.charged){Effects.comic(u.x,u.y-40,'HÚC!','#ff9a3a',true);Effects.shake(3,.15);}
+          }
+        }
+        if (this.atk >= 1) {this.atk = -1;this.meleeImpact=null;}
+      }
       this.cd -= dt;
       if (this.slowT > 0) { this.slowT -= dt; if (this.slowT <= 0) this.slowMul = 1; }
-      if (this.stunT > 0) { this.stunT -= dt; this.state = 'idle'; return; }
       this.abilities(dt);
 
       // Trùm đập đất
@@ -90,11 +99,9 @@
         this.blocker = blocker;
         if (blocker) {
           this.state = 'fight'; this.face = blocker.x >= this.x ? 1 : -1;
-          if (this.cd <= 0) {
+          if (this.cd <= 0 && this.atk < 0) {
             this.cd = this.def.rate * this.rateMul; this.atk = 0;
-            if (this.chargeT > 0) { this.chargeT = 0; Combat.hitUnit(blocker, [this.def.damage[0] * 2, this.def.damage[1] * 2]); Effects.comic(blocker.x, blocker.y - 40, 'HÚC!', '#ff9a3a', true); Effects.shake(3, 0.15); }
-            else Combat.hitUnit(blocker, this.def.damage);
-            Effects.hit(blocker.x, blocker.y - 14, '#ffb0a0'); if (blocker.hitT !== undefined) blocker.hitT = 0.2;
+            this.meleeImpact={target:blocker,charged:this.chargeT>0};this.chargeT=0;
           }
           return;
         }
@@ -126,9 +133,9 @@
       if (this.p3 || (this.p2 && this.def.phase2)) K_glow(ctx, this.x, fy - this.height * 0.5, this.radius * 3, '#ff2a1a', 0.35 + Math.sin(this.anim * 8) * 0.15);
       const aim = mode === 'walk' ? Math.atan2(this.tdy || 0, this.tdx || 1) : (this.face > 0 ? 0.35 : Math.PI - 0.35);
       let art = this.art, face = this.face; const dk = window.Art3D && Art3D.dirKey && Art3D.dirKey(art, aim); if (dk) { art = dk; face = 1; }
-      Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.anim);
+      Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.anim, this);
       ctx.globalAlpha = 1;
-      if (this.flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(0.75, this.flash * 7); Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.anim); ctx.restore(); }
+      if (this.flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(0.75, this.flash * 7); Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.anim, this); ctx.restore(); }
       if (this.slowT > 0) ArtKit.glow(ctx, this.x, fy - this.height * 0.4, this.radius * 2.2, '#8fe0ff', 0.45);
       if (this.dots) { if (this.dots.poison && this.dots.poison.t > 0) ArtKit.glow(ctx, this.x, fy - this.height * 0.45, this.radius * 1.9, '#7aff4a', 0.4); if (this.dots.burn && this.dots.burn.t > 0) { ArtKit.glow(ctx, this.x, fy - this.height * 0.45, this.radius * 1.9, '#ff7a2a', 0.45); if (Math.random() < 0.2) Effects.particle(this.x + (Math.random() - 0.5) * this.radius, fy - this.height * 0.6, 0, -40, 0.4, '#ffb04a', 4); } }
       if (this.stunT > 0) for (let i = 0; i < 3; i++) { const a = this.anim * 6 + i * 2.1; ArtKit.dot(ctx, this.x + Math.cos(a) * this.radius * 0.7, fy - this.height - 4 + Math.sin(a) * 3, 2.2, '#ffe58a'); }

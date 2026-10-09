@@ -26,6 +26,7 @@
     }
 
     update(dt) {
+      this.moving=false;
       if (this.flash > 0) this.flash -= dt;
       if (this.hitT > 0) this.hitT -= dt;
       if (this.shieldT > 0) this.shieldT -= dt;
@@ -123,8 +124,8 @@
       const dk = window.Art3D && Art3D.dirKey && Art3D.dirKey(art, aim); // 3D: 8 hướng thật
       if (dk) { art = dk; face = 1; }
       else if (mode === 'walk') { const v = this.dvy || 0, s = v < -0.55 ? '_b' : v > 0.6 ? '_f' : Math.abs(this.dvx || 0) > 0.8 ? '_s' : ''; if (s && ArtChars[art + s]) art += s; }
-      Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.idleT);
-      if (this.flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(0.6, this.flash * 6); Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.idleT); ctx.restore(); }
+      Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.idleT, this);
+      if (this.flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(0.6, this.flash * 6); Painter.char(ctx, art, this.x, fy, this.scale, face, mode, mode === 'atk' ? this.atk : mode === 'walk' ? this.walk : this.idleT, this); ctx.restore(); }
       if (hb) ctx.restore();
       if (this.shieldT > 0) { // lá chắn khiên vàng
         const k = Math.min(1, this.shieldT * 3), s = (CONFIG.unitScale || 1);
@@ -153,7 +154,7 @@
     },
     tick(u, dt) {
       if (u.skillCd > 0) u.skillCd -= dt;
-      u.engage = u.state === 'post' ? (u.range ? u.range + 20 : 135) : 0; // anh hùng cận chiến tự lao ra đánh quái trong ~135
+      u.engage = u.state === 'post' ? (u.range ? u.range + 20 : 80) : 0;
       const f = u.fx; if (!f) return;
       f.t += dt;
       if (f.kind === 'rain') {

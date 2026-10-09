@@ -20,7 +20,11 @@
       let lo = 0, hi = this.segLen.length - 1;
       while (lo < hi) { const m = (lo + hi + 1) >> 1; if (this.cum[m] <= d) lo = m; else hi = m - 1; }
       const i = lo, a = this.points[i], b = this.points[i + 1], l = this.segLen[i] || 1, t = Math.max(0, Math.min(1, (d - this.cum[i]) / l));
-      out.tx = (b.x - a.x) / l; out.ty = (b.y - a.y) / l; out.nx = -out.ty; out.ny = out.tx;
+      // Interpolate knot tangents, so a lateral lane does not jump at segment seams.
+      const prev=this.points[Math.max(0,i-1)],next=this.points[Math.min(this.points.length-1,i+2)];
+      const al=Math.hypot(b.x-prev.x,b.y-prev.y)||1,bl=Math.hypot(next.x-a.x,next.y-a.y)||1;
+      const tx=(b.x-prev.x)/al*(1-t)+(next.x-a.x)/bl*t,ty=(b.y-prev.y)/al*(1-t)+(next.y-a.y)/bl*t,tl=Math.hypot(tx,ty)||1;
+      out.tx=tx/tl;out.ty=ty/tl;out.nx=-out.ty;out.ny=out.tx;
       out.x = a.x + (b.x - a.x) * t; out.y = a.y + (b.y - a.y) * t;
       return out;
     }

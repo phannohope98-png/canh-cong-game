@@ -146,7 +146,7 @@
       const id = Progress.selectedHero(), H = CONFIG.heroes[id], lv = Progress.heroLevel(id), m = 1 + (lv - 1) * CONFIG.heroPerLevel, gm = Progress.gearMods(id);
       const art = ArtChars.heroKey(id, Progress.wornTiers(id)), p = map.paths[0].pointAt(map.paths[0].length - 190, {});
       const hp = Math.round(H.hp * m * (1 + gm.hp)), dm = m * (1 + gm.dmg);
-      const u = new Unit({ isHero: true, heroId: id, heroDef: H, art, radius: H.radius, scale: H.radius / ArtChars[art].dr * (CONFIG.unitScale || 1) * 1.1, x: p.x, y: p.y, postX: p.x, postY: p.y,
+      const u = new Unit({ isHero: true, heroId: id, heroDef: H, art, radius: H.radius, scale: (['borin','haldren'].includes(id)?43:54) / 48 * (CONFIG.unitScale || 1), x: p.x, y: p.y, postX: p.x, postY: p.y,
         maxHp: hp, hp, damage: [H.damage[0] * dm, H.damage[1] * dm], armor: Math.min(0.8, H.armor + gm.arm), rate: H.attackRate / (1 + gm.rate),
         speed: H.speed * (1 + gm.spd), regen: H.regen, engage: 80, level: lv, skillCd: 0, range: H.range || 0, proj: H.proj, air: !!H.air, dtype: H.type, fx: null });
       return u;
@@ -220,7 +220,7 @@
       for (const u of this.list) if (u.tower === T) {
         const r = full || !u.maxHp ? 1 : u.hp / u.maxHp;
         u.maxHp = Math.round(lv.hp * hb); u.hp = Math.max(1, Math.round(u.maxHp * r)); u.damage = [lv.damage[0] * db, lv.damage[1] * db];
-        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = art; u.special = null; u.scale = 42 / ArtChars[art].tall; u.regen = u.maxHp * 0.08;
+        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = T.type==='barracks'?'soldier':art; u.special = null; u.scale = 42 / 48; u.regen = u.maxHp * 0.08;
       }
     },
     remove(T) { for (let i = this.list.length - 1; i >= 0; i--) if (this.list[i].tower === T) this.list.splice(i, 1); },

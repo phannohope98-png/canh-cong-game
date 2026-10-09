@@ -59,6 +59,7 @@
     clear() { cache.clear(); px = 0; },
     char(ctx, type, x, y, scale, face, mode, phase, ppuOverride, aim) {
       if (aim !== undefined && window.Art3D && Art3D.dirKey) { const dk = Art3D.dirKey(type, aim); if (dk) { type = dk; face = 1; } }
+      if(window.ArtStylized?.atlases.get(ArtStylized.identify(type))?.loaded){const P={w:mode==='walk'?phase:-1,a:mode==='atk'?phase:-1,t:mode==='idle'?phase:0};if(mode==='die')P.d=phase;ctx.save();ctx.translate(x,y);if(face<0)ctx.scale(-1,1);ArtStylized.draw(ctx,type,P,48*scale);ctx.restore();return;}
       const d = ArtChars[type]; if (!d) return;
       const ppu = bucket(ppuOverride || scale * this.res);
       let i;

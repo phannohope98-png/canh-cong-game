@@ -37,7 +37,7 @@
     muzzle() {
       const T = ArtTowers, f = this.anim.face;
       if(window.PaintedWorld?.enabled){
-        const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;
+        const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;if(L.muzzle)return{x:this.x+L.muzzle[0]*f,y:this.y+L.base+L.muzzle[1]};
         if(c)return{x:this.x+c[1]+(L.mx||14)*f*TS,y:this.y+L.base+c[2]-(L.my||20)*TS};
         return{x:this.x,y:this.y+L.base-L.h*.6};
       }

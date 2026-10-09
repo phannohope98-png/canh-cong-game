@@ -7,7 +7,7 @@
     const v=images.get(s.file),entry={id,img:v.img,registration:s.registration,loaded:false};entry.ready=v.ready.then(()=>{entry.loaded=true;return entry;});atlases.set(id,entry);
   }
   for(const [a,b] of Object.entries(aliases))atlases.set(a,atlases.get(b));
-  function identify(key){if(key==='hero')return window.Save?.data?.hero||'aldric';const h=/(?:h_|c_)(aldric|lyra|selene|borin|nara)/.exec(key);if(h)return h[1];return key.replace(/_a\d$|_[bfs]$/,'').replace(/s[0-5]$/i,'').replace(/[1-4]$/,'');}
+  function identify(key){if(key==='hero')return window.Save?.data?.hero||'aldric';const h=/(?:h_|c_)(aldric|lyra|selene|borin|nara|veyra|thalen|oria|haldren|brakka)/.exec(key);if(h)return h[1];return key.replace(/_a\d$|_[bfs]$/,'').replace(/s[0-5]$/i,'').replace(/[1-4]$/,'');}
   function blit(g,e,n,H){const r=e.registration,f=r.frames[n],s=H/r.height;g.save();const x=((f.offset||0)-r.pivot)*s,y=-f.baseline*s;if(f.clipRects){if(!f.path){f.path=new Path2D();f.clipRects.forEach(b=>f.path.rect(...b));}g.translate(x,y);g.scale(s,s);g.clip(f.path);g.drawImage(e.img,f.x,f.y,f.w,f.h,0,0,f.w,f.h);}else g.drawImage(e.img,f.x,f.y,f.w,f.h,x,y,f.w*s,f.h*s);g.restore();}
   function draw(g,key,P,H=48){const id=identify(key),e=atlases.get(id);if(!e?.loaded)return false;const dead=P.d!==undefined,attack=P.a>=0,walk=P.w>=0,phase=attack?Math.min(.9999,P.a):walk?((P.w%1)+1)%1:0,n=dead?0:(attack?12:walk?6:0)+Math.floor(phase*6);g.save();if(dead){g.rotate(Math.min(1,P.d)*1.3);g.globalAlpha*=1-Math.min(1,P.d)*.8;}else if(!walk&&!attack){const b=Math.sin((P.t||0)*2.1);g.scale(1-b*.004,1+b*.006);}if(!dead&&window.PaintedMotion&&PaintedMotion.render(g,e.id,P,H,e,n,6,phase)){g.restore();return true;}blit(g,e,n,H);g.restore();return true;}
   function install(){

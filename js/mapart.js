@@ -221,7 +221,7 @@
       for (let d = 0; d <= p.length + 5; d += 4) {
         p.pointAt(Math.min(d, p.length), tmp); const wet = d <= p.length && wetAt(map.feat, tmp.x, tmp.y, 6);
         if (wet && start < 0) start = d;
-        if ((!wet || d > p.length) && start >= 0) { bridge(g, p, Math.max(0, start - 14), Math.min(p.length, d + 10), PW, theme); start = -1; }
+        if ((!wet || d > p.length) && start >= 0) { paintedBridge(g, p, Math.max(0, start - 10), Math.min(p.length, d + 8), PW, theme); start = -1; }
       }
     }
   }
@@ -265,7 +265,7 @@
       g.strokeStyle=shade(color,-.32);g.lineWidth=1;g.beginPath();g.moveTo(q.x-q.nx*half-q.tx*3,q.y-q.ny*half-q.ty*3);g.lineTo(q.x+q.nx*half-q.tx*3,q.y+q.ny*half-q.ty*3);g.stroke();
       if(!stone){g.strokeStyle='rgba(251,217,147,.25)';g.lineWidth=.65;for(const o of[-14,9]){g.beginPath();g.moveTo(q.x+q.nx*o,q.y+q.ny*o);g.lineTo(q.x+q.nx*(o+12),q.y+q.ny*(o+12));g.stroke();}}
     }
-    const deck=window.PaintedWorld?.texture(g,theme,3,240);if(deck){g.fillStyle=deck;g.fillRect(0,0,4096,2048);}
+    const deck=window.PaintedWorld?.texture(g,theme,3,240);if(deck){g.save();g.globalAlpha=.13;g.fillStyle=deck;g.fillRect(0,0,4096,2048);g.restore();}
     g.restore();
     for(const side of[-1,1]){
       const rail=[];
@@ -508,7 +508,7 @@
     }
     // 6) cờ xuất phát & điểm phòng thủ
     const tmp = {};
-    map.paths.forEach((p, i) => { p.pointAt(map.entry[i] - 30, tmp); Level.spawnFlag(g, tmp.x, tmp.y, theme); });
+    (map.def.compact60?map.paths.slice(0,1):map.paths).forEach((p, i) => { p.pointAt(map.entry[i] - 30, tmp); Level.spawnFlag(g, tmp.x, tmp.y, theme); });
     if(map.def.map===5&&!map.feat.props.some(p=>p.gate58||p.gate59))Level.defendFlag(g,map.W-90,map.def.route.exit[1]+3,theme);
     // 7) ánh sáng
     g.save();g.globalAlpha=.35; g.globalCompositeOperation = 'soft-light';

@@ -17,9 +17,9 @@
       this.flying = !!d.flying; this.boss = !!d.boss; this.reward = d.reward;
       this.art = type; this.pathIndex = pathIndex; this.rateMul = 1; this.speedMul = 1; this.chargeT = 0;
       this.scale = d.radius / art.dr * (CONFIG.unitScale || 1); this.height = (art.tall ? art.tall * 0.95 : art.box[3] * 0.78) * this.scale + (this.flying ? 18 : 0);
-      this.path = Game.map.paths[pathIndex]; this.dist = 0; this.lat = (Math.random() - 0.5) * CONFIG.pathWidth * 0.32;
+      this.path = Game.map.paths[pathIndex]; this.dist = 0; this.lat = [-6,0,6][this.uid%3];
       this.alive = true; this.state = 'walk'; this.cd = 0.4; this.atk = -1; this.flash = 0; this.slow = 0;
-      this.walk = Math.random(); this.anim = Math.random() * 3; this.face = 1; this.slamT = d.slam ? d.slam.every : 0; this.shootCd = 1;
+      this.walk = (this.uid%6)/6; this.anim = Math.random() * 3; this.face = 1; this.slamT = d.slam ? d.slam.every : 0; this.shootCd = 1;
       this.place();
     }
     place() {
@@ -40,13 +40,13 @@
       if (d.lord) {
         if (!this.p2 && hpR < 0.66) { this.p2 = true; this.sumT = 1; Effects.comic(this.x, this.y - this.height - 20, 'QUÂN TA ĐÂU!', '#c08aff', true); }
         if (this.p2) { this.sumT -= dt; if (this.sumT <= 0) { this.sumT = 8; this.summon([['goblin', 3], ['orc', 2]]); } }
-        if (!this.p3 && hpR < 0.33) { this.p3 = true; this.art = 'darkLord3'; this.speedMul = 1.9; this.rateMul = 0.65; Effects.comic(this.x, this.y - this.height - 20, 'CUỒNG NỘ!', '#ff3a2a', true); Effects.shake(12, 0.7); Effects.flash(this.x, this.y - 40, 160, '#ff3a2a'); }
+        if (!this.p3 && hpR < 0.33) { this.p3 = true; this.art = 'darkLord3'; this.speedMul = 1.25; this.rateMul = 0.65; Effects.comic(this.x, this.y - this.height - 20, 'CUỒNG NỘ!', '#ff3a2a', true); Effects.shake(12, 0.7); Effects.flash(this.x, this.y - 40, 160, '#ff3a2a'); }
       }
     }
     summon(list) {
       let i = 0;
       for (const [type, n] of list) for (let k = 0; k < n; k++, i++) {
-        const m = new Enemy(type, this.pathIndex, Waves.hpMul); m.dist = Math.max(0, this.dist - 30 - i * 14); m.lat = (Math.random() - 0.5) * CONFIG.pathWidth * 0.6; m.place(); m.alpha = 0;
+        const m = new Enemy(type, this.pathIndex, Waves.hpMul); m.dist = Math.max(0, this.dist - 30 - i * 14); m.lat = [-6,0,6][m.uid%3]; m.place(); m.alpha = 0;
         Enemies.list.push(m); Effects.burst(m.x, m.y - 10, '#3a1a4a', 10, 120, 0.5, 7, -60);
       }
       Effects.ring(this.x, this.y, 10, 110, 0.6, '#7a2ab0', 7); Effects.flash(this.x, this.y - 30, 120, '#5a1a8a'); AudioSys.play('boss');
@@ -111,8 +111,8 @@
       }
       if(this.atk>=0&&!this.flying){this.state='idle';return;}
       this.state = 'walk';
-      const step = this.speed * (this.slowMul || 1) * this.speedMul * (this.chargeT > 0 ? this.def.charge.mul : 1) * dt;
-      const oldX=this.x,oldY=this.y;this.dist += step; this.place(); this.walk += Math.hypot(this.x-oldX,this.y-oldY) / (window.ArtStylized?.stride(this.art,this.height)||this.radius*2.8);
+      const step = this.speed * (this.slowMul || 1) * this.speedMul * (this.chargeT > 0 ? Math.min(1.25,this.def.charge.mul) : 1) * dt;
+      const oldX=this.x,oldY=this.y;this.dist += step; this.place(); this.walk += step / (window.ArtStylized?.stride(this.art,48*this.scale)||this.radius*2.8);
       if (this.dist >= this.path.length) { Game.enemyEscaped(this); return; }
       this.place();
     }

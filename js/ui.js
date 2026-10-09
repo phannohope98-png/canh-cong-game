@@ -345,7 +345,8 @@
     /** Nút đầu lâu ở cửa vào: gọi đợt quái */
     updateWaveButtons() {
       const box = this.hud.waves, can = Game.state === 'playing' && Waves.canCall;
-      const paths = can ? Waves.upcomingPaths() : [];
+      // Routes share one entry before the fork; a single call starts all scheduled lanes.
+      const paths = can ? Waves.upcomingPaths().slice(0, 1) : [];
       const key = can ? paths.join(',') + Waves.state : '';
       if (box.dataset.k !== key) {
         box.dataset.k = key;

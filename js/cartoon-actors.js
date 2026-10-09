@@ -15,5 +15,5 @@
     for(const key of keys){const id=identify(key);if(!atlases.has(id))continue;const d=ArtChars[key]||{};ArtChars[key]={...d,tall:48,dr:12,wide:48,head:24,chibi:true,__3d:false,box:[150,110,75,80],draw:(g,P)=>draw(g,id,P,48)};}
     ArtChars.heroKey=id=>id;Painter.clear();
   }
-  window.ArtStylized={atlases,draw,identify,atlasKey:id=>aliases[id]||id,blit,install,captureLegacy(){},kind:()=>true,ink:true,originals:{},ready:Promise.all([...images.values()].map(v=>v.ready)),stride(key,H=48){const id=identify(key);return H*(id==='soldier'||CONFIG.heroes[id]?.race?.length ? .95 : ['warg','frostWolf','wolfRider'].includes(id)?.8:['treant','troll','magmaGolem'].includes(id)?.55:.65);}};
+  window.ArtStylized={atlases,draw,identify,atlasKey:id=>aliases[id]||id,blit,install,captureLegacy(){},kind:()=>true,ink:true,originals:{},ready:Promise.all([...images.values()].map(v=>v.ready)),stride(key,H=48){const id=identify(key);return H*(id==='soldier'||CONFIG.heroes[id]?.race?.length ? .95 : ['warg','frostWolf','wolfRider'].includes(id)?1.2:['treant','troll','magmaGolem','iceGolem'].includes(id)?.9:.9);}};
 })();

@@ -509,7 +509,7 @@
     // 6) cờ xuất phát & điểm phòng thủ
     const tmp = {};
     map.paths.forEach((p, i) => { p.pointAt(map.entry[i] - 30, tmp); Level.spawnFlag(g, tmp.x, tmp.y, theme); });
-    if(map.def.map===5)Level.defendFlag(g,map.W-55,Journey.y(map.def.map*1280+map.W-55)+10,theme);
+    if(map.def.map===5&&!map.feat.props.some(p=>p.gate58))Level.defendFlag(g,map.W-90,map.def.route.exit[1]+3,theme);
     // 7) ánh sáng
     g.save();g.globalAlpha=.35; g.globalCompositeOperation = 'soft-light';
     const sun = g.createLinearGradient(0, 0, W, H);

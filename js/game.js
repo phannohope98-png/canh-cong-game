@@ -130,7 +130,7 @@
       for (const u of Units.list) u.drawBar(c);
       for (const T of Towers.list) T.drawOverlay(c);
       Effects.drawTexts(c); Effects.drawComics(c);
-      if (this.heroSelected && Units.hero && Units.hero.state === 'move') { const h = Units.hero; drawRallyFlag(c, h.postX, h.postY, '#f2c14e', now); }
+      // Joystick movement uses the hero selection ring, without a destination flag.
     },
 
     /** Lớp không khí theo vùng: mây, đom đóm, tuyết, tàn lửa, bụi cát, hạt hỗn mang. Chỉ hình ảnh. */

@@ -3,7 +3,7 @@
  * Trụ không bị tấn công. Nâng cấp đổi hình dạng (4 cấp).
  * ========================================================= */
 (function () {
-  const TS = 1.15; // trụ lớn, rõ hơn trên bản đồ gọn
+  const TS = 1.0; // trụ lớn, rõ hơn trên bản đồ gọn
   const FALL = 0.32, SQUASH = 0.22, DROP_H = 65; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
   const TARGET = {
     first(T, air) { let b = null, bd = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.dist > bd) { bd = e.dist; b = e; } return b; },
@@ -35,7 +35,7 @@
     get refund() { return Math.floor(this.spent * CONFIG.match.sellRefund); }
     inRange(e) { const r = this.stats.range + e.radius, dx = e.x - this.x, dy = (e.y - this.y) * 1.15; return dx * dx + dy * dy <= r * r; }
     muzzle() {
-      const T = ArtTowers, f = this.anim.face;
+      const T = ArtTowers, f = this.anim.face;if(this.type==='artillery'&&window.Cannon58)return Cannon58.muzzle(this,TS);
       if(window.PaintedWorld?.enabled){
         const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;if(L.muzzle)return{x:this.x+L.muzzle[0]*f,y:this.y+L.base+L.muzzle[1]};
         if(c)return{x:this.x+c[1]+(L.mx||14)*f*TS,y:this.y+L.base+c[2]-(L.my||20)*TS};
@@ -50,7 +50,7 @@
       if (this.drop < FALL + SQUASH) this.drop += dt;
       if (!this.landed) { if (this.drop < FALL) return; this.land(); }
       if (this.def.kind === 'barracks') return;
-      const A = this.anim, st = this.stats;
+      const A = this.anim, st = this.stats;if(this.type==='artillery'&&this.pending?.alive){const L=PaintedWorld.layout(this.type,this.level,TS),dx=this.pending.x-this.x,dy=this.pending.y-(this.y-L.h*.64);A.face=dx>=0?1:-1;const goal=Math.max(-.5,Math.min(.5,Math.atan2(dy,Math.abs(dx))));A.cannonAngle=(A.cannonAngle||0)+(goal-(A.cannonAngle||0))*Math.min(1,dt*7);}
       if (A.a >= 0) { const prev = A.a; A.a += dt / (this.type === 'artillery' ? 1.05 : this.type === 'mage' ? .95 : .8); const releaseAt=this.type==='mage'?2/3:.5;if(prev<releaseAt&&A.a>=releaseAt)this.release(); if (A.a >= 1) A.a = -1; }
       if (this.burstN > 0) { this.burstT -= dt; if (this.burstT <= 0) { const tg = TARGET.first(this, true); if (tg) { A.k++; this.shootArrow(tg, this.muzzle()); } this.burstN--; this.burstT = 0.09; } }
       this.cd -= dt;
@@ -104,7 +104,7 @@
         const gx = this.x, gy = this.y + 2;
         if (this.drop < FALL) {
           const u = this.drop / FALL, off = -DROP_H * (1 - u * u);
-          ctx.save(); ctx.globalAlpha = 0.15 + 0.4 * u; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(gx, gy, 20 + 34 * u, 8 + 12 * u, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+          // Soil remains anchored while the building lands; no floating shadow disk.
           ctx.save(); ctx.translate(gx, gy + off); ctx.scale(0.94, 1.08); ctx.translate(-gx, -gy);
           Painter.tower(ctx, this.type, this.level, this.x, this.y, TS, this.t, this.anim); ctx.restore();
           ctx.save(); ctx.globalAlpha = 0.35 * (1 - u); ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3; for (const dx of [-26, 0, 26]) { ctx.beginPath(); ctx.moveTo(gx + dx, gy + off - 160); ctx.lineTo(gx + dx, gy + off - 260); ctx.stroke(); } ctx.restore();

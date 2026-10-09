@@ -8,7 +8,8 @@
     const q = []; let t = 0, k = 0;
     str.split(',').map(s => s.trim()).filter(Boolean).forEach((part, gi) => {
       const [main, pth] = part.split('/'), [type, cnt, iv] = main.split(':');
-      const n = parseInt(cnt, 10) || 1, gap = iv ? parseFloat(iv) : (CONFIG.spawnInterval[type] || 1);
+      const n = parseInt(cnt, 10) || 1, rawGap = iv ? parseFloat(iv) : (CONFIG.spawnInterval[type] || 1);
+      const gap = Math.max((CONFIG.enemies[type]?.radius || 12) >= 20 ? 3.2 : 1.8, rawGap * 1.3);
       if (gi > 0) t += 1.6;
       for (let i = 0; i < n; i++) { q.push({ time: t, type, path: pth !== undefined ? Math.min(nPaths - 1, +pth) : (k++ % nPaths) }); t += gap; }
     });

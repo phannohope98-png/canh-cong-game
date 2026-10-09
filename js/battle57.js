@@ -8,6 +8,7 @@
  function summon(u,x,y,n,life,art='soldier',illusion=false){const p=post(x,y);for(let i=0;i<n;i++){const px=p.x+(i-(n-1)/2)*24,py=p.y+(i%2?9:-9),hp=(illusion?90:145)*(1+(u.level-1)*.012),damage=illusion?u.damage.map(v=>v*.4):[u.damage[0]*.4,u.damage[1]*.5];Units.list.push(new Unit({temp:true,life,art,x:px,y:py-32,postX:px,postY:py,state:'move',alpha:0,radius:8,speed:90,rate:1.5,engage:140,maxHp:hp,hp,damage,armor:illusion?.05:.3,regen:0,scale:(illusion?43:32)/48,range:illusion?150:0,proj:illusion?'bolt':null,dtype:illusion?'magic':'physical',air:illusion}));Effects.ring(px,py,4,24,.45,illusion?'#b9a0e6':'#a0cbe3',3);Effects.burst(px,py-8,illusion?'#cab3eb':'#dfd9b8',8,65,.5,3,30);}}
  const add=z=>zones.push({t:0,done:0,pulse:0,...z}),oldCast=Hero.cast;
  Hero.cast=function(u,slot=0,point){if(!u?.active||u.state==='dead'||slot&&u.level<10||u.commandCd[slot]>0)return false;const h=u.heroDef,id=u.heroId,target=near(u.x,u.y,300)[0],p=point||{x:target?.x??u.x,y:target?.y??u.y},m=.5*(1+Math.min(1.1,(u.level-1)*.018))*(1+Math.min(.35,Progress.gearMods(id).skill));p.x=Math.max(24,Math.min(Game.map.W-24,p.x));p.y=Math.max(24,Math.min(Game.map.H-24,p.y));if(id==='brakka'&&slot&&!near(p.x,p.y,80).length){UI.toast('Chọn một quái trong tầm móc');return false;}if(point&&Math.hypot(p.x-u.x,p.y-u.y)>320){UI.toast('Chọn điểm trong tầm của tướng');return false;}
+  u.face=p.x>=u.x?1:-1;
   if(!extra.includes(id)&&id!=='aldric'){
    /* The original four retain their own command behavior; clicked ground selects the target group. */
    if(id==='lyra'&&slot)return oldCast.call(this,u,slot);{const targets=near(p.x,p.y,180);if(id==='lyra'&&!slot){u.commandCd[0]=h.skill.cooldown;u.skillCd=u.commandCd[0];u.atk=0;for(const e of targets.slice(0,6)){e.windMarkT=6;Combat.fire('arrow',u.x,u.y-25,e,{damage:[h.skill.damage*m*.55,h.skill.damage*m*.65],type:'physical'});}add({id,slot,x:p.x,y:p.y,r:80,life:.75});return true;}
@@ -47,6 +48,7 @@
   }};
  const oldFx=SkillArt.fx;function fx(g,id,slot,x,y,r,t,life=1.5,z={}){
   if(window.SkillFx59)return SkillFx59.draw(g,id,slot,x,y,r,t,life,z);
+  u.face=p.x>=u.x?1:-1;
   if(!extra.includes(id)&&id!=='aldric'){oldFx(g,id,slot,x,y,r,t,life,z);return;}
   const fade=Math.min(1,t*9,(life-t)*5),p=Math.min(1,t/.5);g.save();g.translate(x,y);g.globalAlpha=Math.max(0,fade);g.lineCap='round';g.lineJoin='round';
   if(id==='aldric'&&!slot){g.strokeStyle='#b1d4e3';g.fillStyle='#84a5bd22';g.lineWidth=2;g.beginPath();g.ellipse(0,0,r*p,r*p*.32,0,0,7);g.fill();g.stroke();for(const q of [-1,1]){g.save();g.translate(q*18,-8);ArtStylized.draw(g,'soldier',{w:-1,a:-1,t},28);g.restore();}}

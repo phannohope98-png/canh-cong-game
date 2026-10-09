@@ -8,6 +8,14 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 61 — chuyển động và điểm trúng đòn
+
+Hướng lệch ngang của quái được nội suy liên tục qua các đoạn đường, tránh nhảy vị trí khi rẽ. Chu kỳ bước theo quãng đường được rút ngắn cho từng nhóm quái. Lính xóa trạng thái đang di chuyển trước mỗi lượt cập nhật, nên khi đứng đánh không tiếp tục chạy tại chỗ.
+
+Đòn cận chiến của quái gây sát thương ở giữa động tác, chỉ trúng một lần; choáng hủy đòn đang chuẩn bị. Các tư thế đứng, đi và đánh chuyển mềm trong 90 ms bằng toàn bộ khung ảnh vẽ, không cắt ghép chân. Lính trên trụ dùng cùng cơ chế chuyển tư thế.
+
+Đã kiểm tra chuyển động riêng của 31 loại quái (3.720 lượt vẽ), các điểm nối đường của 36 màn, và trận mô phỏng 30 giây có tên, phép và đạn pháo. Kiểm tra trình duyệt ở khung 844×390; kết quả này không thay thế kiểm tra trên điện thoại thật hoặc chơi hết chiến dịch.
+
 ## Bản 60 — bố cục điện thoại
 
 Chiến trường gọn 1000×480, lối mòn rộng 44 đơn vị. Màn nhiều lối tách nhánh từ một đường vào chung rồi nhập lại; không ép tọa độ nhánh vào mép map. Sông hẹp và cầu ngắn, có ván/mạch đá cùng lan can. Cây và vật thể được gom thành cụm quanh vùng chiến đấu.

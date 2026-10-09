@@ -2,7 +2,7 @@
 (function(){
  const $=id=>document.getElementById(id),oldLoad=Save.load,oldReset=Save.reset;
  const links=[[],[0],[0],[1,2],[3],[4],[4],[5,6]],positions=[[170,293],[100,241],[240,241],[170,189],[170,141],[100,89],[240,89],[170,37]];
- const branchNames={aldric:['Sinh lực','Mai kiên cố','Búa chiến'],lyra:['Phi tiêu','Nhanh nhẹn','Thám hiểm'],selene:['Băng thuật','Khống chế','Bảo hộ'],borin:['Công phá','Cơ khí','Bền bỉ'],nara:['Hồi phục','Rễ trói','Sao băng']};
+ const branchNames={aldric:['Thể lực','Khiên thành','Giáo trận'],lyra:['Xạ thủ','Gió rừng','Trinh sát'],selene:['Sét ấn','Phong ấn','Vỏ phép'],borin:['Công phá','Cơ khí','Bền bỉ'],nara:['Sức Orc','Cuồng chiến','Phá giáp']};
  const branchStats={aldric:['hp','arm','dmg'],lyra:['dmg','rate','spd'],selene:['dmg','skill','hp'],borin:['dmg','skill','hp'],nara:['skill','rate','dmg']};
  const statNames={hp:'máu',arm:'giáp',dmg:'sát thương',rate:'tốc đánh',spd:'tốc chạy',skill:'hiệu lực kỹ năng'},values={hp:.008,arm:.0025,dmg:.007,rate:.005,spd:.004,skill:.006};
  function normalize(){const d=Save.data;d.accountXp=Math.max(0,Number(d.accountXp)||0);d.tree55=d.tree55||{};for(const id of Object.keys(CONFIG.heroes)){let a=d.tree55[id];a=Array.from({length:24},(_,i)=>Math.max(0,Math.min(5,Math.floor(Number(a?.[i])||0))));for(let b=0;b<3;b++)for(let n=0;n<8;n++)if(links[n].some(k=>a[b*8+k]<3))a[b*8+n]=0;while(a.reduce((x,y)=>x+y,0)>Progress.heroLevel(id)){let k=a.length-1;while(k>=0&&!a[k])k--;a[k]--;}d.tree55[id]=a;}for(const [id,h]of Object.entries(CONFIG.heroes))if(Progress.playerLevel()>=h.unlockLevel)d.heroes[id]=true;}

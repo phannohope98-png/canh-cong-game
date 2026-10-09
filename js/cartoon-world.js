@@ -2,7 +2,7 @@
 (function(){
  const base=new URL('../assets/sprites/',document.currentScript.src),sheets={},images=new Map(),themes=['forest','castle','desert','ice','lava','chaos'],types=['barracks','archer','mage','artillery'];
  for(const [id,d] of Object.entries(WORLD55)){const img=new Image(),s=sheets[id]={...d,img,loaded:false};s.ready=new Promise((ok,no)=>{img.onload=()=>{s.loaded=true;ok();};img.onerror=no;});img.src=new URL(d.file,base).href;}
- const world=new Image();world.src=new URL('worlds55.webp',base).href;
+ const world=new Image();world.src=new URL('worlds56.webp',base).href;
  function blit(g,id,n,x,y,h,flip){const s=sheets[id==='towers'?'towers55':id.startsWith('env-')?'environment55':id];if(!s?.loaded)return false;if(id.startsWith('env-'))n+=themes.indexOf(id.slice(4))*12;const f=s.frames[n];if(!f)return false;const z=h/f.h;g.save();g.translate(x,y);if(flip)g.scale(-1,1);g.drawImage(s.img,f.x,f.y,f.w,f.h,-f.w*z/2,-h,f.w*z,h);g.restore();return true;}
  const slots={tree:0,pine:2,snowpine:2,palm:0,cactus:2,deadtree:1,bush:3,drybush:3,rock:4,mesa:4,spire:1,stump:5,mush:3,bones:6,icecrystal:3,redcrystal:3,voidcrystal:3,rune:6,cabin:7,house:7,tent:7,ruin:6,monument:8,gateway:8,castle:9,fort:9,portal:9,well:10,barrel:10,crate:10,hay:10,lamp:11,brazier:11};
  const heights={tree:94,pine:99,snowpine:100,palm:95,cactus:62,deadtree:80,bush:33,drybush:30,rock:35,mesa:80,spire:100,stump:27,mush:24,bones:25,icecrystal:40,redcrystal:40,voidcrystal:40,rune:42,cabin:75,house:80,tent:65,ruin:55,monument:90,gateway:95,castle:150,fort:150,portal:150,well:40,barrel:28,crate:30,hay:28,lamp:42,brazier:42};

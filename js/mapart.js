@@ -201,8 +201,8 @@
       const gr=g.createLinearGradient(0,0,0,map.H);gr.addColorStop(0,T.road);gr.addColorStop(1,T.roadD);g.fillStyle=gr;g.fillRect(0,0,map.W,map.H);
       // Broad brush variation, scattered soil only; stones belong to the city.
       const surface=theme==='castle'?window.PaintedWorld?.texture(g,theme,1,384):null;if(surface){g.globalAlpha=theme==='castle'?.45:.12;g.fillStyle=surface;g.fillRect(0,0,map.W,map.H);g.globalAlpha=1;}
-      for(let d=20;d<p.length;d+=18){p.pointAt(d,q);const off=(rnd()-.5)*PW*.7;g.fillStyle=ArtKit.alpha(T.roadL,.22);g.beginPath();g.ellipse(q.x+q.nx*off,q.y+q.ny*off,1+rnd()*3,.7+rnd(),0,0,TAU);g.fill();}g.restore();
-      if(['forest','castle'].includes(theme))for(let d=8;d<p.length;d+=10){p.pointAt(d,q);for(const side of [-1,1]){const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083)),x=q.x+q.nx*(w-1)*side,y=q.y+q.ny*(w-1)*side;tuft(g,x,y,ArtKit.shade(T.g0,.04+rnd()*.13),.45+rnd()*.3);}}
+      g.globalAlpha=.09;for(let d=18;d<p.length;d+=28){p.pointAt(d,q);g.fillStyle=T.roadL;g.beginPath();g.ellipse(q.x,q.y+(rnd()-.5)*PW*.45,12+rnd()*22,4+rnd()*5,0,0,TAU);g.fill();}g.globalAlpha=1;for(let d=20;d<p.length;d+=18){p.pointAt(d,q);const off=(rnd()-.5)*PW*.7;g.fillStyle=ArtKit.alpha(T.roadL,.22);g.beginPath();g.ellipse(q.x+q.nx*off,q.y+q.ny*off,1+rnd()*3,.7+rnd(),0,0,TAU);g.fill();}g.restore();
+      if(['forest','castle'].includes(theme))for(let d=8;d<p.length;d+=19+rnd()*21){if(rnd()>.4)continue;p.pointAt(d,q);for(const side of [-1,1]){const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083)),x=q.x+q.nx*(w-1)*side,y=q.y+q.ny*(w-1)*side;tuft(g,x,y,ArtKit.shade(T.g0,.04+rnd()*.13),.25+rnd()*.3);}}
 
     }
   }

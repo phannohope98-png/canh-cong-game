@@ -32,7 +32,7 @@
       Save.data.items.push(it);
       // túi đầy: phân rã món tệ nhất (không đang gắn) lấy Xu
       while (Save.data.items.length > C().bag) {
-        let w = null; for (const i of Save.data.items) if (i !== it && !this.isEquipped(i) && (!w || i.r < w.r)) w = i;
+        let w = null; for (const i of Save.data.items) if (i !== it && i.r < 5 && !this.isEquipped(i) && (!w || i.r < w.r)) w = i;
         if (!w) break; this.salvage(w.u, true);
       }
       // vị trí còn trống thì tự gắn luôn cho tiện

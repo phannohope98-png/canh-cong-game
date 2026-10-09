@@ -1,0 +1,52 @@
+/* Five faction worlds; original heroes and individually named relics. */
+(function(){
+ const order=[1,0,5,3,4],oldRegions=CONFIG.regions,oldLevels=CONFIG.levels;
+ const names=['Vương Quốc Người','Rừng Cổ Elf','Cõi Phù Thủy','Sơn Thành Người Lùn','Hoang Địa Orc'];
+ CONFIG.regions=order.map((r,i)=>({...oldRegions[r],name:names[i],faction:['Người','Elf','Phù thủy','Người lùn','Orc'][i]}));
+ CONFIG.levels=order.flatMap((r,i)=>oldLevels.slice(r*6,r*6+6).map((L,s)=>({...L,route:{...L.route,chapter:i},hpMul:(.76+i*.22)*(1+s*.06),gold:245+i*35+s*14,story:`Chặng ${s+1}/6 của ${names[i]}. Năm chủng tộc tìm năm Ấn Cổng để ngăn quân Hư Vô chiếm những thành trì cuối cùng. `+(s===5?'Giữ thành, hạ kẻ giữ cổng rồi sang lãnh địa kế tiếp.':'Bảo vệ đường đoàn quân tiến tới thành cuối lãnh địa.')})));
+ REALM55.origins=['Ấn Thành','Ấn Rừng','Ấn Sao','Ấn Lò Rèn','Ấn Chiến'];
+ const info={
+  aldric:{name:'Caelan Giáo Thành',race:'Người',role:'Đột phá · Giữ tuyến',color:'#6da9e8',title:'Đội trưởng cổng phía Bắc',hp:480,damage:[23,31],armor:.44,range:0,proj:null,type:'physical',air:false,speed:94,skill:{name:'Mũi Giáo Phá Trận',cooldown:23,radius:150,damage:125,short:'Đâm xuyên tuyến trước, đẩy lùi và choáng ngắn nhóm quái.'},skill2:{name:'Khiên Chặn Tuyến',cooldown:18,level:10,short:'Nâng khiên trong 4 giây, chặn đòn và phản chấn quái đang áp sát.'},desc:'Caelan giữ tuyến bằng giáo và khiên, tạo khoảng trống cho lính giữ cổng.'},
+  lyra:{name:'Aelith Lá Bạc',race:'Elf',role:'Bắn xuyên · Đánh dấu',color:'#a8ce72',title:'Người canh lối mòn',hp:285,damage:[20,29],armor:.18,range:170,proj:'arrow',type:'physical',air:true,speed:112,skill:{name:'Loạt Tên Xuyên Lá',cooldown:20,radius:240,damage:125,short:'Bắn loạt tên vào tối đa 5 quái, đánh dấu để chúng nhận thêm sát thương.'},skill2:{name:'Bước Gió Ghim Chân',cooldown:17,level:10,short:'Lùi khỏi nguy hiểm, ghim chân quái gần nhất bằng một mũi tên.'},desc:'Aelith là trinh sát Elf. Mũi tên xuyên lá tìm đúng kẻ dẫn đầu, bước gió giữ khoảng cách.'},
+  selene:{name:'Mirelle Khắc Ấn',race:'Phù thủy',role:'Sét phép · Phong ấn',color:'#bd8fe5',title:'Người giữ tháp Sao',hp:260,damage:[24,35],armor:.12,range:160,proj:'bolt',type:'magic',air:true,speed:91,skill:{name:'Sét Khắc Ấn',cooldown:25,radius:230,damage:160,short:'Sét tím nối tối đa 4 quái, xuyên một phần kháng phép.'},skill2:{name:'Lồng Ấn Hư Không',cooldown:22,level:10,short:'Dựng phong ấn 3 giây: giữ quái thường, làm chậm boss và gây sát thương phép.'},desc:'Mirelle dùng sét và những ấn viết tay để cắt đội hình địch.'},
+  borin:{name:'Durik Nòng Đồng',race:'Người lùn',role:'Pháo chùm · Bẫy mìn',color:'#e4b46c',title:'Thợ pháo Sơn Thành',hp:390,damage:[29,42],armor:.34,range:155,proj:'bomb',type:'physical',air:false,speed:82,skill:{name:'Chùm Pháo Xuyên Đá',cooldown:28,radius:235,damage:150,short:'Bắn 3 quả pháo vào các nhóm quái, nổ lan trên mặt đất.'},skill2:{name:'Bãi Mìn Đồng',cooldown:24,level:10,short:'Đặt 3 mìn trong 12 giây. Quái tới gần làm mìn nổ và choáng ngắn.'},desc:'Durik mang pháo do mình rèn. Pháo chùm phá cụm quái, mìn giữ những điểm chặn quan trọng.'},
+  nara:{name:'Gorak Nanh Chiến',race:'Orc',role:'Cận chiến · Phá đội hình',color:'#dc8278',title:'Thủ lĩnh giữ lời thề',hp:610,damage:[34,49],armor:.26,range:0,proj:null,type:'physical',air:false,speed:92,skill:{name:'Rìu Xé Trận',cooldown:22,radius:125,damage:170,short:'Chém rìu thành vòng cung rộng, gây sát thương và chảy máu 3 giây.'},skill2:{name:'Tiếng Gầm Chiến Trận',cooldown:25,level:10,short:'Tăng 25% sát thương của Gorak và lính gần đó trong 5 giây.'},desc:'Gorak là Orc đồng minh, khác hẳn quân Orc xâm lược. Thủ lĩnh này giữ cổng bằng rìu và tiếng gầm chiến trận.'}
+ };
+ for(const [id,v]of Object.entries(info)){Object.assign(CONFIG.heroes[id],v);CONFIG.heroes[id].story=`${v.name}, ${v.title.toLowerCase()}, đại diện ${v.race} trong hiệp ước Năm Ấn Cổng. ${v.desc}`;CONFIG.heroes[id].attackRate=id==='nara'?2.05:id==='borin'?2.2:1.55;}
+ CONFIG.items.mythicChance=.002;CONFIG.items.mythicMinRegion=3;CONFIG.items.mythicMinHeroLevel=30;
+ const relics={
+ barracks:[
+  ['Cờ Bình Minh Cuối','Trong cuộc vây thành Bắc, đội trưởng Elran dùng chính áo choàng xanh khâu lại lá cờ rách. Cờ vẫn ở trên cổng khi người cuối cùng thoát qua hầm. Sau trận, mũi giáo xuyên cờ hóa thành đường chỉ bạc; chỉ một lá cờ ấy được nhận dấu Ấn Thành.'],
+  ['Cửa Ngàn Mũi Giáo','Thợ cửa Halen gom những mũi giáo gãy của đội giữ thành để rèn chốt khóa. Đêm thứ bảy, quân địch phá cả tường nhưng không bật được chốt. Khi cổng mở cho dân trở về, thép tự liền lại thành một bộ cửa duy nhất.'],
+  ['Ấn Người Ở Lại','Người đưa tin cuối cùng không rời thành mà đem Ấn Thành trả lại cho viên đội trưởng tử trận. Dấu ấn nằm trên tấm khiên suốt mùa đông, hấp thụ lời thề của đội lính ở lại. Không một khuôn rèn nào tái tạo được vết nứt sáng ấy.'],
+  ['Mái Che Mưa Tên','Kiến trúc sư Nerin dựng mái từ những tấm khiên thủng để che trạm cứu dân. Một ngôi sao rơi nung các tấm khiên thành lớp ngói bạc. Mái che này chỉ tồn tại trên chiếc vọng lâu đã giữ nguyên vị trí trong đêm Mưa Tên.'],
+  ['Tường Đá Ghi Tên','Mỗi viên đá mang tên một người đã đẩy xe lương qua cổng. Khi kẻ xâm lược xóa các tên ấy, chữ khắc lại hiện lên dưới ánh bình minh. Đội thợ chỉ cứu được một đoạn tường; đó là di vật không thể ghép thêm bằng đá thường.'],
+  ['Chuông Trở Về','Người gác cổng gõ chuông ba lần để báo đoàn quân mất tích trở về. Lần thứ ba, quả chuông nứt và không bao giờ ngân cùng một âm nữa. Dấu Ấn Thành giữ âm cuối ấy trong đồng, dành cho những lần triệu tập lính giữ cổng.']
+ ],
+ archer:[
+  ['Chong Gió Không Lạc','Lữ khách Elf Ilyen đánh dấu hướng trở về bằng một cánh chong gió trên cổ thụ. Cơn bão xóa mọi lối mòn nhưng cánh gió chỉ về đúng nơi đoàn trẻ đang trú. Sau bão, Ấn Rừng đóng vào trục; nó không quay theo bất kỳ bản sao nào.'],
+  ['Giàn Cung Rễ Đầu','Rễ cây đầu tiên mọc xuyên chiếc cung của người canh rừng đã ngã xuống. Thân cây ôm cung suốt một trăm mùa lá; thợ Elf chỉ cắt được giàn gỗ khi cây tự nhả nó. Sức căng của rễ sống không thể được luyện từ cung thường.'],
+  ['Giá Tên Sương Sớm','Một đội cung thủ dành tất cả mũi tên còn lại để bảo vệ khu vườn hạt giống. Sương đọng trên giá tên sau trận đông thành bạc xanh, giữ dấu tay của từng người bắn. Chỉ giá tên nằm dưới ngọn cây ấy được Ấn Rừng nhận.'],
+  ['Mắt Lá Bạc','Thợ quan trắc Sareth mài thấu kính từ chiếc lá bạc duy nhất trên cây đã chết. Qua nó, người canh nhìn thấy đường quân xâm lược trước khi lửa chạm rừng. Lá không mọc lại; chiếc ống ngắm này là mảnh cuối của cây.'],
+  ['Giọt Nhựa Lời Thề','Cổ thụ chảy một giọt nhựa khi năm dân tộc cùng đặt tay thề giữ cổng. Ilyen hứng nó vào lọ đất nung, mang vượt ba đèo trong đêm. Nhựa chỉ chảy lần ấy và không thể hòa trộn từ những lọ độc khác.'],
+  ['Rễ Canh Giấc Ngủ','Rễ trắng của cây mẹ tự cuộn thành bệ cho trụ giữ khu rừng đang ngủ. Đội thợ không chặt cây mà mang cả vòng rễ nguyên vẹn tới cổng. Vì còn giữ nhịp của cây mẹ, di vật không thể sinh ra bằng ghép rễ thường.']
+ ],
+ mage:[
+  ['Tinh Thạch Sao Lặng','Nhà khắc ấn Mireth bắt được ngôi sao cuối cùng trước khi bầu trời bị Hư Vô nuốt mất. Bà khóa nó trong một viên tinh thạch và đánh đổi khả năng nghe tiếng phép. Ngôi sao ấy không có ngôi thứ hai; tinh thạch chỉ trở lại khi boss giữ Ấn Sao bị hạ.'],
+  ['Đai Khóa Đêm Dài','Ba vòng kim loại được uốn trong ba đêm không có bình minh, mỗi vòng giữ một câu chú bị cấm. Người thợ không hoàn thành vòng thứ tư. Bộ đai cuối cùng khóa được khe Hư Vô trên mái tháp và chỉ còn một bộ nguyên vẹn.'],
+  ['Trụ Dẫn Sét Thứ Bảy','Sét đánh sáu trụ thử nghiệm thành tro. Trụ thứ bảy không né sét mà dẫn nó xuống đúng vết nứt của cổng. Vết cháy tím bên trong vẫn ghi một nét ấn của pháp sư; đồng mới không thể giả lại nét cháy đó.'],
+  ['Ống Băng Không Tan','Pháp sư Velra đóng băng dòng phép đang tràn khỏi tháp để cứu thư viện. Băng giữ nguyên hình ống suốt mùa lửa, nhờ câu chú cuối bà bỏ lại. Di vật là dòng phép đã đông ấy, không phải vật liệu có thể mua hoặc ghép.'],
+  ['Thấu Kính Mặt Trăng Vỡ','Khi trăng bị một mũi giáo Hư Vô làm vỡ bóng, người thợ nhặt đúng mảnh phản chiếu tòa thành. Ông mài mặt ngoài nhưng giữ nguyên vết rạn ở lõi. Thấu kính nhìn qua lớp kháng phép bằng vết rạn duy nhất này.'],
+  ['Bản Khắc Tên Thật','Người giữ tháp viết tên thật của kẻ mở khe Hư Vô lên đá trong lúc bị truy đuổi. Nửa dòng cuối được hoàn thành bằng ánh sao sau khi mực cạn. Phiến khắc giữ nguyên chữ viết tay ấy; ghép rune không tạo được tên thật.']
+ ],
+ artillery:[
+  ['Ống Ngắm Đỉnh Cuối','Thợ pháo Barun chỉnh ống ngắm trên đỉnh núi cuối trước khi cầu sập. Một phát bắn duy nhất mở được đường cho đoàn xe xuống thung lũng. Thấu kính bị sức giật nung thành màu hổ phách, ghi lại hướng bắn không thể lặp.'],
+  ['Nòng Tim Núi','Người Lùn rèn nòng từ một lõi quặng đỏ tự đập như tim dưới Sơn Thành. Lõi chỉ được đưa ra khi cả năm Ấn Cổng cộng hưởng. Nòng không có bản đúc thứ hai vì mạch quặng đã tắt ngay sau nhát búa cuối.'],
+  ['Buồng Lửa Câm','Người thợ Nolda khóa vụ nổ cứu thành trong một buồng nạp bằng đồng. Nó không phát tiếng dù lửa cháy bên trong, để đoàn quân lùi qua hầm mà không bị phát hiện. Chính ngọn lửa của đêm ấy khiến buồng trở thành di vật độc nhất.'],
+  ['Bánh Răng Lời Hứa','Hai anh em thợ máy rèn bánh răng cuối từ chiếc búa chung của cha. Một người giữ lò, một người giữ cổng; họ hẹn gặp nhau khi răng cuối ăn khớp. Bánh răng chạy tiếp sau khi lò tắt, còn giữ lời hứa chưa được thực hiện.'],
+  ['Lò Tro Ngược Gió','Trong trận đèo đổ, người thợ dùng một lò nhỏ đốt những bản vẽ để giữ pháo hoạt động. Tro không bay xuống gió mà trở về trong lò, thành nguồn lửa màu vàng. Không ai còn bản vẽ nào để tái tạo ngọn lửa ấy.'],
+  ['Giằng Cầu Không Gãy','Thanh giằng là phần duy nhất còn nguyên của cây cầu đã giữ cả đoàn pháo khi đèo rung. Người Lùn tháo nó khỏi vách sau trận và lắp vào bệ súng của đội giữ Ấn Lò Rèn. Vết cong chịu tải không thể được rèn bằng ba thanh giằng mới.']
+ ]};
+ for(const [t,a]of Object.entries(relics))a.forEach(([name,story],s)=>Object.assign(CONFIG.items.gear[t][s],{relicName:name,lore:{...CONFIG.items.gear[t][s].lore,5:story}}));
+ window.REALM56={names,info,relics};
+})();

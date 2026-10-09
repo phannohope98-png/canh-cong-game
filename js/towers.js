@@ -38,7 +38,7 @@
       const T = ArtTowers, f = this.anim.face;
       if(window.PaintedWorld?.enabled){
         const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;
-        if(c)return{x:this.x+c[1]+(this.type==='artillery'?22:9)*f*TS,y:this.y+L.base+c[2]-20*TS};
+        if(c)return{x:this.x+c[1]+(L.mx||14)*f*TS,y:this.y+L.base+c[2]-(L.my||20)*TS};
         return{x:this.x,y:this.y+L.base-L.h*.6};
       }
       if (this.type === 'archer') return { x: this.x + ((this.anim.k % 2 ? 9 : -9) + 10 * f) * TS, y: this.y + (T.ARCH_TOP[this.level] - 14) * TS };
@@ -51,7 +51,7 @@
       if (!this.landed) { if (this.drop < FALL) return; this.land(); }
       if (this.def.kind === 'barracks') return;
       const A = this.anim, st = this.stats;
-      if (A.a >= 0) { const prev = A.a; A.a += dt / (this.type === 'artillery' ? 0.5 : this.type === 'orc' ? 0.45 : 0.36); if (prev < 0.5 && A.a >= 0.5) this.release(); if (A.a >= 1) A.a = -1; }
+      if (A.a >= 0) { const prev = A.a; A.a += dt / (this.type === 'artillery' ? 1.05 : this.type === 'mage' ? .95 : .8); const releaseAt=this.type==='mage'?2/3:.5;if(prev<releaseAt&&A.a>=releaseAt)this.release(); if (A.a >= 1) A.a = -1; }
       if (this.burstN > 0) { this.burstT -= dt; if (this.burstT <= 0) { const tg = TARGET.first(this, true); if (tg) { A.k++; this.shootArrow(tg, this.muzzle()); } this.burstN--; this.burstT = 0.09; } }
       this.cd -= dt;
       if (this.cd > 0 || A.a >= 0) return;

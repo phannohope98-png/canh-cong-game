@@ -232,7 +232,7 @@
       const bonus = M.list.filter(Boolean).map(it => `<li style="--rc:${Items.rar(it).col}"><b>${Items.def(it).name}</b> ${Items.statText(it)}</li>`).join('') || '<li>Chưa gắn đồ nào</li>';
       $('items-tower').innerHTML = `<div class="tabs it-tabs">${tabs}</div>
         <div class="card it-stage-card"><div class="it-stage"><canvas data-tower="${t}" data-tier="4" data-fit="0.8" width="320" height="340"></canvas>${slots}</div>
-        <div class="it-rule"><b>Quy tắc lắp:</b> mỗi trụ có 6 vị trí cố định. Mỗi vị trí chỉ nhận đúng 1 loại đồ của đúng trụ đó (vd. <b>Khiên</b> chỉ lắp ở <b>tầng trên trụ Người</b> – lắp vào thì lính cầm khiên). Đồ gắn tác dụng cho mọi trụ ${CONFIG.towers[t].name} trong trận.</div>
+        <div class="it-rule"><b>Quy tắc lắp:</b> mỗi trụ có 6 vị trí cố định. Mỗi vị trí chỉ nhận đúng 1 loại đồ của đúng trụ đó (vd. <b>Cờ</b> lắp trên cột trụ Người, <b>pha lê</b> đặt vào ổ phép của trụ Phù Thủy). Đồ gắn tác dụng cho mọi trụ ${CONFIG.towers[t].name} trong trận.</div>
         <ul class="it-bonus">${bonus}</ul>
         <div class="row"><button class="gbtn green sm" data-action="it-auto">${I('up')}<span>Gắn đồ tốt nhất</span></button></div></div>`;
       const list = Items.sortBag().filter(it => it.t === t && (slot === null || it.s === slot));
@@ -245,8 +245,8 @@
           <p class="it-stat">${Items.statText(sel)}</p><p class="sub">${Items.lore(sel)}</p>
           ${!eq && cur ? `<p class="sub">Đang gắn: ${Items.name(cur)} (${Items.statText(cur)})</p>` : ''}
           <div class="row it-acts">${eq ? `<button class="gbtn gray sm" data-action="it-unequip" data-u="${sel.u}"><span>Tháo ra</span></button>` : `<button class="gbtn green sm" data-action="it-equip" data-u="${sel.u}"><span>Gắn vào trụ</span></button>`}
-          ${sel.r < G.rarities.length-1 ? `<button class="gbtn sm ${nf >= 3 ? '' : 'off'}" data-action="it-fuse" data-u="${sel.u}"><span>Ghép 3→1 (${Math.min(nf, 3)}/3)</span></button>` : ''}
-          <button class="gbtn red sm" data-action="it-salvage" data-u="${sel.u}"><span>Phân rã</span><span class="price">${I('coin')}${R.salvage}</span></button></div></div></div>`;
+          ${sel.r < 4 ? `<button class="gbtn sm ${nf >= 3 ? '' : 'off'}" data-action="it-fuse" data-u="${sel.u}"><span>Ghép 3→1 (${Math.min(nf, 3)}/3)</span></button>` : ''}
+          ${sel.r < 5 ? `<button class="gbtn red sm" data-action="it-salvage" data-u="${sel.u}"><span>Phân rã</span><span class="price">${I('coin')}${R.salvage}</span></button>` : `<span class="sub">Di vật độc nhất · Giữ trong bộ sưu tập</span>`}</div></div></div>`;
       }
       $('items-bag').innerHTML = det + `<div class="it-head"><b>${slot === null ? 'Đồ của trụ ' + CONFIG.towers[t].name : 'Đồ cho ' + G.slots[slot].name.toLowerCase() + ': ' + G.gear[t][slot].name}</b> <small>(${list.length} món · túi ${Items.bag().length}/${G.bag})</small>
           ${slot !== null ? '<button class="gbtn gray sm" data-action="it-all"><span>Tất cả</span></button>' : ''}<button class="gbtn gray sm" data-action="it-junk"><span>Phân rã đồ Tệ</span></button></div>

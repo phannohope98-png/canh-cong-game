@@ -176,7 +176,7 @@
         <div class="lvcard"><div><img class="lvimg" src="${window.ART_BASE || "assets/art/"}map_${i}.jpg" alt="">
           <p>${L.story}</p>
           <div class="row" style="margin:6px 0">${foes.map(f => `<canvas class="portrait dark" data-char="${f}" width="120" height="120" style="width:44px;height:44px;border-radius:12px"></canvas>`).join('')}</div>
-          <p style="font-size:13px">${L.waves.length} đợt quái · ${(L.ipaths || L.paths).length > 1 ? (L.ipaths || L.paths).length + ' cửa vào · ' : ''}${L.gold} vàng khởi đầu · Độ khó: ${L.diff}</p>
+          <p style="font-size:13px">${L.waves.length} đợt quái · ${(L.ipaths || L.paths).length > 1 ? (L.ipaths || L.paths).length + ' lối đi · ' : ''}${L.gold} vàng khởi đầu · Độ khó: ${L.diff}</p>
         </div><div>
           <div class="big-stars">${[1, 2, 3].map(k => `<span class="s ${k <= st ? 'got' : ''}">${I('star')}</span>`).join('')}</div>
           <p style="font-size:13px">Anh hùng: <b>${H.name}</b> (cấp ${Progress.heroLevel(hid)})</p>
@@ -400,7 +400,7 @@
     confirm(msg, yes) { this.overlay(`<div class="ribbon">Xác nhận</div><p style="margin-top:8px">${msg}</p><div class="row" style="margin-top:10px"><button class="gbtn gray sm" onclick="UI.closeOverlay()">Huỷ</button><button class="gbtn red sm" data-action="overlay-ok">Đồng ý</button></div>`, yes); },
     story(name, text) {
       Game.paused = true;
-      this.overlay(`<div class="ribbon green">${name}</div><p style="margin-top:8px">${text}</p><p style="font-size:13px">Chạm ô đất để xây trụ. Bấm <b>đầu lâu đỏ</b> ở cửa vào khi đã sẵn sàng.</p><div class="row" style="margin-top:8px"><button class="gbtn green sm" data-action="overlay-ok"><span>Vào trận</span></button></div>`, () => Game.resume());
+      this.overlay(`<div class="ribbon green">${name}</div><p style="margin-top:8px">${text}</p><p style="font-size:13px">Chạm ô đất để xây trụ. Bấm <b>Gọi đợt »</b> ở góc phải khi đã sẵn sàng.</p><div class="row" style="margin-top:8px"><button class="gbtn green sm" data-action="overlay-ok"><span>Vào trận</span></button></div>`, () => Game.resume());
     },
     introEnemies(types) {
       const t = types.shift(); if (!t) { Game.resume(); return; }

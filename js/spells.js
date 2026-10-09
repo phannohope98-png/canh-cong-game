@@ -32,12 +32,12 @@
         Game.map.paths.forEach((p, i) => { const n = p.nearest(x, y); if (!best || n.perp < best.perp) best = { perp: n.perp, dist: n.dist, i }; });
         if (!best || best.perp > 60) { UI.toast('Hãy chạm lên con đường'); AudioSys.play('error'); return true; }
         const p = Game.map.paths[best.i];
-        const arts = ['soldier3', 'dwarf3'];
+        const arts = ['soldier', 'soldier']; // viện binh: 2 lính người, cùng hình & cỡ lính trụ Người
         [-1, 1].forEach((s, j) => {
           p.pointAt(Math.max(20, Math.min(p.length - 20, best.dist + s * 14)), tmp);
           const px = tmp.x + tmp.nx * s * 12, py = tmp.y + tmp.ny * s * 12, art = arts[j];
           const u = new Unit({ temp: true, life: DEF.reinforce.life, x: px, y: py - 40, postX: px, postY: py, state: 'move', alpha: 0, radius: 12, speed: 90, rate: 0.95, engage: 90,
-            maxHp: DEF.reinforce.hp, hp: DEF.reinforce.hp, damage: DEF.reinforce.damage.slice(), armor: DEF.reinforce.armor, art, scale: 12 / ArtChars[art].dr * 1.05 * (CONFIG.unitScale || 1), regen: 6 });
+            maxHp: DEF.reinforce.hp, hp: DEF.reinforce.hp, damage: DEF.reinforce.damage.slice(), armor: DEF.reinforce.armor, art, scale: 34 / 48, regen: 6 });
           Units.list.push(u);
           Effects.ring(px, py, 6, 34, 0.45, '#8ac8ff', 4); Effects.burst(px, py - 10, '#dfefff', 12, 140, 0.45, 5, -40);
         });

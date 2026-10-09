@@ -15,7 +15,7 @@
 
   /* ---------------- Bảng màu theo vùng ---------------- */
   const TH = {
-    forest: { g0: '#86a950', g1: '#597d3f', g2: '#b0c878', road: '#b6a386', roadD: '#a08d71', roadL: '#d0bb94', edge: '#796b52', water: '#247f96', waterL: '#94d7ce', bank: '#5a4a30',
+    forest: { g0: '#86a950', g1: '#597d3f', g2: '#b0c878', road: '#cba46c', roadD: '#a8824c', roadL: '#e2c48c', edge: '#6e5432', water: '#247f96', waterL: '#94d7ce', bank: '#5a4a30',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
     castle: { g0: '#829975', g1: '#637c58', g2: '#aebe91', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
@@ -197,7 +197,7 @@
     for(const p of map.paths){
       const left=[],right=[],q={};for(let d=0;d<=p.length+6;d+=6){p.pointAt(Math.min(d,p.length),q);const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083));left.push([q.x+q.nx*w,q.y+q.ny*w]);right.push([q.x-q.nx*w,q.y-q.ny*w]);}
       const path=()=>{g.beginPath();[...left,...right.slice().reverse()].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
-      path();g.fillStyle=T.roadD;g.shadowColor=ArtKit.alpha(T.roadD,.42);g.shadowBlur=9;g.fill();g.shadowBlur=0;g.save();g.clip();
+      path();g.lineJoin='round';g.lineWidth=7;g.strokeStyle=ArtKit.alpha(ArtKit.shade(T.roadD,-.45),.55);g.stroke();g.fillStyle=T.roadD;g.shadowColor=ArtKit.alpha(T.roadD,.42);g.shadowBlur=9;g.fill();g.shadowBlur=0;g.lineWidth=2.2;g.strokeStyle=ArtKit.alpha(ArtKit.shade(T.roadD,-.38),.9);g.stroke();g.save();g.clip(); /* r61: viền đường rõ như Kingdom Rush */
       const gr=g.createLinearGradient(0,0,0,map.H);gr.addColorStop(0,T.road);gr.addColorStop(1,T.roadD);g.fillStyle=gr;g.fillRect(0,0,map.W,map.H);
       // Broad brush variation, scattered soil only; stones belong to the city.
       const surface=theme==='castle'?window.PaintedWorld?.texture(g,theme,1,384):null;if(surface){g.globalAlpha=theme==='castle'?.45:.12;g.fillStyle=surface;g.fillRect(0,0,map.W,map.H);g.globalAlpha=1;}

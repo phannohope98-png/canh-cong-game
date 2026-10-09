@@ -3,8 +3,7 @@
   const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),canvas=$('view'),g=canvas.getContext('2d');
   await ArtStylized.ready;
   const aliases={wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight'};
-  const list=Chars3D.list.filter(d=>ArtStylized.kind(d.id)||ArtStylized.originals[d.id]||ArtStylized.originals[aliases[d.id]]);
-  list.push({id:'nara',name:'Nara Mầm Sống',race:'Tinh linh rừng',role:'Hồi phục · Trói chân',palette:[]});
+  const list=Object.entries({...CONFIG.heroes,...CONFIG.enemies,soldier:{name:'Lính kiếm'},elf:{name:'Cung thủ'},mage:{name:'Pháp sư'},dwarf:{name:'Pháo thủ'}}).filter(([id])=>ArtStylized.kind(id)).map(([id,d])=>({id,name:d.name,palette:[]}));
   let current=list.find(d=>d.id===q.get('c'))||list[0],tier=+q.get('t')||4,mode='idle',face=1,time=0,speed=1,small=false;
   const modes={idle:'Đứng',walk:'Đi',atk:'Đánh',skill:'Kỹ năng',die:'Ngã'};
   function pose(t){return {t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
@@ -13,13 +12,13 @@
   function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent=d.id==='pharaoh'?'Pharaoh chiến đấu: băng vải ngà, giáp vàng–lam, mắt xanh và kiếm cong. Nét vẽ có khối, với các tư thế bước đi và chém kiếm nối thành hoạt ảnh.':'Sprite vẽ có khối và chất liệu riêng. Bộ đứng, di chuyển và tấn công dùng cùng renderer với nhân vật trong trận.';
     $('sh-pal').replaceChildren();for(const {c:col,l:name} of (d.palette||[])){const s=document.createElement('span');s.textContent=name+' '+col;s.style.borderLeft='18px solid '+col;s.style.padding='5px';$('sh-pal').append(s);}
     $('sh-turn').replaceChildren();for(const [label,dir]of [['Phải',1],['Trái',-1]]){const f=document.createElement('figure'),im=document.createElement('img');im.src=picture(d.id,160,190,{t:0,w:-1,a:-1},dir).toDataURL();im.alt=label;const c=document.createElement('figcaption');c.textContent=label;f.append(im,c);$('sh-turn').append(f);}
-    $('sh-stats').textContent='2D vẽ tay · chuyển động khớp liên tục · 2 hướng';$('sh-bones').textContent=['warg','frostWolf','wolfRider'].includes(d.id)?'4 chân độc lập · chân chạm đất và nâng chân · IK hai khớp':'Nội suy nét vẽ · bước theo quãng đường · đứng và tấn công';
+    $('sh-stats').textContent='2D vẽ tay · chuyển động khớp liên tục · 2 hướng';$('sh-bones').textContent=['warg','frostWolf','wolfRider'].includes(d.id)?'4 chân · 6 tư thế chạy vẽ tay · nội suy chuyển động':'Nội suy nét vẽ · bước theo quãng đường · đứng và tấn công';
     history.replaceState(null,'','?c='+d.id+'&t='+tier);for(const b of $('roster').children)b.classList.toggle('on',b.dataset.id===d.id);
   }
   for(const d of list){const b=document.createElement('button');b.dataset.id=d.id;const im=document.createElement('img');im.src=picture(d.id,96,100,{t:0,w:-1,a:-1},1).toDataURL();const s=document.createElement('span');s.textContent=d.name;b.append(im,s);b.onclick=()=>select(d);$('roster').append(b);}
   for(let i=1;i<=4;i++){const b=document.createElement('button');b.textContent=i;b.onclick=()=>{tier=i;select(current);};$('sh-tiers').append(b);}
   for(const [id,label]of Object.entries(modes)){const b=document.createElement('button');b.textContent=label;b.className='chip';b.onclick=()=>{mode=id;time=0;};$('anims').append(b);const o=document.createElement('option');o.value=id;o.textContent=label;$('ex-anim').append(o);}
-  $('tg-spin').textContent='Đổi hướng';$('tg-spin').onclick=()=>{face*=-1;};$('tg-cam').textContent='Cỡ trong trận';$('tg-cam').onclick=()=>{small=!small;};$('tg-speed').onclick=()=>{speed=speed===1?.5:speed===.5?1.5:1;$('tg-speed').textContent='Tốc độ '+speed+'×';};$('tg-ink').onclick=()=>{ArtStylized.ink=!ArtStylized.ink;};
+  $('tg-spin').textContent='Đổi hướng';$('tg-spin').onclick=()=>{face*=-1;};$('tg-cam').textContent='Cỡ trong trận';$('tg-cam').onclick=()=>{small=!small;};$('tg-speed').onclick=()=>{speed=speed===1?.5:speed===.5?1.5:1;$('tg-speed').textContent='Tốc độ '+speed+'×';};$('tg-ink').hidden=true;$('tg-ink').onclick=()=>{ArtStylized.ink=!ArtStylized.ink;};
   $('ex-glb').hidden=true;$('ex-all').hidden=true;$('ex-sheet').textContent='Sprite sheet 2 hướng';$('ex-png').onclick=()=>download(picture(current.id,512,600,pose(time),face),current.id+'-2d.png');
   $('ex-sheet').onclick=()=>{const c=document.createElement('canvas'),sz=+$('ex-cell').value;c.width=sz*12;c.height=sz*2;const ctx=c.getContext('2d'),old=mode;mode=$('ex-anim').value;for(let row=0;row<2;row++)for(let i=0;i<12;i++){const P={t:i/12*2.618,w:mode==='walk'?i/12:-1,a:mode==='atk'||mode==='skill'?i/12:-1,...(mode==='die'?{d:i/11}:{})};ctx.drawImage(picture(current.id,sz,sz,P,row?-1:1),i*sz,row*sz);}mode=old;download(c,current.id+'-'+$('ex-anim').value+'-2d.png');};
   $('sh-tiers').parentElement.hidden=true;

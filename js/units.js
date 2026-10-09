@@ -81,7 +81,7 @@
 
     reachOf(e) { return this.range ? this.range - 10 : e.radius + this.radius + 4; }
     /** thời gian 1 nhát đánh: theo tốc đánh (đánh nhanh thì vung nhanh), không dài hơn nhịp đánh */
-    atkDur() { return Math.max(0.22, Math.min(0.45, this.rate * 0.55)); }
+    atkDur() { return Math.max(0.48, Math.min(0.7, this.rate * 0.6)); }
     /** Chọn quái gần vị trí canh: ưu tiên con đang đánh mình, rồi con chưa ai chặn. keep: mục tiêu hiện tại (được cộng điểm để khỏi đổi qua lại) */
     pick(keep) {
       const R = this.engage, cx = this.postX, cy = this.postY;
@@ -220,7 +220,7 @@
       for (const u of this.list) if (u.tower === T) {
         const r = full || !u.maxHp ? 1 : u.hp / u.maxHp;
         u.maxHp = Math.round(lv.hp * hb); u.hp = Math.max(1, Math.round(u.maxHp * r)); u.damage = [lv.damage[0] * db, lv.damage[1] * db];
-        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = art; u.special = lv.special; u.scale = u.radius / ArtChars[art].dr * 1.05 * (CONFIG.unitScale || 1); u.regen = u.maxHp * 0.08;
+        u.armor = Math.min(0.85, lv.armor + M.armor); u.rate = (lv.rate || 1) / (1 + M.rate); u.block = M.block; u.art = art; u.special = null; u.scale = 42 / ArtChars[art].tall; u.regen = u.maxHp * 0.08;
       }
     },
     remove(T) { for (let i = this.list.length - 1; i >= 0; i--) if (this.list[i].tower === T) this.list.splice(i, 1); },

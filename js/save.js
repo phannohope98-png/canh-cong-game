@@ -25,7 +25,7 @@
         d.unlocked = p.unlocked || 1; d.coins = typeof p.coins === 'number' ? p.coins : d.coins;
         d.hero = CONFIG.heroes[p.hero] && d.heroes[p.hero] ? p.hero : 'aldric';
         d.accountXp = Number.isFinite(p.accountXp)?p.accountXp:Object.values(d.stars).reduce((a,b)=>a+b,0)*100;
-        d.talents = p.talents || {};
+        d.talents = p.talents || {}; d.tree55=p.tree55||{};
         if(p.heroBuildVersion!==1)for(const slot of SLOTS){const n=Math.max(0,Math.min(CONFIG.equipment[slot].items.length,Math.floor(Number(p.gear?.[slot])||0)));d.coins+=CONFIG.equipment[slot].items.slice(0,n).reduce((sum,it)=>sum+it.cost,0);}
         if(Array.isArray(p.items)) d.coins += p.items.filter(i=>i?.t==='orc').reduce((a,i)=>a+(CONFIG.items.rarities[i.r]?.salvage||0),0);
         if (Array.isArray(p.items)) d.items = p.items.filter(i => i && CONFIG.items.gear[i.t] && i.s >= 0 && i.s < 6 && i.r >= 0 && i.r < CONFIG.items.rarities.length);

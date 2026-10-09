@@ -3,8 +3,8 @@
  * Trụ không bị tấn công. Nâng cấp đổi hình dạng (4 cấp).
  * ========================================================= */
 (function () {
-  const TS = 1.3; // trụ lớn, rõ hơn trên bản đồ gọn
-  const FALL = 0.32, SQUASH = 0.22, DROP_H = 150; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
+  const TS = 1.15; // trụ lớn, rõ hơn trên bản đồ gọn
+  const FALL = 0.32, SQUASH = 0.22, DROP_H = 65; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
   const TARGET = {
     first(T, air) { let b = null, bd = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.dist > bd) { bd = e.dist; b = e; } return b; },
     densest(T) {
@@ -28,7 +28,7 @@
     get stats() {
       const lv = this.def.levels[this.level - 1], M = Items.mods(this.type);
       const dm = (1 + M.damage), rm = (1 + M.range), am = (1 + M.aoe);
-      return { damage: lv.damage ? [lv.damage[0] * dm, lv.damage[1] * dm] : null, range: (lv.range || 0) * rm, rate: (lv.rate || 1) / (1 + M.rate), aoe: (lv.aoe || 0) * am, special: lv.special,
+      return { damage: lv.damage ? [lv.damage[0] * dm, lv.damage[1] * dm] : null, range: (lv.range || 0) * rm, rate: (lv.rate || 1) / (1 + M.rate), aoe: (lv.aoe || 0) * am, special: null,
         crit: M.crit, poison: M.poison, root: M.root, slow: M.slow, pen: M.pen, burn: M.burn, stun: M.stun };
     }
     get nextCost() { return this.level >= 4 ? null : this.def.cost[this.level]; }
@@ -38,7 +38,7 @@
       const T = ArtTowers, f = this.anim.face;
       if(window.PaintedWorld?.enabled){
         const L=PaintedWorld.layout(this.type,this.level,TS),c=L.crew;
-        if(c)return{x:this.x+c[1]+(this.type==='artillery'?22:9)*f*TS,y:this.y+L.base+c[2]-13*TS};
+        if(c)return{x:this.x+c[1]+(this.type==='artillery'?22:9)*f*TS,y:this.y+L.base+c[2]-20*TS};
         return{x:this.x,y:this.y+L.base-L.h*.6};
       }
       if (this.type === 'archer') return { x: this.x + ((this.anim.k % 2 ? 9 : -9) + 10 * f) * TS, y: this.y + (T.ARCH_TOP[this.level] - 14) * TS };
@@ -63,7 +63,6 @@
     land() {
       this.landed = true; const x = this.x, y = this.y;
       const soil=Game.map.theme.dirt; Effects.burst(x-24,y+5,soil,7,70,.4,4,70);Effects.burst(x+24,y+5,soil,7,70,.4,4,70);
-      Effects.ring(x, y + 4, 14, 92, 0.45, '#f4e6c0', 6); Effects.ring(x, y + 4, 8, 60, 0.3, '#ffe58a', 4);
       // The permanent foundation supplies the soil contact.
       Effects.shake(2, 0.15); AudioSys.play('build');
       if (this.def.kind === 'barracks' && !Units.list.some(u => u.tower === this)) Units.createFor(this);
@@ -81,7 +80,6 @@
       if (this.type === 'archer') {
         this.shots++;
         this.shootArrow(t, m);
-        if (st.special === 'triple' && this.shots % 4 === 0) { this.burstN = 2; this.burstT = 0.09; }
       } else if (this.type === 'orc') {
         this.shots++;
         const stun = st.special === 'stun' && this.shots % 3 === 0, tx = t.x, ty = t.y;
@@ -92,12 +90,9 @@
       } else if (this.type === 'mage') {
         this.shots++;
         Combat.fire('bolt', m.x, m.y, t, { damage: st.damage, type: 'magic', aoe: st.aoe, pen: st.pen, slow: st.slow }); AudioSys.play('magic');
-        if (st.special === 'meteor' && this.shots % 5 === 0) { // gọi mưa thiên thạch
-          for (let i = 0; i < 3; i++) { const a = Math.random() * 6.28, r = i ? 22 + Math.random() * 30 : 0; Spells.rocks.push({ x: t.x + Math.cos(a) * r, y: t.y + Math.sin(a) * r * 0.7, t: 0, delay: 0.2 + i * 0.2, fall: 0.5, dmg: [st.damage[0] * 1.2, st.damage[1] * 1.2], r: 50 }); }
-          Effects.comic(t.x, t.y - 60, 'THIÊN THẠCH!', '#ff9a3a', true);
-        }
+  
       } else {
-        Combat.fire('bomb', m.x, m.y, t, { damage: st.damage, aoe: st.aoe, cluster: st.special === 'cluster', burn: st.burn, stun: st.stun }); AudioSys.play('cannon');
+        Combat.fire('bomb', m.x, m.y, t, { damage: st.damage, aoe: st.aoe, cluster: false, burn: st.burn, stun: st.stun }); AudioSys.play('cannon');
         Effects.burst(m.x, m.y, '#e8e0d8', 8, 80, 0.5, 7, -30);
       }
     }
@@ -106,7 +101,7 @@
       if(window.PaintedWorld?.foundation)PaintedWorld.foundation(ctx,this.x,this.y,this.type,this.level,this.drop);
       const k = this.pulse > 0 ? 1 + Math.sin(this.pulse / 0.4 * Math.PI) * 0.08 : 1;
       if (this.drop < FALL + SQUASH) { // rơi từ trời: tăng tốc dần, bóng dưới đất lớn dần; chạm đất thì bẹp xuống rồi nảy lại
-        const gx = this.x, gy = this.y + 4.9*TS;
+        const gx = this.x, gy = this.y + 2;
         if (this.drop < FALL) {
           const u = this.drop / FALL, off = -DROP_H * (1 - u * u);
           ctx.save(); ctx.globalAlpha = 0.15 + 0.4 * u; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(gx, gy, 20 + 34 * u, 8 + 12 * u, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -121,7 +116,7 @@
       }
       if (this.born < 0.5) { // mọc lên từ mặt đất, nảy nhẹ (easeOutBack)
         const u = Math.min(1, this.born / 0.5), c1 = 1.9, ey = 1 + (c1 + 1) * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2);
-        ctx.save(); ctx.translate(this.x, this.y + 14); ctx.scale(1 + (1 - u) * 0.15, Math.max(0.05, ey)); ctx.translate(-this.x, -this.y - 14);
+        ctx.save(); ctx.translate(this.x, this.y + 2); ctx.scale(1 + (1 - u) * 0.15, Math.max(0.05, ey)); ctx.translate(-this.x, -this.y - 2);
         Painter.tower(ctx, this.type, this.level, this.x, this.y, TS * k, this.t, this.anim); ctx.restore(); return;
       }
       Painter.tower(ctx, this.type, this.level, this.x, this.y, TS * k, this.t, this.anim);

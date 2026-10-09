@@ -201,7 +201,9 @@
       const gr=g.createLinearGradient(0,0,0,map.H);gr.addColorStop(0,T.road);gr.addColorStop(1,T.roadD);g.fillStyle=gr;g.fillRect(0,0,map.W,map.H);
       // Broad brush variation, scattered soil only; stones belong to the city.
       const surface=theme==='castle'?window.PaintedWorld?.texture(g,theme,1,384):null;if(surface){g.globalAlpha=theme==='castle'?.45:.12;g.fillStyle=surface;g.fillRect(0,0,map.W,map.H);g.globalAlpha=1;}
-      for(let d=30;d<p.length;d+=theme==='castle'?35:110){p.pointAt(d,q);g.fillStyle=ArtKit.alpha(T.roadL,.24);g.beginPath();g.ellipse(q.x,q.y,PW*.2,theme==='castle'?4:9,Math.atan2(q.ty,q.tx),0,TAU);g.fill();}g.restore();
+      for(let d=20;d<p.length;d+=18){p.pointAt(d,q);const off=(rnd()-.5)*PW*.7;g.fillStyle=ArtKit.alpha(T.roadL,.22);g.beginPath();g.ellipse(q.x+q.nx*off,q.y+q.ny*off,1+rnd()*3,.7+rnd(),0,0,TAU);g.fill();}g.restore();
+      if(['forest','castle'].includes(theme))for(let d=8;d<p.length;d+=10){p.pointAt(d,q);for(const side of [-1,1]){const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083)),x=q.x+q.nx*(w-1)*side,y=q.y+q.ny*(w-1)*side;tuft(g,x,y,ArtKit.shade(T.g0,.04+rnd()*.13),.45+rnd()*.3);}}
+
     }
   }
   function tuft(g, x, y, col, s) {
@@ -224,7 +226,7 @@
     }
   }
   function bridge(g,p,d0,d1,PW,theme){
-    if(window.PaintedWorld?.enabled){paintedBridge(g,p,d0,d1,PW,theme);return;}
+    
 
     const tmp = {}, half = PW / 2 + 9, stone = theme === 'castle' || theme === 'ice' || theme === 'chaos';
     const wood = theme === 'lava' ? '#4a3a36' : theme === 'desert' ? '#b88a52' : '#9a6a3a';

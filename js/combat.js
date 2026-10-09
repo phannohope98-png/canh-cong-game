@@ -47,9 +47,9 @@
       const tx = target.x, ty = target.y - (target.height || 20) * 0.5;
       if (kind === 'bomb') {
         // dự đoán vị trí quái khi đạn rơi
-        p.dur = 0.95; const fut = target.predict ? target.predict(p.dur) : target;
+        p.dur = 1.25; const fut = target.predict ? target.predict(p.dur) : target;
         p.tx = fut.x; p.ty = fut.y;
-      } else { p.tx = tx; p.ty = ty; p.dur = Math.max(0.12, Math.hypot(tx - x, ty - y) / (kind === 'bolt' ? 420 : 640)); }
+      } else { p.tx = tx; p.ty = ty; p.dur = Math.max(0.38, Math.hypot(tx - x, ty - y) / (kind === 'bolt' ? 200 : 255)); }
       p.angle = 0;
       this.shots.push(p); return p;
     },
@@ -65,7 +65,7 @@
         p.angle = Math.atan2(ny - p.y, nx - p.x); p.x = nx; p.y = ny;
         if (p.kind === 'bolt' || p.kind === 'bomb') {
           p.trail -= dt;
-          if (p.trail <= 0) { p.trail = 0.03; Effects.particle(p.x, p.y, (Math.random() - 0.5) * 20, -20, 0.35, p.kind === 'bolt' ? (p.o.slow ? '#ffffff' : Math.random() < 0.5 ? '#a8d8ff' : '#e0c8ff') : p.o.burn ? (Math.random() < 0.5 ? '#ffb02a' : '#ff5a1a') : '#c8c0b8', p.kind === 'bolt' ? 5 : 6); }
+          if (p.trail <= 0) { p.trail = 0.09; Effects.particle(p.x, p.y, (Math.random() - 0.5) * 20, -20, 0.35, p.kind === 'bolt' ? (p.o.slow ? '#ffffff' : Math.random() < 0.5 ? '#a8d8ff' : '#e0c8ff') : p.o.burn ? (Math.random() < 0.5 ? '#ffb02a' : '#ff5a1a') : '#c8c0b8', p.kind === 'bolt' ? 5 : 6); }
         }
         if (p.k >= 1) { this.impact(p, alive); this.pool.push(p); swapRemove(this.shots, i); }
       }

@@ -8,6 +8,16 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 63 — cảnh chiến dịch và mobile
+
+Toàn bộ 36 nền map có thêm gò đất thấp, nét cỏ/hoa theo cụm và mép lối mòn tự nhiên. Mỗi màn có một điểm nhấn ngoài đường giao chiến: trại Người/Orc, vòm rễ Elf, tinh thể Phù Thủy, giàn khai thác Người Lùn và đài Ấn của Liên Minh. Các điểm nhấn tránh đường, nước, trụ và cổng; cây quanh điểm nhấn được gom lại để không chồng kín cảnh. Cảnh tĩnh được vẽ một lần; cache địa hình mới chỉ giữ bốn màn.
+
+Trên khung điện thoại, giới hạn mật độ canvas 1,5 và nền 1,25; ánh sáng dùng ảnh nhỏ tái sử dụng, lớp nước cập nhật tối đa 30 lần/giây. Chiến đấu và nhân vật vẫn cập nhật đầy đủ. Chất lượng thích ứng dùng chi phí xử lý khung, không dùng thời gian giữa hai khung; phục hồi độ nét khi máy nhẹ tải.
+
+Nhân vật đứng dùng đủ chu kỳ tư thế, chuyển khung đi/đánh mềm hơn; chuẩn bị các khung cần thiết thành từng lượt ngắn để giảm khựng lúc đơn vị xuất hiện. Không cắt ghép chi hoặc kéo giãn thân.
+
+Đã dựng và xem 36 map, kiểm tra chuyển động 31 loại quái và trận mô phỏng 30 giây. Khung 667×375 hiển thị toàn map và các điều khiển không chồng nhau. Đây là kiểm tra desktop ở kích thước mobile, chưa xác nhận trên điện thoại thật.
+
 ## Bản 62 — vật phẩm kiến trúc và hiệu ứng kỹ năng
 
 Hình vật phẩm trong kho và bộ phận gắn trên trụ dùng cùng nét vẽ: cờ, cửa gia cố, phù hiệu, mái, giá cung, rễ, tinh thể, vòng phép, cơ cấu pháo. Kính ngắm và vòng nòng đi theo nòng pháo khi xoay và giật. Thần Tích có khắc dấu trên phần gắn, không thêm vòng hào quang rời quanh trụ.

@@ -8,6 +8,14 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 60 — bố cục điện thoại
+
+Chiến trường gọn 1000×480, lối mòn rộng 44 đơn vị. Màn nhiều lối tách nhánh từ một đường vào chung rồi nhập lại; không ép tọa độ nhánh vào mép map. Sông hẹp và cầu ngắn, có ván/mạch đá cùng lan can. Cây và vật thể được gom thành cụm quanh vùng chiến đấu.
+
+Gom gọi đợt quái vào một nút ở góc phải. Thu gọn bảng thông tin và cụm kỹ năng; giữ các nút hành động và joystick riêng. Đổi kích thước màn hình giữ mức zoom tương đối, tránh cắt map khi xoay hoặc đổi viewport.
+
+Đã dựng và kiểm tra 36 màn, vùng đặt trụ, cửa cổng và các cầu. Đã kiểm tra toàn cảnh và điều khiển ở 667×375 và 844×390 trên trình duyệt desktop.
+
 ## Bản 59
 
 - Căn điểm cuối đường theo cửa thật của ảnh cổng; sửa vùng cắt khi vẽ đường.

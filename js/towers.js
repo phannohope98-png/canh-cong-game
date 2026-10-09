@@ -7,6 +7,10 @@
   const FALL = 0.32, SQUASH = 0.22, DROP_H = 65; // xây trụ: rơi từ trên trời xuống, đập đất rồi nảy
   const TARGET = {
     first(T, air) { let b = null, bd = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.dist > bd) { bd = e.dist; b = e; } return b; },
+    /** máu còn nhiều nhất (bắn con trâu nhất) */
+    strong(T, air) { let b = null, bh = -1; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e) && e.hp > bh) { bh = e.hp; b = e; } return b; },
+    /** gần trụ nhất */
+    near(T, air) { let b = null, bd = 1e9; for (const e of Enemies.list) if (e.alive && (air || !e.flying) && T.inRange(e)) { const d = Math.hypot(e.x - T.x, e.y - T.y); if (d < bd) { bd = d; b = e; } } return b; },
     densest(T) {
       let b = null, bc = -1; const r = T.stats.aoe;
       for (const e of Enemies.list) { if (!e.alive || e.flying || !T.inRange(e)) continue; let c = 0; for (const o of Enemies.list) if (o.alive && !o.flying && Math.abs(o.x - e.x) < r && Math.abs(o.y - e.y) < r) c++; if (c > bc || (c === bc && e.dist > b.dist)) { bc = c; b = e; } }
@@ -55,7 +59,8 @@
       if (this.burstN > 0) { this.burstT -= dt; if (this.burstT <= 0) { const tg = TARGET.first(this, true); if (tg) { A.k++; this.shootArrow(tg, this.muzzle()); } this.burstN--; this.burstT = 0.09; } }
       this.cd -= dt;
       if (this.cd > 0 || A.a >= 0) return;
-      const tg = this.type === 'artillery' ? TARGET.densest(this) : TARGET.first(this, this.def.targetsAir);
+      const air = this.def.targetsAir, tm = this.tmode || 0; // 0 = mặc định (đầu đoàn / pháo: chỗ đông) · 1 = trâu nhất · 2 = gần nhất
+      const tg = tm === 1 ? TARGET.strong(this, air) : tm === 2 ? TARGET.near(this, air) : this.type === 'artillery' ? TARGET.densest(this) : TARGET.first(this, air);
       if (!tg) { this.cd = 0.1; return; }
       this.pending = tg; A.face = tg.x >= this.x ? 1 : -1; A.aim = Math.atan2(tg.y - this.y, tg.x - this.x); A.a = 0; A.k++; this.cd = st.rate;
     }

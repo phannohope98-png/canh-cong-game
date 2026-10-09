@@ -271,6 +271,11 @@ button { font-family: inherit; color: inherit; border: 0; padding: 0; background
 .ring-item .tag { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 2px; padding: 0 5px; height: 20px; border-radius: 10px;
   background: linear-gradient(#5a3a6a, #2a1630); border: 2px solid var(--ink); font-size: 13px; color: var(--gold); white-space: nowrap; text-shadow: 0 1px 0 var(--ink); }
 .ring-item .tag .ico { width: 13px; height: 13px; color: var(--gold); }
+.ring-item.pick { transform: scale(1.18); box-shadow: 0 0 0 3px #ffe58a, 0 0 18px 6px rgba(255,220,90,.75); z-index: 2; }
+.ring-item.pick::after { content: '✔'; position: absolute; right: -6px; top: -8px; width: 22px; height: 22px; border-radius: 50%; background: #4ac04a; border: 2px solid var(--ink); color: #fff; font: 900 13px/18px sans-serif; text-align: center; }
+.diffsel { display: flex; gap: 6px; margin: 6px 0 2px; }
+.diffsel button { flex: 1; padding: 6px 4px; border-radius: 10px; border: 2.5px solid var(--ink); background: #e8dcc0; font-weight: 800; color: #3a2a1a; }
+.diffsel button.on { background: linear-gradient(#ffe36a, #e8a21c); box-shadow: 0 3px 0 var(--ink); }
 .ring-item.poor { filter: grayscale(.9) brightness(.7); }
 .ring-item.poor .tag { color: #ff8a7a; }
 .ring-item.act { display: grid; place-items: center; color: #fff; }

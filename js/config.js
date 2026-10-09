@@ -141,6 +141,12 @@ window.CONFIG = {
       { name: 'Giày Gió Thần', cost: 560, spd: 0.32, col: '#7fe0ff' } ] }
   },
   startCoins: 200,
+  /* Chế độ chơi: máu quái ×hp, vàng đầu trận ×gold, Xu thưởng ×coin */
+  difficulty: {
+    easy: { name: 'Dễ', hp: 0.72, gold: 1.15, coin: 0.8, text: 'Quái yếu hơn ~30%, thêm vàng đầu trận. Hợp để làm quen.' },
+    normal: { name: 'Thường', hp: 1, gold: 1, coin: 1, text: 'Độ khó chuẩn: cần trụ hợp lý + dùng kỹ năng anh hùng.' },
+    hard: { name: 'Khó', hp: 1.3, gold: 0.95, coin: 1.5, text: 'Quái trâu hơn 30%, ít vàng hơn; thưởng Xu ×1,5.' }
+  },
 
   /* ---------------- QUÁI ----------------
      lives: số mạng bị trừ khi lọt qua. flying: bay. ranged: bắn tên vào lính. */

@@ -26,8 +26,7 @@
       const L = this.map.def;
       Effects.clear(); Combat.clear(); Enemies.clear(); Units.clear(); Loot.reset(); Items.dirty();
       Towers.init(this.map); Waves.init(L, i); Spells.reset();
-      const DF = CONFIG.difficulty[Save.data.settings.diff || 'normal'] || CONFIG.difficulty.normal;
-      this.gold = Math.round(L.gold * DF.gold); this.lives = CONFIG.match.lives; this.kills = 0; this.xp = 0;
+      this.gold = L.gold; this.lives = CONFIG.match.lives; this.kills = 0; this.xp = 0;
       this.sel = null; this.heroSelected = false; this.rallyFor = null; this.speed = 1; this.time = 0; this.paused = false;
       this.measure();
       Camera.setup(this.map.W, this.map.H, this.viewW, this.viewH);
@@ -213,7 +212,7 @@
       this.state = 'ended';
       const S = CONFIG.match.stars, stars = this.lives >= S.three ? 3 : this.lives >= S.two ? 2 : 1;
       const newStars = Progress.recordWin(this.levelIndex, stars);
-      const hid = Progress.selectedHero(), lv0 = Progress.heroLevel(hid); Progress.addHeroXp(hid, this.xp); const coins = Math.floor((this.xp * 0.3 + 50 + stars * 20) * ((CONFIG.difficulty[Save.data.settings.diff || 'normal'] || {}).coin || 1)); Progress.addCoins(coins); const lvUp = Progress.heroLevel(hid) > lv0;
+      const hid = Progress.selectedHero(), lv0 = Progress.heroLevel(hid); Progress.addHeroXp(hid, this.xp); const coins = Math.floor(this.xp * 0.3 + 50 + stars * 20); Progress.addCoins(coins); const lvUp = Progress.heroLevel(hid) > lv0;
       Effects.confetti(Camera.x, Camera.y - 200, 500); AudioSys.play('victory');
       setTimeout(() => UI.showResult({ win: true, stars, newStars, xp: this.xp, lvUp, coins, loot: Loot.found.slice() }), 1100);
     },

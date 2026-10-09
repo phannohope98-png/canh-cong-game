@@ -58,7 +58,6 @@
         case 'overlay-ok': { const cb = this.overlayCb; this.overlayCb = null; this.closeOverlay(); if (cb) cb(); if (Game.state === 'playing' && !Game.towersBuilt) this.tutStep('start'); break; }
         // trong trận
         case 'speed': Game.toggleSpeed(); break;
-        case 'diff': Save.data.settings.diff = d.v; Save.save(); if (this.cardLevel !== undefined && !$('overlay').classList.contains('hidden')) this.levelCard(this.cardLevel); else this.renderSettings(); break;
         case 'pause': this.openPause(); break;
         case 'resume': this.closeOverlay(); Game.resume(); this.pauseOpen = false; break;
         case 'restart': this.closeOverlay(); this.pauseOpen = false; Game.restart(); break;
@@ -174,7 +173,6 @@
       $('overlay-panel').classList.add('wide');
     },
     levelCard(i) {
-      this.cardLevel = i; const dv = Save.data.settings.diff || 'normal', DF = CONFIG.difficulty;
       const L = CONFIG.levels[i], st = Save.data.stars[i] || 0; $('overlay-panel').classList.remove('wide');
       const foes = [...new Set(L.waves.join(',').split(',').map(s => s.split(':')[0].trim()))];
       const hid = Progress.selectedHero(), H = CONFIG.heroes[hid];
@@ -185,7 +183,6 @@
           <p style="font-size:13px">${L.waves.length} đợt quái · ${(L.ipaths || L.paths).length > 1 ? (L.ipaths || L.paths).length + ' lối đi · ' : ''}${L.gold} vàng khởi đầu · Độ khó: ${L.diff}</p>
         </div><div>
           <div class="big-stars">${[1, 2, 3].map(k => `<span class="s ${k <= st ? 'got' : ''}">${I('star')}</span>`).join('')}</div>
-          <div class="diffsel">${Object.keys(DF).map(k => `<button class="${k === dv ? 'on' : ''}" data-action="diff" data-v="${k}">${DF[k].name}</button>`).join('')}</div><p style="font-size:12px;margin:2px 0 4px">${DF[dv].text}</p>
           <p style="font-size:13px">Anh hùng: <b>${H.name}</b> (cấp ${Progress.heroLevel(hid)})</p>
           <div class="row" style="margin-top:8px"><button class="gbtn gray sm" data-action="overlay-ok">Đóng</button><button class="gbtn sm" data-action="open-heroes-ov" onclick="UI.closeOverlay();UI.showScreen('screen-heroes')">${I('crown')}<span>Anh hùng</span></button><button class="gbtn green sm" data-action="start-level" data-index="${i}">${I('sword')}<span>Chiến đấu</span></button></div>
         </div></div>`);
@@ -295,8 +292,7 @@
 
     renderSettings() {
       const s = Save.data.settings, row = (k, label) => `<div class="setting"><span>${label}</span><button class="switch ${s[k] ? 'on' : ''}" data-action="toggle" data-key="${k}"><i></i></button></div>`;
-      const dv = s.diff || 'normal', DF = CONFIG.difficulty;
-      $('settings-list').innerHTML = `<div class="card"><h3>Độ khó</h3><div class="diffsel">${Object.keys(DF).map(k => `<button class="${k === dv ? 'on' : ''}" data-action="diff" data-v="${k}">${DF[k].name}</button>`).join('')}</div><p class="sub">${DF[dv].text}</p></div><div class="card">${row('music', 'Nhạc nền')}${row('sound', 'Âm thanh')}${row('shake', 'Rung màn hình')}${window.Art3D ? row('art3d', 'Hiệu ứng 3D (tắt nếu máy yếu)') : ''}</div>
+      $('settings-list').innerHTML = `<div class="card">${row('music', 'Nhạc nền')}${row('sound', 'Âm thanh')}${row('shake', 'Rung màn hình')}${window.Art3D ? row('art3d', 'Hiệu ứng 3D (tắt nếu máy yếu)') : ''}</div>
         <div class="card"><h3>Cách chơi</h3><p class="sub" style="line-height:1.55;font-size:14px">• Chạm ô đất có cọc gỗ để chọn 1 trong 4 trụ: Người (2 kiếm sĩ), Elf (bắn nhanh), Phù thủy (tầm xa, sát thương lan), Người Lùn (đại bác tầm xa nhất, nổ lan).<br>• Chạm trụ để nâng cấp (4 cấp đổi hình) hoặc bán.<br>• Kéo để di chuyển bản đồ, chụm 2 ngón để phóng to.<br>• Chạm anh hùng rồi chạm bản đồ để di chuyển; nút kỹ năng ở bên cạnh.<br>• Chạm đầu lâu đỏ để gọi đợt quái, gọi sớm được thưởng vàng.<br>• Tướng mở theo cấp hành trình; cấp tướng nhận điểm cho ba nhánh phát triển.<br>• Chiến dịch có 5 thế giới của Người, Elf, Phù Thủy, Người Lùn và Orc; mỗi thế giới 6 chặng; map 6 là boss – hạ boss mới sang vùng mới.<br>• Quái chết có thể rơi đồ (6 bậc: Tệ, Bình thường, Cao, Cao cấp, Huyền thoại, Thần Tích). Vào <b>Kho đồ</b> để gắn đồ vào 6 vị trí của mỗi trụ; ghép 3 món giống nhau lên bậc kế tiếp, tối đa Huyền Thoại. Thần Tích chỉ tìm được ở boss đủ điều kiện.</p></div>
         <div class="row"><button class="gbtn red sm" data-action="reset">${I('trash')}<span>Xoá dữ liệu</span></button></div>`;
     },

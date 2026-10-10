@@ -27,7 +27,7 @@
   if (!window.ArtStylized || !ArtStylized.atlases) return;
   const F = 12, sources = new WeakMap(), records = [];
   function feather(entry) {
-    const img = entry.img, r = entry.registration; if (!img || !img.naturalWidth || !r || entry.__feather62) return; entry.__feather62 = true;
+    const img = entry.img, r = entry.registration; if (!img || !img.naturalWidth || !r || r.clean || entry.__feather62) return; entry.__feather62 = true;
     let source=sources.get(img);
     if(!source){const W=img.naturalWidth,H=img.naturalHeight,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);let data;try{data=g.getImageData(0,0,W,H).data;}catch(e){return;}source={W,H,c,g,data};sources.set(img,source);records.push(source);}
     const {W,H,c,g}=source,data=source.data||g.getImageData(0,0,W,H).data;

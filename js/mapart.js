@@ -15,7 +15,7 @@
 
   /* ---------------- Bảng màu theo vùng ---------------- */
   const TH = {
-    forest: { g0: '#86a950', g1: '#597d3f', g2: '#b0c878', road: '#cba46c', roadD: '#a8824c', roadL: '#e2c48c', edge: '#6e5432', water: '#247f96', waterL: '#94d7ce', bank: '#5a4a30',
+    forest: { g0: '#86a950', g1: '#597d3f', g2: '#b0c878', road: '#b6a386', roadD: '#a08d71', roadL: '#d0bb94', edge: '#796b52', water: '#247f96', waterL: '#94d7ce', bank: '#5a4a30',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8', '#c8b0ff'], mix: [['tree', 0.5], ['pine', 0.14], ['bush', 0.15], ['rock', 0.1], ['stump', 0.05], ['mush', 0.06]] },
     castle: { g0: '#829975', g1: '#637c58', g2: '#aebe91', road: '#e2d6b8', roadD: '#b0a284', roadL: '#f4ecd6', edge: '#7a6e58', cobble: true, water: '#2f86b8', waterL: '#80cce8', bank: '#6a6458',
       tree: ['#386449', '#739245', '#31543d'], flowers: ['#fff6a0', '#ffffff', '#ff9ab8'], mix: [['tree', 0.36], ['bush', 0.2], ['rock', 0.14], ['pine', 0.1], ['barrel', 0.06], ['crate', 0.06], ['hay', 0.08]] },
@@ -192,19 +192,29 @@
 
   /* ---------------- Đường đi ---------------- */
   function drawRoad(g,map,T,res,rnd){
-    const PW=CONFIG.pathWidth,theme=map.def.theme;
-    // An irregular worn footprint with feathered dirt edges, never a forest pavement.
-    for(const p of map.paths){
-      const left=[],right=[],q={};for(let d=0;d<=p.length+6;d+=6){p.pointAt(Math.min(d,p.length),q);const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083));left.push([q.x+q.nx*w,q.y+q.ny*w]);right.push([q.x-q.nx*w,q.y-q.ny*w]);}
-      const path=()=>{g.beginPath();[...left,...right.slice().reverse()].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
-      path();g.lineJoin='round';g.lineWidth=7;g.strokeStyle=ArtKit.alpha(ArtKit.shade(T.roadD,-.45),.55);g.stroke();g.fillStyle=T.roadD;g.shadowColor=ArtKit.alpha(T.roadD,.42);g.shadowBlur=9;g.fill();g.shadowBlur=0;g.lineWidth=2.2;g.strokeStyle=ArtKit.alpha(ArtKit.shade(T.roadD,-.38),.9);g.stroke();g.save();g.clip(); /* r61: viền đường rõ như Kingdom Rush */
-      const gr=g.createLinearGradient(0,0,0,map.H);gr.addColorStop(0,T.road);gr.addColorStop(1,T.roadD);g.fillStyle=gr;g.fillRect(0,0,map.W,map.H);
-      // Broad brush variation, scattered soil only; stones belong to the city.
-      const surface=theme==='castle'?window.PaintedWorld?.texture(g,theme,1,384):null;if(surface){g.globalAlpha=theme==='castle'?.45:.12;g.fillStyle=surface;g.fillRect(0,0,map.W,map.H);g.globalAlpha=1;}
-      g.globalAlpha=.09;for(let d=18;d<p.length;d+=28){p.pointAt(d,q);g.fillStyle=T.roadL;g.beginPath();g.ellipse(q.x,q.y+(rnd()-.5)*PW*.45,12+rnd()*22,4+rnd()*5,0,0,TAU);g.fill();}g.globalAlpha=1;for(let d=20;d<p.length;d+=18){p.pointAt(d,q);const off=(rnd()-.5)*PW*.7;g.fillStyle=ArtKit.alpha(T.roadL,.22);g.beginPath();g.ellipse(q.x+q.nx*off,q.y+q.ny*off,1+rnd()*3,.7+rnd(),0,0,TAU);g.fill();}g.restore();
-      if(['forest','castle'].includes(theme))for(let d=8;d<p.length;d+=19+rnd()*21){if(rnd()>.4)continue;p.pointAt(d,q);for(const side of [-1,1]){const w=PW*.5*(1+.09*Math.sin(d*.031)+.045*Math.sin(d*.083)),x=q.x+q.nx*(w-1)*side,y=q.y+q.ny*(w-1)*side;tuft(g,x,y,ArtKit.shade(T.g0,.04+rnd()*.13),.25+rnd()*.3);}}
-
+    // Paint the union once: intersections have one surface, without doubled seams.
+    const PW=CONFIG.pathWidth,theme=map.def.theme,c=mk(map.W,map.H),p=c.getContext('2d'),q={};
+    p.fillStyle=T.road;p.lineJoin='round';
+    for(const path of map.paths){const left=[],right=[];
+      for(let d=0;d<=path.length+4;d+=4){path.pointAt(Math.min(d,path.length),q);
+        const w=PW*.5*(1+.07*Math.sin(q.x*.047+q.y*.037)+.035*Math.sin(q.x*.15-q.y*.09));
+        left.push([q.x+q.nx*w,q.y+q.ny*w]);right.push([q.x-q.nx*w,q.y-q.ny*w]);}
+      p.beginPath();[...left,...right.reverse()].forEach((v,i)=>i?p.lineTo(...v):p.moveTo(...v));p.closePath();p.fill();
     }
+    const mask=mk(map.W,map.H);mask.getContext('2d').drawImage(c,0,0);
+    p.globalCompositeOperation='source-atop';
+    const gradient=p.createLinearGradient(0,0,map.W*.3,map.H);gradient.addColorStop(0,sh(T.road,.08));gradient.addColorStop(1,sh(T.road,-.07));p.fillStyle=gradient;p.fillRect(0,0,map.W,map.H);
+    for(const path of map.paths)for(let d=12;d<path.length;d+=13){path.pointAt(d,q);const off=(rnd()-.5)*PW*.75,x=q.x+q.nx*off,y=q.y+q.ny*off;
+      p.fillStyle=K.alpha(d%3?T.roadL:T.roadD,.2);p.beginPath();p.ellipse(x,y,2+rnd()*8,1+rnd()*3,0,0,TAU);p.fill();
+      if(['lava','chaos','ice','castle'].includes(theme)&&rnd()<.3){p.strokeStyle=K.alpha(T.roadD,.4);p.lineWidth=.8;p.beginPath();p.moveTo(x-6,y-2);p.lineTo(x,y);p.lineTo(x-2,y+4);p.stroke();}
+    }
+    // A restrained ground lip, rather than a glowing smooth ribbon.
+    g.save();g.globalAlpha=.55;g.drawImage(mask,0,2);g.globalCompositeOperation='source-over';g.globalAlpha=1;g.drawImage(c,0,0);g.restore();
+    if(['forest','castle'].includes(theme))for(const path of map.paths)for(let d=14;d<path.length;d+=16){path.pointAt(d,q);for(const side of [-1,1]){
+      const x=q.x+q.nx*(PW*.5+1)*side,y=q.y+q.ny*(PW*.5+1)*side;
+      if(map.paths.some(other=>other!==path&&other.nearest(x,y).perp<PW*.5+3)||wetAt(map.feat,x,y,5))continue;
+      if(rnd()<.65)tuft(g,x,y,sh(T.g0,.08),.25+rnd()*.2);
+    }}
   }
   function tuft(g, x, y, col, s) {
     g.fillStyle = sh(col, -0.25);

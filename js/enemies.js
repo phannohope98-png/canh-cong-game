@@ -93,6 +93,8 @@
         let blocker = null, bk = -1;
         for (const u of Units.list) {
           if (!u.active || u.alpha < 0.5) continue;
+          // mỗi lính giữ chân tối đa 2 quái, anh hùng 3 – số còn lại đi vòng qua (kiểu Kingdom Rush)
+          if (this.blocker !== u) { let n = 0; for (const o of Enemies.list) if (o !== this && o.alive && o.blocker === u) n++; if (n >= (u.isHero ? 3 : 2)) continue; }
           const r = this.radius + u.radius + 6;
           if (Math.abs(u.x - this.x) < r && Math.abs(u.y - this.y) < r && Math.hypot(u.x - this.x, u.y - this.y) < r) { const k = u.tUid === this.uid ? 2 : 1; if (k > bk) { bk = k; blocker = u; } }
         }

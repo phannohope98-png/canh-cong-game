@@ -8,6 +8,14 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 65 — bố cục ôm địa hình
+
+Vẽ lại tuyến của 36 màn theo các bố cục khoảng đất trung tâm, vòng trên/dưới, nhánh giữa và một số hướng vào từ trên hoặc dưới. Giữ một/hai/ba lối cùng vị trí cửa thành. Cụm cây ở rìa được gom lại; lớp nền có bảng màu riêng theo vùng, mảng địa hình có mặt đá tối, gờ sáng và vách đá nối ở mép cảnh. Đường sáng hơn nền để nhân vật và điểm giao chiến dễ đọc.
+
+Vẫn có 8–10 ô trụ đã kiểm tra khoảng hở đường/nước. Chi tiết cảnh tĩnh vẽ một lần và cache tối đa bốn màn. Giữ tỷ lệ tướng/lính/quái của bản 64 và hiệu ứng kỹ năng của bản 62.
+
+Đã dựng toàn bộ 36 màn, kiểm tra ô trụ và trận mô phỏng 30 giây ở vùng Orc; không ghi nhận lỗi game. Đây là kiểm tra trình duyệt desktop, chưa kiểm tra trên điện thoại thật.
+
 ## Bản 64 — đường gọn, thêm ô trụ và tỷ lệ đơn vị
 
 Khung map giảm ngang từ 1000 xuống 880, đường rộng 38; đường một lối giảm biên độ uốn, giữ 36 bố cục khác nhau và các nhánh hai/ba lối. Sông, cầu và cổng dùng cùng tọa độ mới. Tăng lên 8–10 ô trụ thực tế mỗi màn; mỗi ô kiểm tra cả vùng trụ cấp cuối với đường và nước, không chỉ điểm chân trụ.

@@ -8,6 +8,10 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 74 — sáu chặng Vương Quốc Người
+
+Giữ bộ dữ liệu sáu màn thiết kế tay: Cảng Biên Giới, Làng Nông Dân, Cầu Đá Bắc, Phố Canh Gác, Đường Tới Vương Thành và Cổng Vương Thành. Cảnh dùng biển, bờ đá, ruộng, kênh nước, cầu và nhà/tháp mái xanh theo ảnh vùng. Bổ sung bộ kiến trúc vẽ tay từ atlas có sẵn. Kiểm tra cả phần mái trụ cấp cuối trước khi đặt ô xây: 8–9 ô mỗi màn, tránh đường và nước; bố trí được cache để giảm tải khi dựng lại. Giữ cơ chế chiến đấu, bộ trang bị đã khôi phục và bản Thần Tích mới. Kiểm tra 6 trận mô phỏng 30 giây, thắng/thua, mở khóa màn và khung 667×375 trên desktop; chưa thử trên điện thoại thật.
+
 ## Bản 72 — khôi phục nét vẽ vật phẩm
 
 Khôi phục bộ hình vật phẩm vẽ tay có vân gỗ, mặt đá, ánh kim và tinh thể từ atlas 57/58. Giữ điểm gắn theo loại/cấp trụ, giới hạn mặt mái và cơ cấu nòng pháo xoay/giật. Cánh cửa gia cố chuyển động trong khung đá cố định. Không thêm vòng hào quang rời. Giữ map cảng và các cập nhật chuyển động của bản 70/71.

@@ -8,6 +8,10 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 66 — tuyến ngắn và điểm hợp lưu
+
+Khung chiến trường thu ngang còn 760. Tuyến chính khoảng 740–905 đơn vị; nhánh vào từ trên/dưới khoảng 380–640. Bố cục gồm đường chữ Y, hai cửa vào riêng, hướng vào dọc và vùng nhập tuyến; màn công thành vẫn kết thúc đúng cửa. Đường được vẽ thành một mặt đất chung ở điểm giao nhau, có vân đất, mép cỏ và vết nứt theo vùng. Cụm cây và mảng đất được bố trí theo khoảng trống giữa đường, tránh vùng trụ. Giữ ít nhất 8 ô xây mỗi màn; không đổi chỉ số nhân vật. Kiểm tra cú pháp, dựng 36 màn và trận mô phỏng 30 giây không ghi nhận lỗi. Đây chưa phải kiểm tra trên điện thoại thật hoặc xác nhận cân bằng toàn chiến dịch.
+
 ## Bản 65 — bố cục ôm địa hình
 
 Vẽ lại tuyến của 36 màn theo các bố cục khoảng đất trung tâm, vòng trên/dưới, nhánh giữa và một số hướng vào từ trên hoặc dưới. Giữ một/hai/ba lối cùng vị trí cửa thành. Cụm cây ở rìa được gom lại; lớp nền có bảng màu riêng theo vùng, mảng địa hình có mặt đá tối, gờ sáng và vách đá nối ở mép cảnh. Đường sáng hơn nền để nhân vật và điểm giao chiến dễ đọc.

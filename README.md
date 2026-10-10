@@ -8,6 +8,16 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 79 — Cõi Phù Thủy
+
+Sáu nền vẽ tay riêng: Bờ Biển Pha Lê, Bậc Thác Ngân Lam, Ngã Rẽ Rừng Trăng, Cầu Đài Thiên Văn, Sân Cung Trăng Khuyết và Chính Điện Cõi Phù Thủy. Chặng cuối chiến đấu trong sảnh chính, kết thúc tại bậc Ngai Trăng. Màn 3, 5 và 6 có hai đường vào; màn 4 đi theo cầu vòng, không lặp lại tuyến ngang.
+
+Tọa độ đường, bệ trụ và các lối nối được dò theo ảnh nền. Trụ thu gọn trên tâm bệ đá; điểm phát tên, phép và đạn pháo được thu theo cùng tỷ lệ. Lính và tướng đi theo đồ thị cầu/sàn và cầu thang của bệ, tránh cắt qua nước hay vực. Ảnh màn chơi WebP tải theo màn và cache bộ nhớ tối đa hai ảnh. Ảnh trong thẻ chiến dịch dùng trực tiếp nền từng màn. Giữ các vùng Người, Elf và toàn bộ trang bị hiện tại.
+
+Đã kiểm tra sáu trận mô phỏng 30 giây (2.700 lượt render), đường tướng trên sáu đồ thị và trụ cấp cuối trên toàn bộ 37 bệ. Không ghi nhận lỗi game trong các bài kiểm tra. Kiểm tra khung 667×375 trên trình duyệt desktop; chưa thử điện thoại thật hoặc đánh giá cân bằng toàn chiến dịch.
+
+Bộ thiết kế có 36 PNG riêng nền trong suốt, ba atlas và danh mục tọa độ. [Tải bộ thiết kế](assets/witch79-design.zip) · [Tải sáu map PNG và tọa độ](assets/witch79-maps.zip). Các ZIP là thư viện tải về, không nằm trong cache game hay tải khi vào trận. Ảnh được tạo bằng built-in ImageGen theo reference người dùng; prompt và danh mục nằm trong các bộ ZIP.
+
 ## Bản 78 — Rừng Cổ Elf trên tán cây
 
 Vùng Elf gồm sáu ảnh nền mới: Bến Rừng Cổ, Lối Rễ Cổ Thụ, Đường Lên Tán Cây, Ngã Rẽ Cầu Treo, Vườn Treo Linh Mộc và Tháp Linh Mộc. Hai màn đầu đi dưới rừng; từ màn ba, đường nằm trên sàn gỗ và cầu treo. Màn bốn có hai nhánh hợp lưu, màn sáu kết thúc tại cửa tháp.

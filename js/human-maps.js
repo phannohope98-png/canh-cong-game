@@ -14,18 +14,18 @@
       beach: [1, 17], seaCliff: 16,
       rivers: [{ pts: [[292, 286], [282, 318], [270, 350], [262, 392], [258, 434]], w: 13 }], lakes: [{ x: 296, y: 280, rx: 22, ry: 11 }],
       falls: [{ x: 258, y: 434, w: 14, h: 36 }],
-      piers: [{ x0: 676, x1: 752, y: 236, half: 11 }, { x0: 650, x1: 748, y: 319, half: 19 }], gangway: [736, 338, 744, 404],
+      piers: [{ x0: 650, x1: 748, y: 319, half: 19 }], gangway: [736, 338, 744, 404],
       cobble: [[455, 150, 668, 345]]
     },
     route: [[744, 414], [738, 372], [726, 322], [690, 319], [648, 319], [600, 318], [550, 292], [502, 252], [452, 240], [414, 264], [402, 312], [374, 366], [322, 392], [258, 396], [192, 392], [146, 360], [130, 300], [150, 246], [182, 200], [162, 150], [112, 120], [56, 100], [-30, 92]],
     spots: [[655, 262], [622, 410], [536, 404], [452, 186], [470, 316], [330, 336], [214, 346], [232, 276], [234, 182], [62, 178]],
     props: [
       { k: 'ship', x: 430, y: 26, s: .45, kind: 'merchant', free: 1 }, { k: 'ship', x: 575, y: 44, s: .52, kind: 'merchant', flip: -1, free: 1 },
-      { k: 'ship', x: 736, y: 190, s: .62, kind: 'enemy', flip: -1, free: 1 }, { k: 'ship', x: 742, y: 456, s: 1, kind: 'enemy', crew: 1, flip: -1, free: 1 },
+      { k: 'ship', x: 742, y: 60, s: .5, kind: 'enemy', flip: -1, free: 1 }, { k: 'ship', x: 742, y: 456, s: 1, kind: 'enemy', crew: 1, flip: -1, free: 1 },
       { k: 'islet', x: 300, y: 30, s: .8, free: 1 }, { k: 'islet', x: 650, y: 22, s: .6, free: 1 }, { k: 'islet', x: 744, y: 96, s: .7, free: 1 },
-      { k: 'rowboat', x: 716, y: 254, free: 1 }, { k: 'rowboat', x: 742, y: 222, flip: -1, free: 1 }, { k: 'rowboat', x: 708, y: 352, flip: -1, free: 1 },
-      { k: 'crates', x: 728, y: 232, free: 1 }, { k: 'barrels', x: 700, y: 234, free: 1 }, { k: 'sacks', x: 668, y: 374 }, { k: 'net', x: 664, y: 356 }, { k: 'skullflag', x: 760, y: 392, free: 1 },
-      { k: 'lighthouse', x: 668, y: 150 },
+      { k: 'hs_harbor', x: 728, y: 272, w: 92, free: 1 }, { k: 'rowboat', x: 708, y: 352, flip: -1, free: 1 },
+      { k: 'sacks', x: 668, y: 374 }, { k: 'net', x: 664, y: 356 }, { k: 'skullflag', x: 760, y: 392, free: 1 },
+      { k: 'lighthouse', x: 726, y: 140, s: 1, free: 1 },
       { k: 'hall', x: 566, y: 226, w: 74, d: 30, h: 40 }, { k: 'hall', x: 504, y: 186, w: 58, d: 24, h: 34 },
       { k: 'sacks', x: 612, y: 254 }, { k: 'cart', x: 526, y: 222 }, { k: 'crates', x: 578, y: 430 }, { k: 'barrels', x: 484, y: 424 }, { k: 'sacks', x: 670, y: 420 }, { k: 'spill', x: 575, y: 350 }, { k: 'spill', x: 492, y: 356 },
       { k: 'banner', x: 540, y: 190 }, { k: 'tower', x: 424, y: 422, s: .8 }, { k: 'banner', x: 392, y: 422 }, { k: 'signpost', x: 220, y: 430, text: 'Cảng' },
@@ -83,7 +83,8 @@
       falls: [{ x: 600, y: 222, w: 46, h: 22 }],
       cliffs: [{ pts: [[580, 200], [620, 196]], h: 8 }]
     },
-    route: [[540, 510], [540, 440], [480, 404], [400, 412], [320, 420], [250, 396], [214, 346], [250, 306], [330, 300], [392, 300], [392, 190], [440, 132], [520, 140], [580, 180], [650, 160], [690, 110], [700, 40], [705, -30]],
+    route: [[540, 510], [540, 440], [480, 404], [400, 412], [320, 420], [250, 396], [214, 346], [240, 300], [300, 286], [440, 196], [480, 160], [530, 136], [590, 170], [650, 160], [690, 110], [700, 40], [705, -30]],
+    noAutoBridge: true,
     spots: [[470, 350], [360, 370], [160, 410], [150, 300], [320, 150], [560, 380], [530, 92], [620, 112]],
     props: [
       { k: 'hall', x: 168, y: 196, w: 58, h: 32, d: 22, wheel: true }, { k: 'reeds', x: 90, y: 270 }, { k: 'reeds', x: 520, y: 214 }, { k: 'reeds', x: 60, y: 200 },
@@ -91,8 +92,8 @@
       { k: 'barricade', x: 300, y: 200 }, { k: 'barricade', x: 452, y: 210, flip: -1 },
       { k: 'bhouse', x: 60, y: 140, s: .6 }, { k: 'bhouse', x: 110, y: 100, s: .58, flip: -1 }, { k: 'bhouse', x: 240, y: 92, s: .56 }, { k: 'well', x: 170, y: 120 }, { k: 'garden', x: 40, y: 90 },
       { k: 'bhouse', x: 640, y: 420, s: .6 }, { k: 'bhouse', x: 700, y: 380, s: .58, flip: -1 }, { k: 'farm70', x: 680, y: 450, w: 90, h: 30, crop: 'wheat' }, { k: 'cart', x: 610, y: 360, hay: true },
-      { k: 'rowboat', x: 90, y: 238, free: 1 }, { k: 'rowboat', x: 700, y: 246, flip: -1, free: 1 }, { k: 'net', x: 60, y: 284 },
-      { k: 'statue', x: 430, y: 192 },
+      { k: 'net', x: 60, y: 290 },
+      { k: 'hs_bridge', x: 370, y: 262, w: 186, flip: -1, free: 1 }, { k: 'hs_wooddock', x: 110, y: 252, w: 76, free: 1 }, { k: 'hs_quay', x: 660, y: 260, w: 84, free: 1 },
       { k: 'pine', x: 20, y: 40, s: .8 }, { k: 'tree', x: 300, y: 40, s: .74 }, { k: 'pine', x: 680, y: 30, s: .72 }, { k: 'tree', x: 740, y: 70, s: .7 }, { k: 'tree', x: 40, y: 470, s: .76 }, { k: 'pine', x: 120, y: 470, s: .72 },
       { k: 'tree', x: 300, y: 470, s: .7, v: 1 }, { k: 'rock', x: 620, y: 290, s: .7 }, { k: 'rock', x: 660, y: 200, s: .6 }, { k: 'bush', x: 580, y: 300 }, { k: 'bush', x: 30, y: 330 }, { k: 'tree', x: 740, y: 300, s: .72 },
       { k: 'signpost', x: 760, y: 70, text: 'Phố Canh Gác', free: 1 }
@@ -159,7 +160,7 @@
     props: [
       { k: 'wall', x: -10, y: 128, x2: 300, y2: 128, h: 34, banners: 1, free: 1 }, { k: 'wall', x: 460, y: 128, x2: 770, y2: 128, h: 34, banners: 1, free: 1 },
       { k: 'tower', x: 60, y: 134, s: 1.05, free: 1 }, { k: 'tower', x: 180, y: 134, s: 1.05, free: 1 }, { k: 'tower', x: 580, y: 134, s: 1.05, free: 1 }, { k: 'tower', x: 700, y: 134, s: 1.05, free: 1 },
-      { k: 'keep', x: 120, y: 70, s: .55, free: 1 }, { k: 'keep', x: 640, y: 70, s: .55, free: 1 },
+      { k: 'hs_castle', x: 380, y: 104, w: 300, free: 1 },
       { k: 'humangate', x: 380, y: 140, h: 150, free: 1 },
       { k: 'statue', x: 40, y: 214 }, { k: 'statue', x: 740, y: 214 },
       { k: 'tent', x: 60, y: 300 }, { k: 'tent', x: 700, y: 440, s: .9 }, { k: 'campfire', x: 740, y: 466 }, { k: 'barricade', x: 200, y: 470 }, { k: 'barricade', x: 470, y: 470, flip: -1 },

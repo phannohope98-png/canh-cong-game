@@ -198,7 +198,7 @@
     // cầu đá tự sinh ở chỗ đường cắt sông
     const wetRiver = (x, y) => (T.rivers || []).some(rv => polyDist(rv.pts, x, y) < rv.w / 2 + 3);
     let seg = null; const bridges = []; for (const p of pts) { const w = wetRiver(p[0], p[1]); if (w && !seg) seg = [p]; else if (w) seg.push(p); else if (seg) { bridges.push(seg); seg = null; } } if (seg) bridges.push(seg);
-    for (const b of bridges) bridge(g, path, Math.max(0, b[0][2] - 12), Math.min(path.length, b[b.length - 1][2] + 12), PW, def.woodBridge, res);
+    if (!def.noAutoBridge) for (const b of bridges) bridge(g, path, Math.max(0, b[0][2] - 12), Math.min(path.length, b[b.length - 1][2] + 12), PW, def.woodBridge, res);
     // cầu tàu
     for (const p of T.piers || []) pier(g, p, res);
     if (T.gangway) { const [x0, y0, x1, y1] = T.gangway; ink(g, 1.6); g.fillStyle = '#b8864f'; g.beginPath(); g.moveTo(x0 - 12, y0); g.lineTo(x0 + 12, y0); g.lineTo(x1 + 10, y1); g.lineTo(x1 - 10, y1); g.closePath(); g.fill(); g.stroke(); g.strokeStyle = '#7a5230'; g.lineWidth = 1; for (let t = .1; t < 1; t += .1) { const x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t; g.beginPath(); g.moveTo(x - 11, y); g.lineTo(x + 11, y); g.stroke(); } }

@@ -11,6 +11,37 @@
     return out;
   };
 
+  /* ===== 5b. Ảnh xem trước chặng: dùng thẳng ảnh vẽ tay (không lưu ảnh "Đang tải…" vào bộ nhớ đệm) ===== */
+  const bgBase = new URL('assets/backgrounds/', location.href).href;
+  function sceneImage(i) {
+    const L = CONFIG.levels[i] || {}, d = L.elf78 || L.witch79 || L.dwarf80 || L.orc81;
+    if (d && d.image) return bgBase + d.image;
+    const t = CONFIG.levels[i] && ['elf78', 'witch79', 'dwarf80', 'orc81'].map(k => ({ k, n: { elf78: 6, witch79: 12, dwarf80: 18, orc81: 24 }[k] })).find(o => i >= o.n && i < o.n + 6);
+    return t ? `${bgBase}${t.k}-${i - t.n + 1}.webp` : null;
+  }
+  function fixThumbs(root) {
+    if (!root) return;
+    root.querySelectorAll('.chapter-card[data-index] img, .rgrid [data-index] img').forEach(img => { const btn = img.closest('[data-index]'), u = sceneImage(+btn.dataset.index); if (u) img.src = u; });
+    const lv = root.querySelector('.lvimg'); if (lv && UI._lv82 != null) { const u = sceneImage(UI._lv82); if (u) lv.src = u; }
+  }
+  const regionCard = UI.regionCard;
+  UI.regionCard = function () { const r = regionCard.apply(this, arguments); fixThumbs(document.getElementById('overlay-panel')); return r; };
+  const levelCard = UI.levelCard;
+  UI.levelCard = function (i) { this._lv82 = +i; const r = levelCard.apply(this, arguments); fixThumbs(document.getElementById('overlay-panel')); return r; };
+
+  /* ===== 9. Ô trống trên map vẽ tay: cùng một kiểu dấu cho mọi vùng (vòng vàng + dấu cộng, chữ game) ===== */
+  const plot = Painter.plot;
+  Painter.plot = function (g, x, y, on, t) {
+    const m = Game.map; if (!(m && (m.elf78 || m.witch79 || m.dwarf80 || m.orc81))) return plot.apply(this, arguments);
+    const R = ((window.Alive81 && Alive81.RING[Game.levelIndex]) || 56) * .42, p = .5 + .5 * Math.sin((t || 0) * 2.4 + x * .05);
+    g.save(); g.translate(x, y + 1);
+    g.strokeStyle = on ? '#fff2b0' : `rgba(255,228,150,${.42 + .2 * p})`; g.lineWidth = on ? 2 : 1.3; g.setLineDash(on ? [] : [5, 4]);
+    g.beginPath(); g.ellipse(0, 0, R, R * .42, 0, 0, Math.PI * 2); g.stroke(); g.setLineDash([]);
+    g.fillStyle = on ? '#fff6cf' : 'rgba(255,240,190,.85)'; g.strokeStyle = 'rgba(40,24,20,.7)'; g.lineWidth = 2.4;
+    g.font = '900 13px "Alegreya SC", "Alegreya Sans", serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.strokeText('+', 0, -1); g.fillText('+', 0, -1); g.restore();
+  };
+
   /* ===== 6. Thanh máu gọn: mảnh, ngắn, sát đầu; quái trâu có vạch chia khúc ===== */
   function bar(g, cx, y, w, ratio, col, ticks) {
     const h = 1.8, x = cx - w / 2, r = Math.max(0, Math.min(1, ratio));
@@ -90,6 +121,10 @@
   // vẽ quái mới bằng hình gốc
   const pchar = Painter.char;
   Painter.char = function (g, art) { const d = E[art]; if (d && d.artFrom) arguments[1] = d.artFrom; return pchar.apply(this, arguments); };
+  const pport = Painter.charPortrait;
+  // hình thiếu (vd. soldier3_b – nhánh nâng cấp chưa có tranh) rơi về hình gần nhất thay vì làm sập màn Bách Khoa
+  const artKey = k => { if (!k || window.ArtChars && ArtChars[k]) return k; const b = String(k).replace(/_[a-z]$/, ''); if (ArtChars[b]) return b; const m = b.match(/^(.*?)([0-9])$/); if (m) for (let n = +m[2]; n >= 1; n--) if (ArtChars[m[1] + n]) return m[1] + n; return k; };
+  if (pport) Painter.charPortrait = function (c, type) { const d = E[type]; arguments[1] = d && d.artFrom ? d.artFrom : artKey(type); try { return pport.apply(this, arguments); } catch (e) { console.warn('portrait', type, e.message); } };
   // trộn quái mới vào đợt của từng vùng: từ đợt 2 trở đi, số lượng tăng dần theo map và đợt
   CONFIG.levels.forEach((L, li) => {
     const types = ROSTER[Math.min(5, (li / 6) | 0)], s = li % 6; if (!types.length || !L.waves) return;
@@ -221,11 +256,11 @@
 
   /* ===== 10b. Nội tại riêng của 10 tướng ===== */
   const PASSIVE = {
-    aldric: ['Khiên Đồng Đội', 'Lính đứng trong 90 quanh Aldric chịu ít hơn 15% sát thương.'],
+    aldric: ['Khiên Đồng Đội', 'Lính đứng gần tướng (bán kính 90) chịu ít hơn 15% sát thương.'],
     lyra: ['Mắt Ưng', 'Mỗi đòn thứ 4 là chí mạng, gây 250% sát thương.'],
     selene: ['Dư Âm Tinh Tú', 'Đòn đánh làm chậm quái 30% trong 1,5 giây.'],
-    borin: ['Kỹ Sư Chiến Trường', 'Trụ trong 120 quanh Borin bắn nhanh hơn 12%.'],
-    nara: ['Mầm Sống', 'Đồng minh trong 100 quanh Nara hồi 1,2% máu mỗi giây.'],
+    borin: ['Kỹ Sư Chiến Trường', 'Trụ gần tướng (bán kính 120) bắn nhanh hơn 12%.'],
+    nara: ['Mầm Sống', 'Đồng minh gần tướng (bán kính 100) hồi 1,2% máu mỗi giây.'],
     veyra: ['Búa Phá Giáp', 'Mỗi đòn xé 5% giáp mục tiêu (tối đa 15%) trong 4 giây – mọi trụ đều được lợi.'],
     thalen: ['Song Đao', '25% cơ hội chém thêm một nhát nữa.'],
     oria: ['Đèn Linh Hồn', 'Hạ quái thì một đốm linh hồn bay sang quái gần nhất, gây 40% sát thương phép.'],
@@ -332,5 +367,25 @@
     return r;
   };
 
-  window.Rev82 = { version: 82, ROSTER, NEW, SETS, PASSIVE, setLevel };
+  /* ===== 3. Trận ngắn cho điện thoại: tối đa 6 đợt (màn boss 7), nghỉ giữa đợt 12 giây =====
+   * Bỏ bớt các đợt ở giữa, giữ đợt mở màn và các đợt cuối khó nhất; mỗi trận còn khoảng 4–6 phút. */
+  CONFIG.match.nextWaveDelay = 12;
+  CONFIG.levels.forEach((L, li) => {
+    if (!L.waves) return; const cap = li % 6 === 5 ? 7 : 6, w = L.waves;
+    if (w.length <= cap) return;
+    const keepHead = 2, keepTail = cap - keepHead - 1, mid = w.slice(keepHead, w.length - keepTail);
+    L.waves = [...w.slice(0, keepHead), mid[(mid.length / 2) | 0], ...w.slice(w.length - keepTail)];
+  });
+
+  /* Hệ số máu quái từng màn sau khi rút gọn đợt + thêm quái mới, hiệu chỉnh bằng test/calib82.js
+   * (bot xếp trụ máy móc, tướng cấp & đồ theo tiến trình thường; mục tiêu thắng còn 6–16 mạng),
+   * nhân thêm độ dốc nhẹ để càng về sau càng khó. */
+  const CAL = [1.254, 1.254, .817, 1.404, 1.572, 1, 1.761, 1.761, 1.292, 1.191, 1.334, 1.12, .677, .762, .663, .681, .642, .549, .615, 1.03, .64, .76, .771, .503, .703, .853, .485, .646, .563, .503, .703, .652, .74, .8, .633, .606];
+  // ×0,87: chừa biên cho độ ngẫu nhiên (cùng một màn, bot lúc thắng lúc thua)
+  CONFIG.levels.forEach((L, i) => { if (CAL[i]) L.hpMul = (L.hpMul || 1) * CAL[i] * .87 * (1 + .003 * i); });
+
+  /* ===== 9b. Tiêu đề chặng không lặp: "Tên vùng · Tên chặng" ===== */
+  CONFIG.levels.forEach((L, i) => { const R = CONFIG.regions[(i / 6) | 0]; if (R && L.sub && (!L.name || L.name === L.sub)) L.name = R.name; });
+
+  window.Rev82 = { version: 82, ROSTER, NEW, SETS, PASSIVE, setLevel, CAL };
 })();

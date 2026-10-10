@@ -88,12 +88,7 @@
 
   /* ---------- phân tích ảnh nền ---------- */
   const WATER = 1, FOAM = 2, LAVA = 4, LIGHT = 16, CRYSTAL = 32, LEAF = 64, PINK = 128;
-  function regionOf(m) { return m.elf78 ? 'elf' : m.witch79 ? 'witch' : m.dwarf80 ? 'dwarf' : m.orc81 ? 'orc' : Game.levelIndex >= 30 ? 'chaos' : 'human'; }
-  function setup(m, bg) {
-    const r = Math.min(R, bg.width / m.W), W = Math.ceil(m.W * r), H = Math.ceil(m.H * r), N = W * H;
-    const base = canvas(W, H), bctx = base.getContext('2d', { willReadFrequently: true }); bctx.drawImage(bg, 0, 0, W, H);
-    const st = { map: m, bg, r, W, H, region: regionOf(m), trees: [], leaves: [], emit: [], embers: [], air: [], last: 0, water: null, fx: null };
-    let px; try { px = bctx.getImageData(0, 0, W, H).data; } catch (e) { console.warn('alive81: không đọc được ảnh nền', e); return st; }
+  function classify(px, N) {
     const cls = new Uint8Array(N);
     for (let i = 0; i < N; i++) {
       const j = i * 4, R_ = px[j], G = px[j + 1], B = px[j + 2]; let c = 0;
@@ -107,6 +102,16 @@
       else if (R_ > 215 && B > 165 && G < R_ - 35 && G > 110) c |= PINK;
       cls[i] = c;
     }
+    return cls;
+  }
+  function regionOf(m) { return m.elf78 ? 'elf' : m.witch79 ? 'witch' : m.dwarf80 ? 'dwarf' : m.orc81 ? 'orc' : Game.levelIndex >= 30 ? 'chaos' : 'human'; }
+  function setup(m, bg, src) {
+    const r = Math.min(R, bg.width / m.W), W = Math.ceil(m.W * r), H = Math.ceil(m.H * r), N = W * H;
+    // src là ImageBitmap chụp sẵn (bất đồng bộ): đọc điểm ảnh trực tiếp từ canvas nền giữa khung hình buộc GPU xả hết lệnh vẽ – đo được 6–7 s; qua ImageBitmap ~15 ms
+    const base = canvas(W, H), bctx = base.getContext('2d', { willReadFrequently: true }); bctx.drawImage(src || bg, 0, 0, W, H);
+    const st = { map: m, bg, r, W, H, region: regionOf(m), trees: [], leaves: [], emit: [], embers: [], air: [], last: 0, water: null, fx: null };
+    let px; try { px = bctx.getImageData(0, 0, W, H).data; } catch (e) { console.warn('alive81: không đọc được ảnh nền', e); return st; }
+    const cls = classify(px, N);
     const bit = b => { const a = new Uint8Array(N); for (let i = 0; i < N; i++) a[i] = cls[i] & b ? 1 : 0; return a; };
     const water = bit(WATER), nearW = dilate(water, W, H, Math.round(3 * r));
     // nguồn sáng nhỏ: lửa (không thuộc dung nham), đèn, pha lê – gom cụm trên lưới 3px
@@ -152,6 +157,8 @@
       st.water = wl; st.wetMask = shrink(wm);
     }
     if (fallN > 20) st.fallMask = shrink(maskCanvas(fall, W, H, 1));
+    // hơi nước: đáy các dải thác (điểm thác mà ngay dưới không còn thác)
+    if (fallN > 20) { const pts = [], step = Math.max(2, Math.round(6 * r)); for (let x = 0; x < W; x += step) for (let y = H - 2; y > 0; y--) { if (fall[y * W + x] && !fall[(y + 1) * W + x]) { pts.push({ x: x / r, y: y / r, ph: Math.random() }); break; } } st.mist = pts.filter((p, i, a) => !a.slice(0, i).some(q => Math.hypot(q.x - p.x, q.y - p.y) < 18)).slice(0, 18); }
     if (lavaN > N * .002) {
       st.lavaMask = shrink(maskCanvas(molten, W, H, 1));
       const glow = canvas(FW, FH), gg = glow.getContext('2d'); gg.filter = 'blur(6px)'; gg.drawImage(st.lavaMask, 0, 0); gg.filter = 'none';
@@ -226,11 +233,6 @@
       passFx(st, g, st.lavaMask, g => { fillPattern(g, 'c', t * 4 * fk, t * 6 * fk, fk / 1.5 * 1.3, .9); fillPattern(g, 'b', -t * 3 * fk, t * 2 * fk, fk / 1.5 * 2, .6); });
       lay(.22, 'lighter');
       if (st.lavaFallMask) { passFx(st, g, st.lavaFallMask, g => fillPattern(g, 'fall', 0, (t * 70 * fk) % 256, fk / 1.5 * 1.4, 1)); lay(.35); }
-    }
-    if (st.fallMask && !st.mist) { // hơi nước: lấy vài điểm đáy thác
-      st.mist = []; const d = st.fallMask.getContext('2d').getImageData(0, 0, st.fw, st.fh).data, step = 6;
-      for (let x = 0; x < st.fw; x += step) for (let y = st.fh - 2; y > 0; y--) { const a = d[(y * st.fw + x) * 4 + 3], b = d[((y + 1) * st.fw + x) * 4 + 3]; if (a > 128 && b < 64) { st.mist.push({ x: x / fk, y: y / fk, ph: Math.random() }); break; } }
-      st.mist = st.mist.filter((p, i, a) => !a.slice(0, i).some(q => Math.hypot(q.x - p.x, q.y - p.y) < 18)).slice(0, 18);
     }
     if (st.mist) { c.save(); c.globalCompositeOperation = 'lighter';
       for (const p of st.mist) for (let i = 0; i < 2; i++) { const ph = (t * .5 + p.ph + i * .5) % 1, rad = 6 + ph * 12, a = Math.sin(ph * Math.PI) * .2, x = p.x + (i - .5) * 6, y = p.y - ph * 7; const gr = c.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(235,250,255,${a})`); gr.addColorStop(1, 'rgba(235,250,255,0)'); c.fillStyle = gr; c.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
@@ -311,15 +313,22 @@
 
   /* ---------- móc vào vòng vẽ ---------- */
   let S = null;
+  // phân tích chạy ngoài vòng vẽ: chụp nền thành ImageBitmap (bất đồng bộ) rồi mới đọc điểm ảnh
+  let job = null;
   function state() {
     const m = Game.map, bg = Game.bg; if (!m || !bg) return null;
-    if (!S || S.map !== m || S.bg !== bg) {
-      // ảnh vẽ tay chưa tải xong thì nền đang là chữ "Đang tải…": chờ tới khi nền thật được dựng lại
-      const d = m.elf78 || m.witch79 || m.dwarf80 || m.orc81;
-      if (d && window.Elf78 && m.elf78) { const a = Elf78.load(d); if (!a.loaded) return null; }
-      try { S = setup(m, bg); } catch (e) { console.warn('alive81', e); S = { map: m, bg, broken: true }; }
+    if (S && S.map === m && S.bg === bg) return S.broken ? null : S;
+    if (job && job.map === m && job.bg === bg) return null;
+    const d = m.elf78 || m.witch79 || m.dwarf80 || m.orc81;
+    if (d && !d.__ready81) { // ảnh vẽ tay chưa tải xong thì nền đang là chữ "Đang tải…": chờ nền thật
+      const L = m.elf78 && window.Elf78 ? Elf78.load(d) : null; if (L && !L.loaded) return null;
+      if (!L && bg.width < 50) return null;
     }
-    return S.broken ? null : S;
+    const j = job = { map: m, bg }, r = Math.min(R, bg.width / m.W), W = Math.ceil(m.W * r), H = Math.ceil(m.H * r);
+    const run = src => { if (job !== j || Game.map !== m || Game.bg !== bg) return; try { S = setup(m, bg, src); } catch (e) { console.warn('alive81', e); S = { map: m, bg, broken: true }; } job = null; if (src && src.close) src.close(); };
+    if (window.createImageBitmap) createImageBitmap(bg, { resizeWidth: W, resizeHeight: H, resizeQuality: 'medium' }).then(run, () => run(null));
+    else setTimeout(() => run(null), 0);
+    return null;
   }
   const waterDraw = WaterFx.draw;
   WaterFx.draw = function (c, now) {

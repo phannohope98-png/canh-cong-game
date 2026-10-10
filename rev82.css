@@ -1,0 +1,62 @@
+/* Rev 82 – giao diện thống nhất & an toàn trên điện thoại.
+ * Một hệ chữ: tiêu đề/nút = Alegreya SC (--display), nội dung/số = Alegreya Sans (--ui). Số dùng chữ số đều độ rộng.
+ * Mọi hộp thoại co theo màn hình (kể cả tai thỏ / thanh điều hướng), cuộn bên trong thay vì tràn ra ngoài. */
+
+/* ---------- chữ ---------- */
+body, button, input, select { font-family: var(--ui); }
+.ribbon, .gbtn, .gbtn span, .rbtn small, h1, h2, h3, .screen-title, .topbar h2, .world-label b, .chapter-card b { font-family: var(--display) !important; letter-spacing: .01em; }
+.pill b, .price, #hud-gold, #hud-lives, #hud-wave, .rprog, .lvl, small b, .it-stat, .talent-head b { font-family: var(--ui) !important; font-variant-numeric: tabular-nums; font-weight: 800; }
+.gbtn { text-transform: none; }
+.gbtn span { white-space: nowrap; }
+p, li, .sub, .rinfo, .desc, .sheet-desc { font-family: var(--ui) !important; font-weight: 700; line-height: 1.38; }
+
+/* ---------- hộp thoại: luôn nằm gọn trong màn hình ---------- */
+/* lớp phủ tự cuộn (panel có ruy băng nhô lên trên nên không cắt panel); margin:auto giữ giữa mà không mất mép trên khi panel cao hơn màn */
+.overlay { display: flex !important; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; box-sizing: border-box; padding: calc(22px + var(--st)) max(8px, var(--sr)) max(8px, var(--sb)) max(8px, var(--sl)); }
+#overlay-panel { margin: auto; flex: none; box-sizing: border-box; max-width: min(640px, calc(100vw - 16px - var(--sl) - var(--sr))) !important; }
+#overlay-panel .ribbon { max-width: calc(100% - 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#overlay-panel img { max-width: 100%; height: auto; }
+.chapter-route, .rgrid { max-width: 100%; }
+.chapter-card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: #2a3a30; }
+
+/* ---------- màn danh sách (anh hùng, kho đồ, bách khoa, cài đặt) ---------- */
+.screen .scroll, #hero-detail, #hero-roster, #items-bag, #codex-list, #settings-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.screen { box-sizing: border-box; }
+.topbar { padding-left: max(10px, var(--sl)) !important; padding-right: max(10px, var(--sr)) !important; }
+
+/* ---------- vùng chạm tối thiểu 40px ---------- */
+.roster-item { flex-shrink: 0; }
+.rbtn, .gbtn.sm, .talent-node, .branch-tabs button, .it-card, .islot, .catalog-filters select { min-height: 40px; }
+.talent-node { min-width: 40px; }
+button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* ---------- nội tại tướng & bộ đồ ---------- */
+.passive82 { margin: 8px 0; padding: 8px 10px; border-radius: 10px; background: rgba(255, 214, 120, .1); border: 1px solid rgba(255, 214, 120, .35); display: flex; flex-direction: column; gap: 3px; }
+.passive82 b { font-family: var(--display); font-size: 13px; color: #ffd98a; letter-spacing: .03em; }
+.passive82 span { font-size: 13px; line-height: 1.35; opacity: .95; }
+.set82 { margin-top: 6px; padding: 6px 8px; border-radius: 8px; border: 1px dashed rgba(255, 255, 255, .25); opacity: .7; list-style: none; }
+.set82.half { opacity: .9; border-color: #8fd0ff; }
+.set82.on { opacity: 1; border: 1px solid #ffd24a; background: rgba(255, 210, 74, .12); }
+
+/* ---------- trận đấu: chừa khung chơi, không đè lên nhau ---------- */
+#screen-game .hud-tl, #screen-game .hud-tr { pointer-events: none; }
+#screen-game .hud-tl > *, #screen-game .hud-tr > * { pointer-events: auto; }
+.wave60 b { font-family: var(--ui) !important; font-weight: 800; white-space: nowrap; }
+#hero-commands .command-label { display: none; }
+
+/* màn thấp (điện thoại ngang ≤ 400px cao): thu gọn thêm */
+@media (max-height: 400px) {
+  #overlay-panel { padding: 10px 12px !important; }
+  #overlay-panel .ribbon { font-size: 16px; padding-top: 4px; padding-bottom: 4px; }
+  .chapter-route { gap: 6px !important; }
+  .chapter-card span b { font-size: 12px; }
+  .chapter-card span small { font-size: 10px; }
+  .hero-summary canvas { width: 96px; height: 110px; }
+}
+/* điện thoại dọc: hộp thoại chiếm gần trọn chiều ngang */
+@media (orientation: portrait) {
+  #overlay-panel { max-width: calc(100vw - 12px) !important; }
+}
+/* ruy băng tiêu đề nhô lên trên panel: chừa chỗ để dòng đầu không bị đè */
+#overlay-panel { padding-top: 34px !important; }
+@media (max-height: 400px) { #overlay-panel .lvimg { max-height: 30vh; width: auto; object-fit: cover; } #overlay-panel canvas.portrait, #overlay-panel .enemy-chip canvas { max-width: 13vh; max-height: 13vh; } }

@@ -8,6 +8,12 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 71 — vật phẩm kiến trúc mới
+
+Thiết kế lại 24 loại bộ phận trụ ở sáu bậc (144 hình trong kho/bách khoa). Cờ, cửa, phù hiệu, mái, tường và chuông dùng nét kim loại/vải của trụ Người; trụ Elf dùng gỗ, lá, giá cung, bồn nhựa và rễ; trụ phép dùng lõi pha lê, vòng niệm, ống dẫn và bệ rune; pháo dùng kính ngắm, vòng nòng, buồng thuốc, bánh răng, lò và chân chống. Hình trong kho và phần lắp dùng chung bộ vẽ; vị trí và kích thước lấy theo loại và cấp trụ. Mái được giới hạn theo mặt mái; cửa gia cố mở cùng cánh cửa; kính ngắm và vòng nòng theo hướng quay/giật của pháo. Các bậc phân biệt màu vật liệu và trang trí, Thần Tích giữ tên và câu chuyện riêng. Bộ phận tĩnh dùng cache giới hạn 192 ảnh để giảm vẽ lại trong trận.
+
+Giữ các sửa map/chuyển động/đạn của bản 70. Đã kiểm tra 144 hình không rỗng/cắt mép, 16 mẫu trụ, ba trạng thái cửa và pháo, cùng trận 30 giây có đủ 24 món trang bị. Không ghi nhận lỗi; khung 667×375 hiển thị đầy đủ. Chưa kiểm tra trên điện thoại thật.
+
 ## Bản 66 — tuyến ngắn và điểm hợp lưu
 
 Khung chiến trường thu ngang còn 760. Tuyến chính khoảng 740–905 đơn vị; nhánh vào từ trên/dưới khoảng 380–640. Bố cục gồm đường chữ Y, hai cửa vào riêng, hướng vào dọc và vùng nhập tuyến; màn công thành vẫn kết thúc đúng cửa. Đường được vẽ thành một mặt đất chung ở điểm giao nhau, có vân đất, mép cỏ và vết nứt theo vùng. Cụm cây và mảng đất được bố trí theo khoảng trống giữa đường, tránh vùng trụ. Giữ ít nhất 8 ô xây mỗi màn; không đổi chỉ số nhân vật. Kiểm tra cú pháp, dựng 36 màn và trận mô phỏng 30 giây không ghi nhận lỗi. Đây chưa phải kiểm tra trên điện thoại thật hoặc xác nhận cân bằng toàn chiến dịch.

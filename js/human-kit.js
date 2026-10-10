@@ -191,7 +191,7 @@
     const onLand = pts.filter(([x, y]) => !(T.piers || []).some(p => x > p.x0 - 2 && x < p.x1 + 6 && Math.abs(y - p.y) < p.half + 6) && !(T.gangway && x > T.gangway[0] - 4));
     const strokePts = (ps, w, col) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); ps.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); };
     for (let k = 0; k < 5; k++) { g.globalAlpha = .08; strokePts(onLand, PW + 32 - k * 6, '#b48a4c'); } g.globalAlpha = 1;
-    strokePts(onLand, PW + 3, '#9c6c30'); strokePts(onLand, PW, '#d3a454'); strokePts(onLand, PW - 7, '#ecc874'); g.globalAlpha = .5; strokePts(onLand, PW * .5, '#f6dc98'); g.globalAlpha = 1;
+    strokePts(onLand, PW + 3, '#9c6c30'); strokePts(onLand, PW, '#d3a454'); strokePts(onLand, PW - 7, '#ecc874'); { const tex = window.HumanRoadTex && HumanRoadTex(g, res); if (tex) { g.globalAlpha = .7; strokePts(onLand, PW - 7, tex); g.globalAlpha = 1; } } g.globalAlpha = .5; strokePts(onLand, PW * .5, '#f6dc98'); g.globalAlpha = 1;
     const isCob = (x, y) => def.cobbleAll || (T.cobble || []).some(([x0, y0, x1, y1]) => x > x0 && x < x1 && y > y0 && y < y1);
     let run = []; const flush = () => { if (run.length > 2) { strokePts(run, PW - 4, pat(g, 'castle', 1, 58, res) || '#c9bfa8'); g.globalAlpha = .16; strokePts(run, PW - 4, '#f2e2b6'); g.globalAlpha = 1; } run = []; };
     for (const p of onLand) { if (isCob(p[0], p[1])) run.push(p); else flush(); } flush();

@@ -30,22 +30,24 @@
 
   /* ---------- vật thể theo cốt truyện từng chặng ---------- */
   const STORY = {
-    0: [['ship', 742, 456, { kind: 'enemy', docked: 1, flip: -1, s: 1, free: 1 }], ['ship', 712, 70, { kind: 'enemy', flip: -1, s: .6, free: 1 }],
+    0: [['hall', 340, 150, { w: 80 }], ['bhouse', 420, 112, { art: 'bluehouse', s: .62 }], ['bhouse', 300, 205, { art: 'bluehouse', s: .58 }], ['ruin', 380, 210, { st: 'chay', dir: 'tay', s: .78 }],
+      ['hs_wooddock', 300, 44, { w: 70, free: 1 }], ['hs_quay', 560, 58, { w: 80, free: 1 }], ['tower', 424, 422, { s: .8 }], ['lamp2', 330, 100, { dir: 'nam' }],
+      ['ship', 742, 456, { kind: 'enemy', docked: 1, flip: -1, s: 1, free: 1 }], ['ship', 712, 70, { kind: 'enemy', flip: -1, s: .6, free: 1 }],
       ['ruin', 610, 440, { st: 'chay', dir: 'tay', s: .8 }], ['ruin', 470, 110, { st: 'do-nat', dir: 'nam', s: .75 }], ['ruin', 420, 440, { st: 'chay', dir: 'dong', s: .7 }],
       ['lamp2', 470, 300, { dir: 'nam' }], ['lamp2', 616, 292, { dir: 'tay' }], ['lamp2', 640, 360, { dir: 'dong' }], ['lamp2', 200, 360, { dir: 'nam' }]],
     1: [['ruin', 236, 150, { st: 'chay', dir: 'nam', s: .8 }], ['ruin', 470, 170, { st: 'do-nat', dir: 'tay', s: .78 }], ['ruin', 300, 440, { st: 'sap', dir: 'dong', s: .75 }], ['ruin', 120, 300, { st: 'chay', dir: 'dong', s: .72 }],
       ['lamp2', 100, 190, { dir: 'dong', lit: false }], ['lamp2', 360, 110, { dir: 'nam', lit: false }]],
     2: [['ruin', 110, 120, { st: 'do-nat', dir: 'dong', s: .75 }], ['ruin', 640, 400, { st: 'chay', dir: 'tay', s: .78 }], ['ruin', 250, 460, { st: 'sap', dir: 'nam', s: .72 }],
       ['lamp2', 290, 330, { dir: 'dong' }], ['lamp2', 460, 236, { dir: 'tay' }], ['lamp2', 520, 100, { dir: 'nam' }]],
-    3: [['ruin', 300, 440, { st: 'chay', dir: 'nam', s: .8 }], ['ruin', 470, 440, { st: 'sap', dir: 'tay', s: .78 }], ['ruin', 40, 260, { st: 'do-nat', dir: 'dong', s: .72 }],
+    3: [['hall', 420, 330, { w: 76 }], ['ruin', 300, 440, { st: 'chay', dir: 'nam', s: .8 }], ['ruin', 470, 440, { st: 'sap', dir: 'tay', s: .78 }], ['ruin', 40, 260, { st: 'do-nat', dir: 'dong', s: .72 }],
       ['lamp2', 160, 330, { dir: 'dong' }], ['lamp2', 360, 230, { dir: 'nam' }], ['lamp2', 450, 60, { dir: 'nam' }], ['lamp2', 520, 330, { dir: 'tay' }], ['lamp2', 700, 300, { dir: 'tay' }], ['lamp2', 240, 120, { dir: 'nam' }]],
-    4: [['ruin', 40, 420, { st: 'sap', dir: 'dong', s: .72 }], ['ruin', 740, 400, { st: 'chay', dir: 'tay', s: .72 }],
+    4: [...[40, 120, 300, 470, 520, 680, 740].map(x => ['tower', x, 62, { s: 1, free: 1 }]), ['ruin', 40, 420, { st: 'sap', dir: 'dong', s: .72 }], ['ruin', 740, 400, { st: 'chay', dir: 'tay', s: .72 }],
       ['lamp2', 120, 360, { dir: 'dong' }], ['lamp2', 420, 250, { dir: 'nam' }], ['lamp2', 610, 100, { dir: 'nam' }], ['lamp2', 260, 110, { dir: 'nam' }]],
-    5: [['lamp2', 300, 200, { dir: 'dong' }], ['lamp2', 460, 200, { dir: 'tay' }], ['lamp2', 330, 236, { dir: 'nam' }], ['lamp2', 430, 236, { dir: 'nam' }], ['lamp2', 120, 260, { dir: 'nam' }], ['lamp2', 640, 260, { dir: 'nam' }],
+    5: [['tree', 60, 470, { s: .8 }], ['pine', 470, 470, { s: .8 }], ['tree', 700, 380, { s: .75 }], ['ruin', 380, 470, { st: 'do-nat', dir: 'nam', s: .7 }], ['lamp2', 300, 200, { dir: 'dong' }], ['lamp2', 460, 200, { dir: 'tay' }], ['lamp2', 330, 236, { dir: 'nam' }], ['lamp2', 430, 236, { dir: 'nam' }], ['lamp2', 120, 260, { dir: 'nam' }], ['lamp2', 640, 260, { dir: 'nam' }],
       ['ruin', 40, 440, { st: 'chay', dir: 'dong', s: .7 }], ['ruin', 740, 470, { st: 'sap', dir: 'tay', s: .7 }]]
   };
   const FOLKS = {
-    0: [{ w: [[60, 230], [40, 300]] }, { x: 340, y: 140, work: 1, dir: 'dong' }, { x: 312, y: 190, work: 1, dir: 'tay' }],
+    0: [],
     1: [{ x: 646, y: 180, work: 1, dir: 'dong' }, { x: 690, y: 160, work: 1, dir: 'nam' }, { x: 540, y: 70, work: 1, dir: 'tay' }, { x: 575, y: 58, work: 1, dir: 'dong' },
       { w: [[760, 120], [600, 110]] }, { w: [[30, 360], [90, 410]] }, { w: [[150, 420], [40, 450]] }],
     2: [{ w: [[60, 160], [140, 130]] }, { x: 700, y: 440, work: 1, dir: 'tay' }, { w: [[600, 440], [700, 420]] }],
@@ -61,7 +63,8 @@
     const free = (x, y, r, tall) => x > 6 && x < m.W - 6 && y > 10 && y < m.H + 6 && near(x, y) > PW / 2 + r && (!tall || near(x, y - 30) > PW / 2) && !HumanKit.wet(m.hand, x, y, r * .5) && !underSpot(x, y, tall);
     const add = [];
     for (const [k, x, y, o] of STORY[i] || []) if ((o && o.free) || free(x, y, k === 'ruin' ? 22 : 8, true)) add.push({ k, x, y, hk: true, ...(o || {}) });
-    if (i === 0) m.decor = m.decor.filter(d => !(d.k === 'ship' && d.kind === 'enemy'));
+    const KEEP = new Set(['bhouse', 'hall', 'tower', 'lighthouse', 'keep', 'tree', 'pine', 'bush', 'rock', 'humangate', 'farm70', 'hay70']);
+    m.decor = m.decor.filter(d => (KEEP.has(d.k) || /^hs_/.test(d.k) || (d.k === 'ship' && d.kind !== 'enemy')) && !(i === 0 && /farm70|hay70/.test(d.k)));
     const rnd = ArtKit.seeded(i * 4111 + 77);
     for (let t = 0, c = 0; t < 900 && c < 46; t++) { const x = rnd() * m.W, y = 20 + rnd() * (m.H - 20), patch = rnd() < .45; if (!free(x, y, patch ? 26 : 10, false) || [...m.decor, ...add].some(d => Math.hypot(d.x - x, (d.y - y) * 1.6) < (patch ? 36 : 20))) continue; add.push({ k: patch ? 'patch' : 'tuft', x, y, v: 1 + (rnd() * 4 | 0), s: .75 + rnd() * .5, hk: true }); c++; }
     const patches = add.filter(d => d.k === 'patch').sort((a, b) => a.y - b.y), rest = [...m.decor, ...add.filter(d => d.k !== 'patch')].sort((a, b) => a.y - b.y);

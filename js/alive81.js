@@ -6,14 +6,18 @@
   'use strict';
   const TAU = Math.PI * 2, R = 1.5;
 
-  /* ---------- cỡ trụ ---------- */
-  const towerScale = m => m?.elf78 ? 0.9 : m?.witch79 ? 0.7 : 1;
+  /* ---------- cỡ trụ: chân trụ phủ kín vòng đá vẽ sẵn ---------- */
+  // bề ngang vòng (đơn vị game) đo trên từng ảnh nền, theo chỉ số màn; chân trụ trung bình ở tỉ lệ 1 rộng ~66
+  const RING = { 6: 53, 7: 53, 8: 60, 9: 63, 10: 67, 11: 63, 12: 57, 13: 60, 14: 60, 15: 57, 16: 77, 17: 90, 18: 57, 19: 63, 20: 50, 21: 50, 22: 50, 23: 73, 24: 55, 25: 55, 26: 55, 27: 57, 28: 55, 29: 60 };
+  const painted = m => !!(m && (m.elf78 || m.witch79 || m.dwarf80 || m.orc81));
+  const ringOf = m => painted(m) ? (RING[Game.levelIndex] || 56) : 0;
+  const towerScale = m => { const r = ringOf(m); return r ? Math.max(.78, Math.min(1.3, r / 66)) : 1; };
   function patchTower(T) {
     const P = Object.getPrototypeOf(T); if (P.__alive81) return; P.__alive81 = true;
     const draw = P.draw;
     P.draw = function (g) {
       const k = towerScale(Game.map); if (k === 1) return draw.apply(this, arguments);
-      g.save(); g.translate(this.x, this.y); g.scale(k, k); g.translate(-this.x, -this.y);
+      g.save(); g.translate(this.x, this.y + ringOf(Game.map) * .12); g.scale(k, k); g.translate(-this.x, -this.y);
       try { return draw.apply(this, arguments); } finally { g.restore(); }
     };
   }
@@ -177,5 +181,5 @@
     drawWater(c, S, now); drawTrees(c, S, now, dt);
     return r;
   };
-  window.Alive81 = { SCENES, towerScale, get state() { return S; } };
+  window.Alive81 = { SCENES, towerScale, RING, get state() { return S; } };
 })();

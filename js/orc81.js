@@ -59,8 +59,6 @@
   Level.renderBackground=function(m,res){if(!m.orc81)return render.call(this,m,res);const a=load(m.orc81),c=document.createElement('canvas');res=Math.min(1.5,Math.max(.7,res||1));c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);const g=c.getContext('2d');g.imageSmoothingQuality='high';if(a.loaded)g.drawImage(a.image,0,0,c.width,c.height);else{g.fillStyle='#442721';g.fillRect(0,0,c.width,c.height);g.fillStyle='#fff1c8';g.font='16px sans-serif';g.textAlign='center';g.fillText(a.error?'Không tải được map Orc':'Đang tải Hoang Địa Orc…',c.width/2,c.height/2);}return c;};
   const plot=Painter.plot;
   Painter.plot=function(g,x,y,on,t){if(!Game.map?.orc81)return plot.apply(this,arguments);g.save();g.strokeStyle=on?'#ffe5ae':'rgba(255,231,172,.65)';g.lineWidth=on?2:1;g.beginPath();g.ellipse(x,y,15,6,0,0,Math.PI*2);g.stroke();g.fillStyle=on?'#fff5ca':'#ffe4ad';g.font='bold 15px sans-serif';g.textAlign='center';g.fillText('+',x,y+3);g.restore();};
-  const tower=Painter.tower;
-  Painter.tower=function(g,type,tier,x,y,...args){if(!Game.map?.orc81)return tower.call(this,g,type,tier,x,y,...args);g.save();g.translate(x,y);g.scale(.70,.70);g.translate(-x,-y);try{return tower.call(this,g,type,tier,x,y,...args);}finally{g.restore();}};
   const spotAt=Towers.spotAt;
   Towers.spotAt=function(x,y){if(!Game.map?.orc81)return spotAt.call(this,x,y);let best=null;for(const s of this.spots){const d=Math.hypot(x-s.x,(y-s.y)*1.7);if(d<27&&(!best||d<best.d))best={s,d};}return best?.s||null;};
   const spawn=Enemies.spawn;
@@ -90,7 +88,6 @@
     document.getElementById('overlay-panel').classList.add('wide');
   };
   const levelCard=UI.levelCard;UI.levelCard=function(i){const out=levelCard.call(this,i),d=scenes[i-24];if(d){const img=document.querySelector('#overlay-panel .lvimg');if(img)img.src=new URL(d.image,base).href;}return out;};
-  const mapUI=UI.renderMap;UI.renderMap=function(){const out=mapUI.call(this),card=document.querySelector('.world-card[data-r="4"]');if(card){card.style.backgroundImage=`url("${new URL(scenes[4].image,base).href}")`;card.style.backgroundSize='cover';card.style.backgroundPosition='center';}return out;};
   const result=UI.showResult;
   UI.showResult=function(r){const out=result.apply(this,arguments),d=scenes[Game.levelIndex-24];if(d)setTimeout(()=>{const rib=document.querySelector('.ribbon');if(rib)rib.insertAdjacentHTML('afterend',`<p class="levelup">${r.win?(Game.levelIndex===29?'Đã giải phong Ngai Huyết Nanh. Năm mảnh Chuông Bình Minh hội tụ; năm cõi cùng giữ lại bình minh.':'Đã giữ '+d.name+'. Tiến tới '+scenes[Game.levelIndex-23].name+'.'):'Tuyến '+d.name+' đã bị xuyên thủng. Hãy đổi cách bố trí trụ và điều tướng.'}</p>`);},0);return out;};
   window.Orc81={scenes,load,nearest,routeBetween,version:81};

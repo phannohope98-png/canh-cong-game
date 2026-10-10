@@ -202,9 +202,9 @@
       if (hasRelic(this.type) && this.landed !== false) {
         const t = (window.Game && Game.time) || 0, pul = .5 + .5 * Math.sin(t * 2.4 + this.x * .05);
         g.save(); g.globalCompositeOperation = 'lighter';
-        let gr = g.createRadialGradient(this.x, this.y + 4, 4, this.x, this.y + 4, 46); gr.addColorStop(0, `rgba(127,247,234,${.45 + .2 * pul})`); gr.addColorStop(.6, 'rgba(89,234,220,.16)'); gr.addColorStop(1, 'rgba(89,234,220,0)');
-        g.fillStyle = gr; g.beginPath(); g.ellipse(this.x, this.y + 4, 46, 18, 0, 0, TAU); g.fill();
-        g.strokeStyle = `rgba(160,255,245,${.35 + .35 * pul})`; g.lineWidth = 2; g.beginPath(); g.ellipse(this.x, this.y + 4, 30 + pul * 6, 11 + pul * 2, 0, 0, TAU); g.stroke();
+        let gr = g.createRadialGradient(this.x, this.y + 4, 4, this.x, this.y + 4, 34); gr.addColorStop(0, `rgba(127,247,234,${.45 + .2 * pul})`); gr.addColorStop(.6, 'rgba(89,234,220,.16)'); gr.addColorStop(1, 'rgba(89,234,220,0)');
+        g.fillStyle = gr; g.beginPath(); g.ellipse(this.x, this.y + 4, 34, 13, 0, 0, TAU); g.fill();
+        g.strokeStyle = `rgba(160,255,245,${.35 + .35 * pul})`; g.lineWidth = 2; g.beginPath(); g.ellipse(this.x, this.y + 4, 24 + pul * 4, 9 + pul * 1.5, 0, 0, TAU); g.stroke();
         gr = g.createLinearGradient(0, this.y - 120, 0, this.y); gr.addColorStop(0, 'rgba(127,247,234,0)'); gr.addColorStop(1, `rgba(127,247,234,${.12 + .08 * pul})`); g.fillStyle = gr; g.fillRect(this.x - 24, this.y - 120, 48, 120);
         g.restore();
       }

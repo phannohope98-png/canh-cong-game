@@ -88,7 +88,6 @@
     document.getElementById('overlay-panel').classList.add('wide');
   };
   const levelCard=UI.levelCard;UI.levelCard=function(i){const out=levelCard.call(this,i),d=scenes[i-12];if(d){const img=document.querySelector('#overlay-panel .lvimg');if(img)img.src=new URL(d.image,base).href;}return out;};
-  const mapUI=UI.renderMap;UI.renderMap=function(){const out=mapUI.call(this),card=document.querySelector('.world-card[data-r="2"]');if(card){card.style.backgroundImage=`url("${new URL(scenes[4].image,base).href}")`;card.style.backgroundSize='cover';card.style.backgroundPosition='center';}return out;};
   const result=UI.showResult;
   UI.showResult=function(r){const out=result.apply(this,arguments),d=scenes[Game.levelIndex-12];if(d)setTimeout(()=>{const rib=document.querySelector('.ribbon');if(rib)rib.insertAdjacentHTML('afterend',`<p class="levelup">${r.win?(Game.levelIndex===17?'Đã giải phong Ngai Trăng. Đoàn tiếp tục sang lãnh địa Người Lùn.':'Đã giữ '+d.name+'. Tiến tới '+scenes[Game.levelIndex-11].name+'.'):'Tuyến '+d.name+' đã bị xuyên thủng. Hãy đổi cách bố trí trụ và điều tướng.'}</p>`);},0);return out;};
   window.Witch79={scenes,load,nearest,routeBetween,version:79};

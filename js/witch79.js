@@ -59,8 +59,6 @@
   Level.renderBackground=function(m,res){if(!m.witch79)return render.call(this,m,res);const a=load(m.witch79),c=document.createElement('canvas');res=Math.min(1.5,Math.max(.7,res||1));c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);const g=c.getContext('2d');g.imageSmoothingQuality='high';if(a.loaded)g.drawImage(a.image,0,0,c.width,c.height);else{g.fillStyle='#302044';g.fillRect(0,0,c.width,c.height);g.fillStyle='#ecd8ff';g.font='16px sans-serif';g.textAlign='center';g.fillText(a.error?'Không tải được map Phù Thủy':'Đang tải Cõi Phù Thủy…',c.width/2,c.height/2);}return c;};
   const plot=Painter.plot;
   Painter.plot=function(g,x,y,on,t){if(!Game.map?.witch79)return plot.apply(this,arguments);g.save();g.strokeStyle=on?'#ffe5ae':'rgba(230,209,255,.65)';g.lineWidth=on?2:1;g.beginPath();g.ellipse(x,y,15,6,0,0,Math.PI*2);g.stroke();g.fillStyle=on?'#fff5ca':'#dac4f2';g.font='bold 15px sans-serif';g.textAlign='center';g.fillText('+',x,y+3);g.restore();};
-  const tower=Painter.tower;
-  Painter.tower=function(g,type,tier,x,y,...args){if(!Game.map?.witch79)return tower.call(this,g,type,tier,x,y,...args);g.save();g.translate(x,y);g.scale(.70,.70);g.translate(-x,-y);try{return tower.call(this,g,type,tier,x,y,...args);}finally{g.restore();}};
   const spotAt=Towers.spotAt;
   Towers.spotAt=function(x,y){if(!Game.map?.witch79)return spotAt.call(this,x,y);let best=null;for(const s of this.spots){const d=Math.hypot(x-s.x,(y-s.y)*1.7);if(d<27&&(!best||d<best.d))best={s,d};}return best?.s||null;};
   const spawn=Enemies.spawn;

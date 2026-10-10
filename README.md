@@ -1,3 +1,14 @@
+# Bản 80 — Sơn Thành Người Lùn
+
+Đã kiểm tra sáu mô phỏng giao tranh 30 giây (2.700 khung vẽ), 36 trụ cấp cuối trên đủ 36 bệ, đường 1/2/3 nhánh và tên/ảnh chiến dịch. Không ghi nhận lỗi trong các bài kiểm tra. Bố cục 667×375 kiểm tra bằng trình duyệt desktop, chưa thử trên điện thoại thật.
+
+Thế giới 4 có sáu nền 2D vẽ tay mới: Cảng Đồng Biên Sơn, Guồng Nước Tuyết Tan, Đèo Ray Quặng, Ba Cầu Thợ Rèn, Sân Thành Mái Vàng và Đại Điện Tim Núi. Đường 1/2/3 nhánh, ô trụ và lối nối bệ theo tọa độ ảnh; di chuyển theo cầu, đèo và đường bộ, tránh cắt qua nước/vách. Trụ và điểm phát đạn cùng tỷ lệ. Giữ nguyên ba thế giới trước và cơ chế chiến đấu.
+
+- [36 PNG tài nguyên riêng + 3 atlas + prompt](assets/dwarf80-design.zip)
+- [6 map PNG + tọa độ đường/ô trụ + prompt](assets/dwarf80-maps.zip)
+
+Ảnh tạo bằng ImageGen tích hợp theo reference người dùng; prompt nằm trong hai ZIP. Nền WebP tải khi cần, giới hạn hai nền trong cache của module; ZIP không được tải khi chơi.
+
 # Canh Cổng
 
 Game fantasy tower-defense 2D trên trình duyệt, dùng Canvas và các bộ ảnh hoạt hình có nền trong suốt.

@@ -191,7 +191,7 @@
   }
 
   /* ---------------- Đường đi ---------------- */
-  function drawRoad(g,map,T,res,rnd){
+  function drawRoad(g,map,T,res,rnd){if(window.KR68&&KR68.road(g,map))return;
     // Paint the union once: intersections have one surface, without doubled seams.
     const PW=CONFIG.pathWidth,theme=map.def.theme,c=mk(map.W,map.H),p=c.getContext('2d'),q={};
     p.fillStyle=T.road;p.lineJoin='round';

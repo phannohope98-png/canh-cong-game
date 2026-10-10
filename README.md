@@ -1,3 +1,12 @@
+# Bản 81 — Hoang Địa Orc
+
+Thế giới 5: sáu nền 2D vẽ tay, đường 1/2/3 nhánh, ô trụ và lối nối theo ảnh. Chặng cuối ở trong Đại Sảnh Huyết Nanh. Giữ nguyên bốn thế giới trước.
+
+- [36 PNG riêng + 3 atlas + prompt](assets/orc81-design.zip)
+- [6 map PNG + tọa độ + prompt](assets/orc81-maps.zip)
+
+ImageGen tích hợp theo reference người dùng; prompt nằm trong ZIP. Runtime WebP tải khi cần, cache hai nền.
+
 # Bản 80 — Sơn Thành Người Lùn
 
 Đã kiểm tra sáu mô phỏng giao tranh 30 giây (2.700 khung vẽ), 36 trụ cấp cuối trên đủ 36 bệ, đường 1/2/3 nhánh và tên/ảnh chiến dịch. Không ghi nhận lỗi trong các bài kiểm tra. Bố cục 667×375 kiểm tra bằng trình duyệt desktop, chưa thử trên điện thoại thật.

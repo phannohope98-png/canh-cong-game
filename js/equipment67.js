@@ -6,6 +6,31 @@
  const roofs=[[[.24,.33],[.53,.13],[.78,.41],[.43,.46]],[[.18,.29],[.5,.11],[.74,.39],[.42,.44]],[[.29,.29],[.56,.10],[.78,.37],[.43,.4]],[[.27,.23],[.53,.09],[.72,.30],[.44,.37]]];
  function palette(it){const race={barracks:'#276ead',archer:'#407e44',mage:'#7654ac',artillery:'#a9672c'}[it.t],rarity=['#9c9983','#c7bdaa','#aad08a','#b2a0df','#e9c366','#82e7df'][it.r];return {race,rarity,metal:it.r===0?'#969b99':it.r===1?'#b2bcae':it.r===2?'#c5ccbd':it.r===3?'#cfbce8':'#e2bd65',ink:'#372d31',dark:'#52545a',wood:'#96653e',myth:it.r===5,rank:it.r};}
  function part(g,it,w,h,time=0,open=0){
+  const sheet=PaintedWorld.sheets[it.r===5?'relics58':'items57'];
+  const frame=sheet?.frames[types.indexOf(it.t)*6+it.s];
+  if(sheet?.loaded&&frame){
+   const scale=Math.min(w/frame.w,h/frame.h),W=frame.w*scale,H=frame.h*scale;
+   g.save();
+   // Preserve the previous hand-painted materials; no floating halo or flat replacement icon.
+   if(it.r<4)g.filter=['saturate(.65)','saturate(.82)','saturate(1.05) hue-rotate(8deg)','saturate(1.08) hue-rotate(-8deg)'][it.r];
+   if(it.t==='barracks'&&it.s===0)g.scale(1,1+Math.sin(time*2)*.025);
+   if(it.t==='archer'&&it.s===0)g.rotate(Math.sin(time*2)*.06);
+   g.drawImage(sheet.img,frame.x,frame.y,frame.w,frame.h,-W/2,-H/2,W,H);
+   if(it.t==='barracks'&&it.s===1&&open>0){
+    // Only the inset leaves move; the stone jambs remain attached to the tower.
+    const left=-W*.24,top=-H*.27,dw=W*.48,dh=H*.62,leaf=dw*.5;
+    g.save();g.beginPath();g.rect(left,top,dw,dh);g.clip();g.fillStyle='#251b17';g.fillRect(left,top,dw,dh);
+    const fold=1-open*.88;
+    for(let side=0;side<2;side++){
+     const sx=frame.x+frame.w*(.26+side*.24),sy=frame.y+frame.h*.23;
+     g.drawImage(sheet.img,sx,sy,frame.w*.24,frame.h*.62,side?left+dw-leaf*fold:left,top,leaf*fold,dh);
+    }g.restore();
+   }
+   g.restore();return;
+  }
+  vectorPart(g,it,w,h,time,open);
+ }
+ function vectorPart(g,it,w,h,time=0,open=0){
   const C=palette(it),s=it.s;g.save();g.scale(w/100,h/100);g.lineJoin='round';g.lineCap='round';
   const grad=(color,light=.28)=>{const a=g.createLinearGradient(-35,-45,30,45);a.addColorStop(0,ArtKit.shade(color,light));a.addColorStop(.5,color);a.addColorStop(1,ArtKit.shade(color,-.3));return a;};
   const fill=(fn,color,stroke=C.ink,lw=3)=>{g.beginPath();fn();g.fillStyle=typeof color==='string'?grad(color):color;g.strokeStyle=stroke;g.lineWidth=lw;g.fill();g.stroke();};
@@ -65,9 +90,19 @@
  function mount(type,tier,s,f){const p=type==='artillery'?bodyMounts[s]:PaintedWorld.mounts[type][tier-1][s],d=dimensions[type][s];return {x:p[0]*f.w,y:p[1]*f.h,w:d[0]*f.w,h:d[1]*f.h};}
  PaintedWorld.drawFitting=function(g,type,tier,it,time,f){
   const a=mount(type,tier,it.s,f);g.save();
-  if(type==='barracks'&&it.s===3){const poly=roofs[tier-1];g.beginPath();poly.forEach(([x,y],i)=>i?g.lineTo(x*f.w,y*f.h):g.moveTo(x*f.w,y*f.h));g.closePath();g.clip();g.translate(poly.reduce((a,p)=>a+p[0],0)*f.w/4,poly.reduce((a,p)=>a+p[1],0)*f.h/4);drawPart(g,it,f.w*.64,f.h*.35,time);g.restore();return;}
+  if(type==='barracks'&&it.s===3){const poly=roofs[tier-1];g.beginPath();poly.forEach(([x,y],i)=>i?g.lineTo(x*f.w,y*f.h):g.moveTo(x*f.w,y*f.h));g.closePath();g.clip();const sh=PaintedWorld.sheets[it.r===5?'relics58':'items57'],v=sh?.frames[3];if(sh?.loaded&&v){const x=Math.min(...poly.map(p=>p[0]))*f.w,y=Math.min(...poly.map(p=>p[1]))*f.h,W=(Math.max(...poly.map(p=>p[0]))-Math.min(...poly.map(p=>p[0])))*f.w,H=(Math.max(...poly.map(p=>p[1]))-Math.min(...poly.map(p=>p[1])))*f.h;g.globalAlpha=.65;g.drawImage(sh.img,v.x+v.w*.25,v.y+v.h*.33,v.w*.5,v.h*.4,x,y,W,H);}g.restore();return;}
   g.translate(a.x,a.y);if(type==='barracks'&&it.s===0)g.translate(a.w*.5,a.h*.5);
   const open=type==='barracks'&&it.s===1&&state?.door>0?Math.sin(Math.min(1,state.door/.95)*Math.PI/2):0;
+  if(type==='barracks'&&it.s===1){
+   const sh=PaintedWorld.sheets[it.r===5?'relics58':'items57'],v=sh?.frames[1];
+   if(sh?.loaded&&v){
+    // Fit the painted gate leaves to the existing arch, without adding another stone doorway.
+    g.beginPath();g.moveTo(-a.w/2,a.h/2);g.lineTo(-a.w/2,-a.h*.22);g.quadraticCurveTo(0,-a.h*.8,a.w/2,-a.h*.22);g.lineTo(a.w/2,a.h/2);g.closePath();g.clip();g.fillStyle='#2b2018';g.fillRect(-a.w/2,-a.h/2,a.w,a.h);
+    const fold=1-open*.88;
+    for(let side=0;side<2;side++)g.drawImage(sh.img,v.x+v.w*(.24+side*.26),v.y+v.h*.13,v.w*.26,v.h*.74,side?a.w/2-a.w*.5*fold:-a.w/2,-a.h/2,a.w*.5*fold,a.h);
+    g.restore();return;
+   }
+  }
   drawPart(g,it,a.w,a.h,time,open);g.restore();
  };
  const tower=Painter.tower;Painter.tower=function(...args){const prev=state;state=args[7];try{return tower.apply(this,args);}finally{state=prev;}};

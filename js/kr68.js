@@ -93,18 +93,19 @@
       if (big.some(pr => Math.abs(pr.x - x) < 90 && pr.y > y - 60 && pr.y < y + 130)) return false;
       return true;
     };
-    const ends = []; for (const p of m.paths) { let a = null, b = null; for (let d = 0; d <= p.length; d += 6) { p.pointAt(d, q); if (q.x >= 0 && q.x <= W && q.y >= 0 && q.y <= H) { if (!a) a = [q.x, q.y]; b = [q.x, q.y]; } } if (a) ends.push(a, b); }
+    const ends = []; for (const p of m.paths) { let a = null, b = null; for (let d = 0; d <= p.length; d += 6) { p.pointAt(d, q); if (q.x >= 0 && q.x <= W && q.y >= 0 && q.y <= H) { if (!a) a = [q.x, q.y]; b = [q.x, q.y]; } } if (a) ends.push([...a, 125], [...b, 125]); }
+    m.paths.forEach((p, i) => { if (m.entry && m.entry[i] !== undefined) { p.pointAt(m.entry[i] - 30, q); ends.push([q.x, q.y, 96]); } });
     const cand = [], seen = new Set();
     for (const p of m.paths) for (let d = 30; d < p.length - 30; d += 8) {
       p.pointAt(d, q); for (const s of [-1, 1]) for (const off of [24, 32, 42, 54, 68]) {
         const x = q.x + q.nx * (PW / 2 + off) * s, y = q.y + q.ny * (PW / 2 + off) * s, key = Math.round(x / 8) + ',' + Math.round(y / 8);
-        if (seen.has(key)) continue; seen.add(key); if (!fits(x, y) || ends.some(e => Math.hypot(e[0] - x, e[1] - y) < 125)) continue;
+        if (seen.has(key)) continue; seen.add(key); if (!fits(x, y) || ends.some(e => Math.hypot(e[0] - x, e[1] - y) < e[2])) continue;
         const cov = []; samples.forEach((v, i) => { const dd = Math.hypot(v[0] - x, v[1] - y); if (dd < 128) cov.push(i); });
         cand.push({ x, y, near: nearRoad(m, x, y), cov });
       }
     }
     const spots = [], covered = new Float32Array(samples.length);
-    for (const [gx, gy] of [[78, 62], [72, 54]]) {
+    for (const [gx, gy] of [[78, 62], [72, 58]]) {
       while (spots.length < want) {
         let best = null, bs = -1e9;
         for (const c of cand) {

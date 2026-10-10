@@ -142,16 +142,16 @@
     }
     drawBar(ctx) {
       if (this.boss || this.hp >= this.maxHp) return;
-      hpBar(ctx, this.x, this.y + this.radius * 0.5 - this.height - 10, Math.max(24, this.radius * 2), this.hp / this.maxHp, '#e8463a');
+      hpBar(ctx, this.x, this.y + this.radius * 0.5 - this.height - 10, Math.max(18, this.radius * 1.6), this.hp / this.maxHp, '#e8463a');
     }
   }
 
   function hpBar(ctx, cx, y, w, r, col) {
-    const x = cx - w / 2, h = 5;
-    ctx.fillStyle = '#1d1220'; ctx.fillRect(x - 1.5, y - 1.5, w + 3, h + 3);
+    const x = cx - w / 2, h = 3;
+    ctx.fillStyle = '#1d1220'; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
     ctx.fillStyle = '#4a1e24'; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = col; ctx.fillRect(x, y, Math.max(0, w * r), h);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(x, y, Math.max(0, w * r), 1.6);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(x, y, Math.max(0, w * r), 1);
   }
 
   const Enemies = {

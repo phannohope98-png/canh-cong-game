@@ -137,7 +137,7 @@
     }
     drawBar(ctx) {
       if (this.state === 'dead' || this.hp >= this.maxHp) return;
-      hpBar(ctx, this.x, this.y + this.radius * 0.5 - (this.isHero ? 62 : 48) * (CONFIG.unitScale || 1), this.isHero ? 30 : 20, this.hp / this.maxHp, '#6ad04a');
+      hpBar(ctx, this.x, this.y + this.radius * 0.5 - (this.isHero ? 58 : 44) * (CONFIG.unitScale || 1), this.isHero ? 20 : 13, this.hp / this.maxHp, '#6ad04a');
     }
   }
 

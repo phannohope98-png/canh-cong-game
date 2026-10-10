@@ -43,7 +43,7 @@
     fire(kind, x, y, target, o) {
       const p = this.pool.pop() || {};
       p.kind = kind; p.sx = p.x = x; p.sy = p.y = y; p.target = target; p.uid = target.uid;
-      p.o = o; p.k = 0; p.age = 0; p.trail = 0;
+      p.o = o; p.k = 0; p.age = 0; p.trail = 0; p.tr = null; // đạn tái dùng: xoá vệt đuôi cũ
       const tx = target.x, ty = target.y - (target.height || 20) * 0.5;
       if (kind === 'bomb') {
         // dự đoán vị trí quái khi đạn rơi

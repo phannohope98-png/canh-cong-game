@@ -8,6 +8,14 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 64 — đường gọn, thêm ô trụ và tỷ lệ đơn vị
+
+Khung map giảm ngang từ 1000 xuống 880, đường rộng 38; đường một lối giảm biên độ uốn, giữ 36 bố cục khác nhau và các nhánh hai/ba lối. Sông, cầu và cổng dùng cùng tọa độ mới. Tăng lên 8–10 ô trụ thực tế mỗi màn; mỗi ô kiểm tra cả vùng trụ cấp cuối với đường và nước, không chỉ điểm chân trụ.
+
+Lính Người cao 34, tướng thường 38 (nhỉnh khoảng 12%), tướng Người Lùn 35. Quái thường dùng khoảng 27–40, quái nặng 43–44 và boss 52 để vẫn phân biệt vai trò nhưng giảm chênh lệch quá lớn. Lính triệu hồi cùng quy chuẩn 32. Kích thước hiển thị tách khỏi chỉ số chiến đấu.
+
+Đã kiểm tra đủ 36 màn có ít nhất 8 ô trụ và khoảng hở đường/nước, tỷ lệ của 10 tướng/31 loại quái, trận mô phỏng 30 giây và khung 667×375. Chưa kiểm tra trên điện thoại thật.
+
 ## Bản 63 — cảnh chiến dịch và mobile
 
 Toàn bộ 36 nền map có thêm gò đất thấp, nét cỏ/hoa theo cụm và mép lối mòn tự nhiên. Mỗi màn có một điểm nhấn ngoài đường giao chiến: trại Người/Orc, vòm rễ Elf, tinh thể Phù Thủy, giàn khai thác Người Lùn và đài Ấn của Liên Minh. Các điểm nhấn tránh đường, nước, trụ và cổng; cây quanh điểm nhấn được gom lại để không chồng kín cảnh. Cảnh tĩnh được vẽ một lần; cache địa hình mới chỉ giữ bốn màn.

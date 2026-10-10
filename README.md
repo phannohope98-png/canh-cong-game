@@ -8,6 +8,10 @@ Năm chủng tộc: Con Người, Elf, Người Lùn, Phù Thủy và Orc. Chi�
 
 Mỗi màn có tọa độ đường đi và bố trí cảnh riêng, gồm một, hai hoặc ba đường. Những màn nhiều đường thường có cửa ra độc lập; màn công thành hội tụ tại ngưỡng cửa cổng. Nền, sông hồ, cụm cây và vật thể được kết hợp theo từng cảnh.
 
+## Bản 72 — khôi phục nét vẽ vật phẩm
+
+Khôi phục bộ hình vật phẩm vẽ tay có vân gỗ, mặt đá, ánh kim và tinh thể từ atlas 57/58. Giữ điểm gắn theo loại/cấp trụ, giới hạn mặt mái và cơ cấu nòng pháo xoay/giật. Cánh cửa gia cố chuyển động trong khung đá cố định. Không thêm vòng hào quang rời. Giữ map cảng và các cập nhật chuyển động của bản 70/71.
+
 ## Bản 71 — vật phẩm kiến trúc mới
 
 Thiết kế lại 24 loại bộ phận trụ ở sáu bậc (144 hình trong kho/bách khoa). Cờ, cửa, phù hiệu, mái, tường và chuông dùng nét kim loại/vải của trụ Người; trụ Elf dùng gỗ, lá, giá cung, bồn nhựa và rễ; trụ phép dùng lõi pha lê, vòng niệm, ống dẫn và bệ rune; pháo dùng kính ngắm, vòng nòng, buồng thuốc, bánh răng, lò và chân chống. Hình trong kho và phần lắp dùng chung bộ vẽ; vị trí và kích thước lấy theo loại và cấp trụ. Mái được giới hạn theo mặt mái; cửa gia cố mở cùng cánh cửa; kính ngắm và vòng nòng theo hướng quay/giật của pháo. Các bậc phân biệt màu vật liệu và trang trí, Thần Tích giữ tên và câu chuyện riêng. Bộ phận tĩnh dùng cache giới hạn 192 ảnh để giảm vẽ lại trong trận.

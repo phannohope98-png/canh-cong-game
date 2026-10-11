@@ -7,6 +7,6 @@
   m.spots=spots;m.decor=MapArt.decor(m.feat,m.paths,spots,m.W,m.H,m.def.theme,i*31+7);return m;
  };
  const create=Hero.create;Hero.create=function(m){const u=create.call(this,m);u.scale=u.heroDef.drawHeight/48;return u;};
- const update=Units.update;Units.update=function(dt){for(const u of this.list)if(u.temp&&!u.isHero)u.scale=32/48;return update.call(this,dt);};
+ const update=Units.update;Units.update=function(dt){for(const u of this.list)if(u.temp&&!u.isHero)u.scale=26/48;return update.call(this,dt);};
  window.Board64={width:880,footprint:{halfWidth:35,height:68},version:64};
 })();

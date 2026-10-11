@@ -16,8 +16,8 @@
  window.Actors83={ready:Promise.all(ready),version:83};
  // Environment motion is composited at 24 fps; fighters and projectiles keep the main frame rate.
  const water=WaterFx.draw;let scene=null;
- WaterFx.draw=function(g,t){if(!Game.mobile63)return water.apply(this,arguments);const m=Game.map;if(!m)return;const res=1.5;
-  if(!scene||scene.map!==m||scene.bg!==Game.bg){const c=document.createElement('canvas');c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);scene={map:m,bg:Game.bg,c,last:-1};}
+ WaterFx.draw=function(g,t){if(!Game.mobile63)return water.apply(this,arguments);const m=Game.map;if(!m)return;const res=Math.min(2.5,Math.max(1.5,(Camera.zoom||1)*(Game.dpr||1)));
+  if(!scene||scene.map!==m||scene.bg!==Game.bg||scene.res!==res){const c=document.createElement('canvas');c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);scene={map:m,bg:Game.bg,res,c,last:-1};}
   if(t<scene.last||t-scene.last>=1/24||scene.last<0){const q=scene.c.getContext('2d');q.clearRect(0,0,scene.c.width,scene.c.height);q.save();q.scale(res,res);water.call(this,q,t);q.restore();scene.last=t;}
   g.drawImage(scene.c,0,0,m.W,m.H);
  };

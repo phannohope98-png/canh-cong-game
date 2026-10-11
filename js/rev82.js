@@ -67,7 +67,7 @@
   Unit.prototype.drawBar = function (g) {
     if (this.state === 'dead' || this.hp >= this.maxHp) return;
     const s = CONFIG.unitScale || 1;
-    bar(g, this.x, this.y + this.radius * .5 - (this.isHero ? 50 : 36) * s, this.isHero ? 15 : 9, this.hp / this.maxHp, this.isHero ? '#ffd24a' : '#6ad04a', 0);
+    bar(g, this.x, this.y + this.radius * .5 - (48 * this.scale + 5) * s, this.isHero ? 15 : 9, this.hp / this.maxHp, this.isHero ? '#ffd24a' : '#6ad04a', 0);
   };
 
   /* ===== 7. Cân bằng sát thương trụ =====

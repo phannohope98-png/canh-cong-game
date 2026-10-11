@@ -20,7 +20,7 @@
   const cw=Math.round(r.width*this.dpr),ch=Math.round(r.height*this.dpr);if(this.canvas.width!==cw||this.canvas.height!==ch){this.canvas.width=cw;this.canvas.height=ch;}
   this.canvas.style.width=r.width+'px';this.canvas.style.height=r.height+'px';this.ctx.imageSmoothingEnabled=true;this.ctx.imageSmoothingQuality='high';Painter.ppuCap=4;
  };
- Game.renderBg=function(){if(this.map)this.bg=Level.renderBackground(this.map,Math.min(2.25,Math.max(1.25,Camera.zoom*this.dpr)));};
+ Game.renderBg=function(){if(this.map)this.bg=Level.renderBackground(this.map,Math.min(2.75,Math.max(1.25,Camera.zoom*this.dpr)));};
  Game.perfWatch=function(){/* Keep pixels crisp; scene extras use a bounded budget instead. */};
  Game.resize=function(){if(!this.map||this.state==='idle'||this.wrap.getBoundingClientRect().width<2)return;this.measure();Camera.resize(this.viewW,this.viewH);this.renderBg();this.pointers.clear();this.gesture=null;Camera.vx=Camera.vy=0;UI.closeRing();this.render();if(UI.hud)UI.tick();};
  let raf=0;
@@ -42,7 +42,7 @@
  ArtStylized.draw=function(g,id,P,h){const k=id.replace(/^crew-/,'');return figure.call(this,g,id,P,onTower&&['elf','mage','dwarf'].includes(k)?h*(k==='dwarf'?1.45:1.65):h);};
  const buildTower=Towers.build;
  Towers.build=function(){const t=buildTower.apply(this,arguments);if(!t)return t;const muzzle=t.muzzle;
-  t.muzzle=function(){const q=muzzle.call(this),m=Game.map,painted=m&&(m.human83||m.elf78||m.witch79||m.dwarf80||m.orc81),k=painted?Alive81.towerScale(m):1,off=painted?(Alive81.RING[Game.levelIndex]||45)*.12:0;return{x:this.x+(q.x-this.x)*k,y:this.y+off+(q.y-this.y)*k};};return t;
+  t.muzzle=function(){const q=muzzle.call(this),m=Game.map,painted=m&&(m.alliance84||m.human83||m.elf78||m.witch79||m.dwarf80||m.orc81),k=painted?Alive81.towerScale(m):1,off=painted?(Alive81.RING[Game.levelIndex]||45)*.12:0;return{x:this.x+(q.x-this.x)*k,y:this.y+off+(q.y-this.y)*k};};return t;
  };
  // Full viewport colour under the undistorted fitted board; no black bars or clipped routes.
  const render=Game.render;

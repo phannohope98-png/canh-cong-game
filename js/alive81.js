@@ -10,10 +10,10 @@
 
   /* ---------- cỡ trụ: chân trụ phủ kín vòng đá vẽ sẵn ---------- */
   // bề ngang vòng (đơn vị game) đo trên từng ảnh nền, theo chỉ số màn; chân trụ trung bình ở tỉ lệ 1 rộng ~66
-  const RING = { 0:55,1:55,2:55,3:55,4:55,5:65, 6: 53, 7: 53, 8: 60, 9: 63, 10: 67, 11: 63, 12: 57, 13: 60, 14: 60, 15: 57, 16: 77, 17: 90, 18: 57, 19: 63, 20: 50, 21: 50, 22: 50, 23: 73, 24: 55, 25: 55, 26: 55, 27: 57, 28: 55, 29: 60 };
-  const painted = m => !!(m && (m.human83 || m.elf78 || m.witch79 || m.dwarf80 || m.orc81));
+  const RING = { 0:55,1:55,2:55,3:55,4:55,5:65, 6: 53, 7: 53, 8: 60, 9: 63, 10: 67, 11: 63, 12: 57, 13: 60, 14: 60, 15: 57, 16: 77, 17: 90, 18: 57, 19: 63, 20: 50, 21: 50, 22: 50, 23: 73, 24: 55, 25: 55, 26: 55, 27: 57, 28: 55, 29: 60,30:50,31:50,32:50,33:40,34:44,35:44 };
+  const painted = m => !!(m && (m.alliance84 || m.human83 || m.elf78 || m.witch79 || m.dwarf80 || m.orc81));
   const ringOf = m => painted(m) ? (RING[Game.levelIndex] || 56) : 0;
-  const towerScale = m => { const r = ringOf(m); return r ? Math.max(.78, Math.min(1.3, r / 66)) : 1; };
+  const towerScale = m => { const r = ringOf(m); return r ? Math.max(.65, Math.min(1.08, r / 66)) : 1; };
   function patchTower(T) {
     const P = Object.getPrototypeOf(T); if (P.__alive81) return; P.__alive81 = true;
     const draw = P.draw;
@@ -320,7 +320,7 @@
     const m = Game.map, bg = Game.bg; if (!m || !bg) return null;
     if (S && S.map === m && S.bg === bg) return S.broken ? null : S;
     if (job && job.map === m && job.bg === bg) return null;
-    const d = m.human83 || m.elf78 || m.witch79 || m.dwarf80 || m.orc81;
+    const d = m.alliance84 || m.human83 || m.elf78 || m.witch79 || m.dwarf80 || m.orc81;
     if (d && !d.__ready81) { // ảnh vẽ tay chưa tải xong thì nền đang là chữ "Đang tải…": chờ nền thật
       const L = m.elf78 && window.Elf78 ? Elf78.load(d) : null; if (L && !L.loaded) return null;
       if (!L && bg.width < 50) return null;

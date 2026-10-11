@@ -1,3 +1,13 @@
+# Bản 84 — Chiến Tuyến Liên Minh
+
+Sáu nền HD riêng cho màn 31–36: cờ trận gãy, hai cầu, trại cháy, ba lỗ thủng, thành vỡ và tâm khe nứt. Các tuyến 1/2/1/3/2/3 hướng theo từng ảnh, ô trụ và đường nối bệ lấy từ tọa độ ảnh gốc. Boss cuối Chúa Tể Hư Không xuất hiện từ đài trung tâm ở đợt cuối màn 36.
+
+Quái bay dùng đồng hồ đập cánh độc lập với bước chân. Imp, Drake và Wraith có bộ ảnh mới; Harpy giữ sáu tư thế cánh. Trụ theo bệ; tướng/lính/viện binh được căn lại cho map 608. Dân cư dùng điểm đặt riêng trên sàn cây, bờ nước, ruộng và xưởng. Tăng độ phân giải nền, giữ ngân sách canvas cho mobile và xử lý đổi chiều màn hình.
+
+[Map PNG, chi tiết và tọa độ](assets/map-va-chi-tiet-84.zip) · [Quái bay và dân cư PNG](assets/quai-bay-va-dan-cu-84.zip) · [Hướng dẫn bản 84](README-84.md).
+
+Đã kiểm tra gọi quái ở 36 màn, chuyển động của 50 loại quái, sáu tư thế của năm quái bay, boss màn cuối, bố trí trụ cấp cuối trên sáu map và xoay dọc/ngang ở tám kích thước với DPR 3. Không ghi nhận lỗi trong các bài kiểm tra. Chưa đo FPS trên điện thoại thật.
+
 # Bản 83 — Hình rõ, map gọn và hoạt ảnh đúng khung
 
 Sáu nền Vương Quốc Người mới theo ảnh gốc, kết thúc trong Đại Điện Bình Minh. Đường và ô trụ được dò trên từng ảnh; toàn chiến dịch thu ngang còn 608 để tuyến ngắn hơn và đơn vị dễ đọc hơn trên điện thoại.

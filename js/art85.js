@@ -1,7 +1,7 @@
 ﻿/* Complete registered painted figures. No limb slicing or uniform walking for airborne creatures. */
 (function(){
  const root=new URL('../assets/sprites/',document.currentScript.src),entries=new Map(),promises=[];
- for(const [id,d]of Object.entries(ART85)){const img=new Image(),e={...d,img};entries.set(id,e);promises.push(new Promise((ok,no)=>{img.onload=()=>{e.loaded=true;ok();};img.onerror=()=>no(new Error('Không tải được '+d.file));}));img.src=new URL(d.file,root).href;}
+ for(const [id,d]of Object.entries(ART85)){const img=new Image(),e={...d,img};entries.set(id,e);promises.push(new Promise((ok,no)=>{img.onload=()=>{e.loaded=true;ok();};img.onerror=()=>no(new Error('Không tải được '+d.file));}));const url=new URL(d.file,root);url.searchParams.set('v','85-mobile1');img.src=url.href;}
  const alias={};
  const original=ArtStylized.draw;
  function identify(k){return k.replace(/_a\d$|_[bfs]$/,'').replace(/^h_/,'');}

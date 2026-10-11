@@ -1,12 +1,12 @@
 (async function(){
   'use strict';
   const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),canvas=$('view'),g=canvas.getContext('2d');
-  await ArtStylized.ready; if(window.Flight84)await Flight84.ready;
+  await ArtStylized.ready; if(window.Flight84)await Flight84.ready;if(window.Art85)await Art85.ready;
   const aliases={wolfRider:'warg',shade:'wraith',pharaoh:'mummy',treantKing:'treant',magmaLord:'magmaGolem',darkKnight:'deathKnight',darkLord:'deathKnight'};
   const list=Object.entries({...CONFIG.heroes,...CONFIG.enemies,soldier:{name:'Lính kiếm'},elf:{name:'Cung thủ'},mage:{name:'Pháp sư'},dwarf:{name:'Pháo thủ'}}).filter(([id])=>ArtStylized.kind(id)).map(([id,d])=>({id,name:d.name,palette:[]}));
   let current=list.find(d=>d.id===q.get('c'))||list[0],tier=+q.get('t')||4,mode='idle',face=1,time=0,speed=1,small=false;
   const modes={idle:'Đứng',walk:'Đi',atk:'Đánh',skill:'Kỹ năng',die:'Ngã'};
-  function pose(t){return {t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
+  function pose(t){return {_actor:{heroSupport85:mode==='skill'&&['ilyen','maera'].includes(current.id)?1:0,rolling85:mode==='skill'&&current.id==='shardback'},t,w:mode==='walk'?(t*.95)%1:-1,a:mode==='atk'||mode==='skill'?(t*.75)%1:-1,...(mode==='die'?{d:(t*.6)%1}:{})};}
   function picture(id,w,h,phase,dir){const c=document.createElement('canvas');c.width=w;c.height=h;const p=c.getContext('2d');p.translate(w/2,h*.88);p.scale(dir||1,1);ArtStylized.draw(p,id,phase,Math.min(h*.74,w*.40));return c;}
   function download(c,name){c.toBlob(blob=>{if(!blob)return;const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});}
   function select(d){current=d;time=0;$('np-name').textContent=$('sh-name').textContent=d.name;$('np-role').textContent='Nhân vật 2D stylized';$('sh-badge').textContent='Fantasy tower-defense · 2D stylized';$('sh-desc').textContent=d.id==='pharaoh'?'Pharaoh chiến đấu: băng vải ngà, giáp vàng–lam, mắt xanh và kiếm cong. Nét vẽ có khối, với các tư thế bước đi và chém kiếm nối thành hoạt ảnh.':'Sprite vẽ có khối và chất liệu riêng. Bộ đứng, di chuyển và tấn công dùng cùng renderer với nhân vật trong trận.';

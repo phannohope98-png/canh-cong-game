@@ -1,0 +1,16 @@
+/* Crisp 2D panels and controls, both phone orientations. */
+html,body{width:100%;height:100%;height:100dvh;min-height:0}
+#app{width:100%;height:100%;height:100dvh}
+#rotate{display:none!important}
+.overlay.hidden{display:none!important;pointer-events:none}
+.overlay:not(.hidden){backdrop-filter:none;-webkit-backdrop-filter:none}
+#game-wrap,#game-canvas{touch-action:none}
+#game-canvas{image-rendering:auto;display:block}
+.wave-btn.wave83{left:auto!important;top:calc(64px + var(--st))!important;right:calc(14px + var(--sr));width:46px;height:46px;margin:0;border:2px solid #513225;box-shadow:0 2px 0 #513225;background:linear-gradient(#ecad68,#ad563c);animation:none}
+.wave83 span>.ico{width:24px;height:24px}.wave83 b{font:800 11px var(--ui);white-space:nowrap;top:calc(100% + 5px)}
+.wave83:disabled{opacity:.55}
+.gbtn{border:2px solid #513925;box-shadow:0 2px 0 #38271f,inset 0 1px 0 #ffe8b1;border-radius:10px;background:linear-gradient(#d9ab6a,#a8753f);text-shadow:0 1px #513925}
+.gbtn.green{background:linear-gradient(#809b56,#466b3c)}.gbtn.gray{background:linear-gradient(#8b9080,#535d53)}
+.card,.panel,#overlay-panel{border-color:#775637;background:linear-gradient(145deg,#f4dfaf,#dac18d);color:#3e3026;box-shadow:0 3px 0 #38271f}
+button:focus-visible{outline:3px solid #ffe9a7;outline-offset:3px}
+@media(orientation:portrait){.battle55 .hud-tl{gap:4px}.battle55 .hud-tl .pill{font-size:15px;padding:0 6px}.battle55 .hud-tr{top:calc(49px + var(--st))}.wave-btn.wave83{top:calc(103px + var(--st))!important}.battle55 .hero-dock{gap:5px;bottom:calc(18px + var(--sb))}.battle55 #hero-commands{gap:4px}.battle55 #hero-joystick{bottom:calc(82px + var(--sb))}.chapter-route{grid-template-columns:repeat(2,minmax(0,1fr))}}

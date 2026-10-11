@@ -1,3 +1,24 @@
+# Bản 83 — Hình rõ, map gọn và hoạt ảnh đúng khung
+
+Sáu nền Vương Quốc Người mới theo ảnh gốc, kết thúc trong Đại Điện Bình Minh. Đường và ô trụ được dò trên từng ảnh; toàn chiến dịch thu ngang còn 608 để tuyến ngắn hơn và đơn vị dễ đọc hơn trên điện thoại.
+
+Sửa lỗi gọi quái sau reset HUD, lớp hộp thoại gây mờ/chặn thao tác, cập nhật canvas khi xoay máy. Tăng người trên trụ theo điểm chân; căn điểm phát đạn cùng tỷ lệ trụ. Mũi tên có thân gỗ, đầu kim loại và lông đuôi.
+
+Hoạt ảnh sói dùng đủ 12 khung theo đúng atlas. Orc cung kéo dây cung thật; Hắc Điểu Tro mới có sáu tư thế cánh. Orc Đánh Trống và Yêu Tinh Thuốc Nổ có hình riêng. Elf, Người Lùn và Phù Thủy có 12 hoạt động dân cư, 48 khung trong suốt. Môi trường trên mobile dựng lớp riêng 24 lần/giây; chiến đấu vẫn chạy vòng chính.
+
+Đã kiểm tra nút gọi quái ở 36 màn, 50 loại quái, tám lượt đổi kích thước dọc/ngang và 68 bộ xuất nhân vật không thiếu/cắt mép. Đây là kiểm tra trình duyệt mô phỏng kích thước điện thoại, chưa phải kiểm tra trên điện thoại thật.
+
+File thiết kế tải về (PNG, khung, tọa độ và prompt):
+
+- [sau-map-vuong-quoc-nguoi-83.zip](assets/sau-map-vuong-quoc-nguoi-83.zip)
+- [dan-cu-hoat-anh-83.zip](assets/dan-cu-hoat-anh-83.zip)
+- [quai-moi-83.zip](assets/quai-moi-83.zip)
+- [nhan-vat-heroes-83.zip](assets/nhan-vat-heroes-83.zip)
+- [nhan-vat-troops-83.zip](assets/nhan-vat-troops-83.zip)
+- [nhan-vat-enemies-83-1.zip](assets/nhan-vat-enemies-83-1.zip)
+- [nhan-vat-enemies-83-2.zip](assets/nhan-vat-enemies-83-2.zip)
+- [nhan-vat-enemies-83-3.zip](assets/nhan-vat-enemies-83-3.zip)
+
 # Bản 81 — Hoang Địa Orc
 
 Thế giới 5: sáu nền 2D vẽ tay, đường 1/2/3 nhánh, ô trụ và lối nối theo ảnh. Chặng cuối ở trong Đại Sảnh Huyết Nanh. Giữ nguyên bốn thế giới trước.
@@ -134,3 +155,13 @@ Mười tướng thuộc năm tộc, có kỹ năng chính/phụ và nhánh tài
 Chạy máy chủ HTTP tại thư mục repository, mở `index.html`. Xưởng 2D ở `design/nhan-vat-3d.html`; tên đường dẫn được giữ để tương thích.
 
 Bản 59 đã kiểm tra cú pháp, tài nguyên, bố cục và vùng đặt trụ của 36 màn, 20 lần dùng kỹ năng thực tế, vị trí phát đạn pháo, chuyển động lính và một trận hai đường. Đã kiểm tra giao diện 844×390 trên trình duyệt desktop; đây không phải xác nhận tương thích mọi điện thoại hoặc hoàn thành toàn bộ chiến dịch.
+
+
+## Mobile art upgrade 83
+Six new Human-realm painted backgrounds share the original blue-and-white coastal kingdom design. Each route and construction pad is traced from its own image; route counts are 1, 2, 1, 3, 2, 2. Runtime board width is 608, reducing legacy route distances by 20% and increasing relative unit readability without stretching the art.
+
+Native-density canvas rendering retains crisp pixels with a 3.2-million-pixel budget, resizes safely after orientation changes, and does not force landscape. The wave button recreates its DOM after HUD resets. Hidden overlays now stop drawing and stop intercepting taps.
+
+Orc archers draw a real bow; a new flying Ash Harpy, War Drummer and Powder Goblin have authored pose atlases. Twelve-frame wolf movement now follows its actual atlas registration rather than the old six-frame row assumption. Elf, dwarf and witch inhabitants have twelve four-frame occupation loops; sheets load on demand. Environment extras composite at 24 fps on compact screens while combat remains at the main frame rate. Tower crew scale and transformed projectile origins stay tied to tower platform coordinates.
+
+Design downloads are in assets: six Human maps, civilian occupation sprites, new enemies, and 68 current game-character exports with transparent PNG frames and common pivot manifests. Character exports preserve current art; they are not new directional designs. Real-device performance varies; verification uses browser phone-size and density simulations.

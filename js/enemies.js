@@ -61,6 +61,7 @@
       if (this.dots) { // độc / cháy từ vật phẩm trụ
         for (const k in this.dots) { const d = this.dots[k]; if (d.t <= 0) continue; d.t -= dt; d.acc += d.dps * dt; if (d.acc >= 1) { const n = Math.floor(d.acc); d.acc -= n; Combat.hitEnemy(this, n, 'true'); if (!this.alive) return; } }
       }
+      if(window.Monster85 && Monster85.update(this,dt))return;
       if(this.stunT>0){this.stunT-=dt;this.state='idle';this.atk=-1;this.meleeImpact=null;this.bowTarget83=null;return;}
       if (this.atk >= 0) { const prev=this.atk;this.atk += dt / 0.5;
         if(prev<2/3&&this.atk>=2/3&&this.bowTarget83){const u=this.bowTarget83;this.bowTarget83=null;if(u.active&&Math.hypot(u.x-this.x,u.y-this.y)<=this.def.ranged*1.1)Combat.fire('enemyArrow',this.x+this.face*this.height*.28,this.y-this.height*.55,u,{damage:this.def.damage});}

@@ -13,7 +13,7 @@
   const RING = { 0:55,1:55,2:55,3:55,4:55,5:65, 6: 53, 7: 53, 8: 60, 9: 63, 10: 67, 11: 63, 12: 57, 13: 60, 14: 60, 15: 57, 16: 77, 17: 90, 18: 57, 19: 63, 20: 50, 21: 50, 22: 50, 23: 73, 24: 55, 25: 55, 26: 55, 27: 57, 28: 55, 29: 60,30:50,31:50,32:50,33:40,34:44,35:44 };
   const painted = m => !!(m && (m.alliance84 || m.human83 || m.elf78 || m.witch79 || m.dwarf80 || m.orc81));
   const ringOf = m => painted(m) ? (RING[Game.levelIndex] || 56) : 0;
-  const towerScale = m => { const r = ringOf(m); return r ? Math.max(.65, Math.min(1.08, r / 66)) : 1; };
+  const towerScale = m => { const r = ringOf(m); return r ? Math.max(.45, Math.min(1.08, r / 66)) : 1; };
   function patchTower(T) {
     const P = Object.getPrototypeOf(T); if (P.__alive81) return; P.__alive81 = true;
     const draw = P.draw;

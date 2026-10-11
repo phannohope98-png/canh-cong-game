@@ -1,7 +1,7 @@
 /* Compact-map scale contract; final boss owns the central breach. */
 (function(){
  'use strict';
- [50,50,50,40,44,44].forEach((r,i)=>Alive81.RING[30+i]=r);
+ [52,46,50,35,44,39].forEach((r,i)=>Alive81.RING[30+i]=r);
  for(const [id,h] of Object.entries(CONFIG.heroes))h.drawHeight=(h.race==='dwarf'||id==='borin'||id==='haldren')?29:32;
  for(const d of Object.values(CONFIG.enemies)){const h=d.drawHeight||32;d.drawHeight=d.boss?Math.min(56,h*.86):h>40?Math.min(44,h*.84):Math.min(34,h);}
  CONFIG.enemies.imp.drawHeight=26;CONFIG.enemies.drake.drawHeight=34;CONFIG.enemies.wraith.drawHeight=28;if(CONFIG.enemies.crystalWraith)CONFIG.enemies.crystalWraith.drawHeight=28;

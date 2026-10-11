@@ -61,8 +61,9 @@
       if (this.dots) { // độc / cháy từ vật phẩm trụ
         for (const k in this.dots) { const d = this.dots[k]; if (d.t <= 0) continue; d.t -= dt; d.acc += d.dps * dt; if (d.acc >= 1) { const n = Math.floor(d.acc); d.acc -= n; Combat.hitEnemy(this, n, 'true'); if (!this.alive) return; } }
       }
-      if(this.stunT>0){this.stunT-=dt;this.state='idle';this.atk=-1;this.meleeImpact=null;return;}
+      if(this.stunT>0){this.stunT-=dt;this.state='idle';this.atk=-1;this.meleeImpact=null;this.bowTarget83=null;return;}
       if (this.atk >= 0) { const prev=this.atk;this.atk += dt / 0.5;
+        if(prev<2/3&&this.atk>=2/3&&this.bowTarget83){const u=this.bowTarget83;this.bowTarget83=null;if(u.active&&Math.hypot(u.x-this.x,u.y-this.y)<=this.def.ranged*1.1)Combat.fire('enemyArrow',this.x+this.face*this.height*.28,this.y-this.height*.55,u,{damage:this.def.damage});}
         if(prev<.5&&this.atk>=.5&&this.meleeImpact){const hit=this.meleeImpact,u=hit.target;this.meleeImpact=null;
           if(u?.active&&Math.hypot(u.x-this.x,u.y-this.y)<this.radius+u.radius+10){
             Combat.hitUnit(u,hit.charged?this.def.damage.map(v=>v*2):this.def.damage);
@@ -70,7 +71,7 @@
             if(hit.charged){Effects.comic(u.x,u.y-40,'HÚC!','#ff9a3a',true);Effects.shake(3,.15);}
           }
         }
-        if (this.atk >= 1) {this.atk = -1;this.meleeImpact=null;}
+        if (this.atk >= 1) {this.atk = -1;this.meleeImpact=null;this.bowTarget83=null;}
       }
       this.cd -= dt;
       if (this.slowT > 0) { this.slowT -= dt; if (this.slowT <= 0) this.slowMul = 1; }
@@ -114,7 +115,7 @@
         if (this.shootCd <= 0) {
           let best = null, bd = this.def.ranged;
           for (const u of Units.list) { if (!u.active) continue; const d = Math.hypot(u.x - this.x, u.y - this.y); if (d < bd) { bd = d; best = u; } }
-          if (best) { this.shootCd = this.def.rate * 1.4; this.atk = 0; Combat.fire('enemyArrow', this.x, this.y - this.height * 0.6, best, { damage: this.def.damage }); }
+          if (best) { this.shootCd = this.def.rate * 1.4; this.atk = 0;this.bowTarget83=best;this.face=best.x>=this.x?1:-1; }
           else this.shootCd = 0.3;
         }
       }

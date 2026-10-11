@@ -4,7 +4,7 @@
  CONFIG.enemies.ashHarpy={...CONFIG.enemies.imp,name:'Hắc Điểu Tro',desc:'Quái bay vượt lính chặn; cung và phép có thể bắn hạ.',hp:190,speed:52,reward:12,radius:11,drawHeight:32,flying:true,armor:.08,mres:.15,art:'ashHarpy'};
  for(const [key,d] of Object.entries(ACTORS83)){
   const img=new Image(),e={id:key+'83',img,loaded:false,cols:6,rows:3,registration:d.registration};
-  e.ready=new Promise(resolve=>{img.onload=()=>{e.loaded=true;Painter.clear();window.PaintedMotion?.clear();resolve(e);};img.onerror=()=>{console.error('Enemy atlas missing',key);resolve(e);};});ready.push(e.ready);img.src=new URL(d.file,root).href;ArtStylized.atlases.set(key,e);ArtStylized.atlases.delete(key+'-walk');
+  e.ready=new Promise(resolve=>{img.onload=()=>{e.loaded=true;Painter.clear();window.PaintedMotion?.clear();resolve(e);};img.onerror=()=>{console.error('Enemy atlas missing',key);resolve(e);};});ready.push(e.ready);img.src=new URL(d.file+'?v=83.2',root).href;ArtStylized.atlases.set(key,e);ArtStylized.atlases.delete(key+'-walk');
   const base=ArtChars[key]||ArtChars.imp||ArtChars.orc;
   ArtChars[key]={...base,tall:48,dr:12,box:[192,120,100,100],chibi:true,__3d:false,draw(g,P){if(key==='ashHarpy')return ArtStylized.draw(g,key,{...P,a:-1,w:((P.t||0)*.8)%1},48);return ArtStylized.draw(g,key,P,48);}};
   for(const suffix of ['_b','_f','_s',...Array.from({length:8},(_,i)=>'_a'+i)])ArtChars[key+suffix]=ArtChars[key];

@@ -31,8 +31,8 @@
     }
     get stats() {
       const lv = this.def.levels[this.level - 1], M = Items.mods(this.type);
-      const dm = (1 + M.damage), rm = (1 + M.range), am = (1 + M.aoe);
-      return { damage: lv.damage ? [lv.damage[0] * dm, lv.damage[1] * dm] : null, range: (lv.range || 0) * rm, rate: (lv.rate || 1) / (1 + M.rate), aoe: (lv.aoe || 0) * am, special: null,
+      const dm = (1 + M.damage), rm = Math.min(1.15, 1 + M.range), am = (1 + M.aoe);
+      return { damage: lv.damage ? [lv.damage[0] * dm, lv.damage[1] * dm] : null, range: (lv.range || 0) * rm, rate: (lv.rate || 1) / (1 + M.rate), aoe: this.type === 'mage' ? 0 : (lv.aoe || 0) * am, special: null,
         crit: M.crit, poison: M.poison, root: M.root, slow: M.slow, pen: M.pen, burn: M.burn, stun: M.stun };
     }
     get nextCost() { return this.level >= 4 ? null : this.def.cost[this.level]; }
@@ -80,7 +80,17 @@
       AudioSys.play('arrow');
     }
     release() {
-      const t = this.pending, st = this.stats; if (!t || !t.alive) return;
+      const t = this.pending, st = this.stats;
+      if (this.type === 'mage') {
+        const targets = Enemies.list.filter(e => e.alive && (this.def.targetsAir || !e.flying) && this.inRange(e));
+        targets.sort((a,b) => this.tmode === 1 ? b.hp-a.hp : this.tmode === 2 ? Math.hypot(a.x-this.x,a.y-this.y)-Math.hypot(b.x-this.x,b.y-this.y) : b.dist-a.dist);
+        if (targets.includes(t)) { targets.splice(targets.indexOf(t),1); targets.unshift(t); }
+        const selected=targets.slice(0,2);if(!selected.length)return;
+        const muzzle=this.muzzle();this.shots++;
+        for(const enemy of selected) Combat.fire('bolt',muzzle.x,muzzle.y,enemy,{damage:st.damage,type:'magic',aoe:0,pen:st.pen,slow:st.slow,twinBeam:true});
+        AudioSys.play('magic');return;
+      }
+      if (!t || !t.alive || !this.inRange(t)) return;
       const m = this.muzzle();
       if (this.type === 'archer') {
         this.shots++;

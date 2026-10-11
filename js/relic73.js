@@ -180,7 +180,7 @@
   function patchTower(T) {
     const P = Object.getPrototypeOf(T); if (P.__relic73) return; P.__relic73 = true;
     const desc = Object.getOwnPropertyDescriptor(P, 'stats');
-    Object.defineProperty(P, 'stats', { configurable: true, get() { const st = desc.get.call(this), G = globals(); if (st.damage) st.damage = [st.damage[0] * (1 + G.gDmg), st.damage[1] * (1 + G.gDmg)]; st.range *= 1 + G.gRange; st.rate /= 1 + G.gRate; st.pow = pow(this.type); return st; } });
+    Object.defineProperty(P, 'stats', { configurable: true, get() { const st = desc.get.call(this), G = globals(); if (st.damage) st.damage = [st.damage[0] * (1 + G.gDmg), st.damage[1] * (1 + G.gDmg)]; st.range = Math.min(st.range * (1 + G.gRange), (this.def.levels[this.level-1].range || 0) * 1.15); st.rate /= 1 + G.gRate; st.pow = pow(this.type); return st; } });
     const release = P.release;
     P.release = function () {
       firing = this.type; try { release.apply(this, arguments); } finally { firing = null; }
@@ -226,7 +226,7 @@
   Combat.fire = function (kind, x, y, target, o) {
     if (firing && o) { o.src = firing; const p = pow(firing);
       if (firing === 'archer' && o.pierce && p.critX) o.damage = [o.damage[0] / 2 * p.critX, o.damage[1] / 2 * p.critX];
-      if (firing === 'mage' && p.chain) o.chain = true;
+      if (firing === 'mage' && p.chain && !o.twinBeam) o.chain = true;
       if (firing === 'artillery' && p.cluster && !o.twin) o.cluster = true; }
     return fire.apply(this, arguments);
   };

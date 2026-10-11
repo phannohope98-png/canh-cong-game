@@ -63,7 +63,7 @@
         const arc = p.kind === 'bomb' ? 160 : p.kind === 'bolt' ? 0 : Math.hypot(p.tx - p.sx, p.ty - p.sy) * 0.22;
         const nx = p.sx + (p.tx - p.sx) * p.k, ny = p.sy + (p.ty - p.sy) * p.k - arc * 4 * p.k * (1 - p.k);
         p.angle = Math.atan2(ny - p.y, nx - p.x); p.x = nx; p.y = ny;
-        if (p.kind === 'bolt' || p.kind === 'bomb') {
+        if ((p.kind === 'bolt' || p.kind === 'bomb') && !p.o.twinBeam) {
           p.trail -= dt;
           if (p.trail <= 0) { p.trail = 0.09; Effects.particle(p.x, p.y, (Math.random() - 0.5) * 20, -20, 0.35, p.kind === 'bolt' ? (p.o.slow ? '#ffffff' : Math.random() < 0.5 ? '#a8d8ff' : '#e0c8ff') : p.o.burn ? (Math.random() < 0.5 ? '#ffb02a' : '#ff5a1a') : '#c8c0b8', p.kind === 'bolt' ? 5 : 6); }
         }
@@ -125,6 +125,10 @@
           K.flat(ctx, [4, -3, 11, 0, 4, 3], '#eef3f8');
           K.flat(ctx, [-12, 0, -16, -3.6, -9, -0.8], p.kind === 'enemyArrow' ? '#3a2a2a' : '#6ad06a'); K.flat(ctx, [-12, 0, -16, 3.6, -9, 0.8], p.kind === 'enemyArrow' ? '#2a1a1a' : '#4ab04a');
           ctx.restore();
+         } else if (p.kind === 'bolt' && p.o.twinBeam) {
+          ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.lineCap='round';
+          ctx.strokeStyle=p.o.slow?'#b5f3ff':'#b9a3ef';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-13,0);ctx.lineTo(2,0);ctx.stroke();
+          ctx.strokeStyle='#f6edff';ctx.lineWidth=1;ctx.stroke();K.dot(ctx,1,0,1.7,'#ffffff');ctx.restore();
         } else if (p.kind === 'bolt') {
           const bc = p.o.slow ? '#e8fbff' : p.o.pen ? '#c890ff' : '#9fdcff'; // Bùa Băng: vệt băng trắng · Nhẫn Hư Không: vệt tím
           trail(ctx, tr, bc, p.o.slow || p.o.pen ? 9 : 7, 0.8);

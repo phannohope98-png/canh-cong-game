@@ -4,11 +4,11 @@
  const cast=Hero.cast;Hero.cast=function(u,slot=0,point){if(!['ilyen','maera'].includes(u?.heroId))return cast.apply(this,arguments);
   if(!u.active||u.state==='dead'||slot&&u.level<10||u.commandCd[slot]>0)return false;
   const h=u.heroDef,s=slot?h.skill2:h.skill,p=point||u;
-  if(Math.hypot(p.x-u.x,p.y-u.y)>240){UI.toast('Đặt hỗ trợ trong tầm của tướng');return false;}
+  if(Math.hypot(p.x-u.x,p.y-u.y)>140){UI.toast('Đặt hỗ trợ trong tầm của tướng');return false;}
   u.commandCd[slot]=s.cooldown;if(!slot)u.skillCd=s.cooldown;u.atk=0;u.heroSupport85=1.4;
   const kind=u.heroId==='ilyen'?(slot?'rescue':'haste'):(slot?'power':'ward');
   const scale=1+Math.min(.25,Progress.gearMods(u.heroId).skill),strength={haste:.18,rescue:.15,power:.16,ward:.2}[kind]*scale;
-  zones.push({kind,id:u.heroId,slot,x:p.x,y:p.y,r:s.radius||100,t:0,life:kind==='rescue'?4:kind==='power'?5:6,strength,healed:new Set()});metrics.casts++;AudioSys.play('magic');return true;
+  zones.push({kind,id:u.heroId,slot,x:p.x,y:p.y,r:(s.radius||100)*.8,t:0,life:kind==='rescue'?4:kind==='power'?5:6,strength,healed:new Set()});metrics.casts++;AudioSys.play('magic');return true;
  };
  const tick=Effects.update;Effects.update=function(dt){tick.call(this,dt);for(let i=zones.length-1;i>=0;i--){const z=zones[i];z.t+=dt;if(z.t>=z.life){zones.splice(i,1);continue;}
   const friends=Units.list.filter(u=>u.active&&u.state!=='dead'&&Math.hypot(u.x-z.x,u.y-z.y)<z.r).sort((a,b)=>Math.hypot(a.x-z.x,a.y-z.y)-Math.hypot(b.x-z.x,b.y-z.y)).slice(0,6);

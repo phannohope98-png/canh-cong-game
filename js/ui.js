@@ -426,7 +426,7 @@
     confirm(msg, yes) { this.overlay(`<div class="ribbon">Xác nhận</div><p style="margin-top:8px">${msg}</p><div class="row" style="margin-top:10px"><button class="gbtn gray sm" onclick="UI.closeOverlay()">Huỷ</button><button class="gbtn red sm" data-action="overlay-ok">Đồng ý</button></div>`, yes); },
     story(name, text) {
       Game.paused = true;
-      this.overlay(`<div class="ribbon green">${name}</div><p style="margin-top:8px">${text}</p><p style="font-size:13px">Chạm ô đất để xây trụ. Bấm <b>Gọi đợt »</b> ở góc phải khi đã sẵn sàng.</p><div class="row" style="margin-top:8px"><button class="gbtn green sm" data-action="overlay-ok"><span>Vào trận</span></button></div>`, () => Game.resume());
+      this.overlay(`<div class="ribbon green">${name}</div><p style="margin-top:8px">${text}</p><p style="font-size:13px">Chạm ô đất để xây trụ. Bấm <b>nút đầu lâu Gọi đợt</b> ở góc phải khi đã sẵn sàng.</p><div class="row" style="margin-top:8px"><button class="gbtn green sm" data-action="overlay-ok"><span>Vào trận</span></button></div>`, () => Game.resume());
     },
     introEnemies(types) {
       const t = types.shift(); if (!t) { Game.resume(); return; }

@@ -14,7 +14,7 @@
   /* ===== 5b. Ảnh xem trước chặng: dùng thẳng ảnh vẽ tay (không lưu ảnh "Đang tải…" vào bộ nhớ đệm) ===== */
   const bgBase = new URL('assets/backgrounds/', location.href).href;
   function sceneImage(i) {
-    const L = CONFIG.levels[i] || {}, d = L.elf78 || L.witch79 || L.dwarf80 || L.orc81;
+    const L = CONFIG.levels[i] || {}, d = L.human83 || L.elf78 || L.witch79 || L.dwarf80 || L.orc81;
     if (d && d.image) return bgBase + d.image;
     const t = CONFIG.levels[i] && ['elf78', 'witch79', 'dwarf80', 'orc81'].map(k => ({ k, n: { elf78: 6, witch79: 12, dwarf80: 18, orc81: 24 }[k] })).find(o => i >= o.n && i < o.n + 6);
     return t ? `${bgBase}${t.k}-${i - t.n + 1}.webp` : null;

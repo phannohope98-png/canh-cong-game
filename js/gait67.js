@@ -42,8 +42,10 @@
     g.restore();
   }
 
-  function render(g, id, P, size, e) {
+  function render(g, id, P, size, e, index) {
     if (P.d !== undefined || !e || !e.loaded) return false;
+    // The caller owns state rows and frame count, including twelve-frame wolf gaits.
+    if(Number.isInteger(index)){const q=frame(e,index),z=size/BASE;g.save();g.scale(z,z);g.drawImage(q.canvas,q.x,q.y);g.restore();return true;}
     const q = pose(id, e, P), z = size / BASE, alpha = g.globalAlpha, mode = P.a >= 0 ? 'atk' : P.w >= 0 ? 'walk' : 'idle';
     let prev = null, blend = 1; const actor = P._actor;
     if (actor && typeof actor === 'object') {

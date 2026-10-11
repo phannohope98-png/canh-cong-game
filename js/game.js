@@ -102,7 +102,7 @@
     /* ================= VẼ ================= */
     render() {
       const c = this.ctx, d = this.dpr, z = Camera.zoom;
-      c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#1a1420'; c.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      c.setTransform(1,0,0,1,0,0); c.fillStyle='#24392d'; c.fillRect(0,0,this.canvas.width,this.canvas.height); if(this.bg){const s=Math.max(this.canvas.width/this.bg.width,this.canvas.height/this.bg.height);c.save();c.globalAlpha=.55;c.drawImage(this.bg,(this.canvas.width-this.bg.width*s)/2,(this.canvas.height-this.bg.height*s)/2,this.bg.width*s,this.bg.height*s);c.restore();}
       if (!this.map) return;
       Painter.res = z * d;
       c.setTransform(d * z, 0, 0, d * z, d * (this.viewW / 2 - (Camera.x - Effects.shakeX) * z), d * (this.viewH / 2 - (Camera.y - Effects.shakeY) * z));

@@ -69,7 +69,7 @@
   const build=Level.build;
   Level.build=function(i){
     const m=build.call(this,i),d=scenes[i-6];if(!d)return m;
-    m.elf78=d;m.W=760;m.H=Math.round(760*d.size[1]/d.size[0]);m.sc=760/d.size[0];
+    m.elf78=d;m.W=608;m.H=Math.round(608*d.size[1]/d.size[0]);m.sc=608/d.size[0];
     const p=([x,y])=>({x:x*m.sc,y:y*m.sc});const routes=d.routes.map(a=>a.map(p));
     m.paths=routes.map(a=>new Level.Path(pointLine(a)));m.spots=d.pads.map((a,id)=>({...p(a),id}));
     m.graph78=graphFor(routes,m.spots);m.entry=m.paths.map(()=>0);m.starts=m.paths.map(a=>({...a.points[0]}));m.exit={...m.paths[0].points.at(-1)};
@@ -78,7 +78,7 @@
   };
   scenes.forEach((d,j)=>{const L=CONFIG.levels[j+6];L.sub=d.name;L.story=d.story;L.elf78=d;L.ipaths=d.routes.map(path=>path.map(([x,y])=>[x*760/d.size[0],y*760/d.size[0]]));L.bg={...L.bg,x0:0,y0:0,x1:760,y1:480};L.route={...L.route,lanes:d.routes.length,entry:L.ipaths[0][0],exit:L.ipaths[0].at(-1)};});
   const render=Level.renderBackground;
-  Level.renderBackground=function(m,res){if(!m.elf78)return render.call(this,m,res);const a=load(m.elf78),c=document.createElement('canvas');res=Math.min(1.5,Math.max(.7,res||1));c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);const g=c.getContext('2d');g.imageSmoothingQuality='high';if(a.loaded)g.drawImage(a.image,0,0,c.width,c.height);else{g.fillStyle='#234c38';g.fillRect(0,0,c.width,c.height);g.fillStyle='#dfefcf';g.font='16px sans-serif';g.textAlign='center';g.fillText(a.error?'Không tải được map Elf':'Đang tải rừng Elf…',c.width/2,c.height/2);}return c;};
+  Level.renderBackground=function(m,res){if(!m.elf78)return render.call(this,m,res);const a=load(m.elf78),c=document.createElement('canvas');res=Math.min(2.25,Math.max(1,res||1));c.width=Math.ceil(m.W*res);c.height=Math.ceil(m.H*res);const g=c.getContext('2d');g.imageSmoothingQuality='high';if(a.loaded)g.drawImage(a.image,0,0,c.width,c.height);else{g.fillStyle='#234c38';g.fillRect(0,0,c.width,c.height);g.fillStyle='#dfefcf';g.font='16px sans-serif';g.textAlign='center';g.fillText(a.error?'Không tải được map Elf':'Đang tải rừng Elf…',c.width/2,c.height/2);}return c;};
   const plot=Painter.plot;
   Painter.plot=function(g,x,y,on,t){if(!Game.map?.elf78)return plot.apply(this,arguments);g.save();g.strokeStyle=on?'#ffe4a1':'rgba(244,241,185,.65)';g.lineWidth=on?2:1;g.beginPath();g.ellipse(x,y,15,6,0,0,Math.PI*2);g.stroke();g.fillStyle=on?'#fff5ca':'#ead6a1';g.font='bold 15px sans-serif';g.textAlign='center';g.fillText('+',x,y+3);g.restore();};
   const spotAt=Towers.spotAt;

@@ -2,7 +2,10 @@
 (function(){
  const cache=new Map(),states=new WeakMap(),BASE=100;let warmGeneration=0;
  function frame(e,n){const key=e.id+':'+n;if(cache.has(key))return cache.get(key);const r=e.registration,s=BASE/r.height;let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const f of r.frames){const x=((f.offset||0)-r.pivot)*s,y=-f.baseline*s;x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x+f.w*s);y1=Math.max(y1,y+f.h*s);}x0=Math.floor(x0)-4;y0=Math.floor(y0)-4;const c=document.createElement('canvas');c.width=Math.ceil(x1-x0)+4;c.height=Math.ceil(y1-y0)+4;const g=c.getContext('2d');g.translate(-x0,-y0);ArtStylized.blit(g,e,n,BASE);const result={canvas:c,x:x0,y:y0};cache.set(key,result);if(cache.size>240)cache.delete(cache.keys().next().value);return result;}
- function render(g,id,P,size,e){if(P.d!==undefined)return false;const atk=P.a>=0,walk=P.w>=0,mode=atk?'atk':walk?'walk':'idle',phase=atk?Math.min(.999,P.a):walk?((P.w%1)+1)%1:(((P.t||0)*.28)%1+1)%1,p=phase*6,i=Math.floor(p),f=p-i,row=atk?12:walk?6:0,next=atk?Math.min(5,i+1):(i+1)%6,a=frame(e,row+i),b=frame(e,row+next),z=size/BASE;
+ function render(g,id,P,size,e,index,n,phase){if(P.d!==undefined)return false;
+  // Follow the caller's registration: twelve-frame quadruped walks are a single row, not row two of an eighteen-frame atlas.
+  if(Number.isInteger(index)){const q=frame(e,index),z=size/BASE;g.save();g.scale(z,z);if(P.w<0&&P.a<0){const b=Math.sin((P.t||0)*2.4);g.scale(1-b*.003,1+b*.006);}g.drawImage(q.canvas,q.x,q.y);g.restore();return true;}
+  const atk=P.a>=0,walk=P.w>=0,mode=atk?'atk':walk?'walk':'idle';phase=atk?Math.min(.999,P.a):walk?((P.w%1)+1)%1:(((P.t||0)*.28)%1+1)%1;const p=phase*6,i=Math.floor(p),f=p-i,row=atk?12:walk?6:0,next=atk?Math.min(5,i+1):(i+1)%6,a=frame(e,row+i),b=frame(e,row+next),z=size/BASE;
   const u=Math.max(0,Math.min(1,(f-.45)/.55)),mix=u*u*(3-2*u),alpha=g.globalAlpha;
   const pose={a,b,mix};let previous=null,blend=1;
   if(P._actor&&(typeof P._actor==='object'||typeof P._actor==='function')){const now=window.Game?.time||0;let state=states.get(P._actor);

@@ -39,7 +39,9 @@
  if(window.Alive81)for(const k of Object.keys(Alive81.RING))Alive81.RING[k]*=.8;
  const painted=Painter.tower,figure=ArtStylized.draw;let onTower=false;
  Painter.tower=function(){const prev=onTower;onTower=true;try{return painted.apply(this,arguments);}finally{onTower=prev;}};
- ArtStylized.draw=function(g,id,P,h){const k=id.replace(/^crew-/,'');return figure.call(this,g,id,P,onTower&&['elf','mage','dwarf'].includes(k)?h*(k==='dwarf'?1.45:1.10):h);};
+ const crewHeights={elf:29,mage:29,dwarf:25};
+ ArtStylized.draw=function(g,id,P,h){const k=id.replace(/^crew-/,'');const towerK=window.Alive81?.towerScale(Game.map)||1;return figure.call(this,g,id,P,onTower&&crewHeights[k]?crewHeights[k]/towerK:h);};
+ const crewLayout=PaintedWorld.layout;PaintedWorld.layout=function(type,tier,scale=1){const L=crewLayout.apply(this,arguments);if(type==='artillery'){const f=WORLD55.towers55.frames[12+tier-1];L.crew=['crew-dwarf',(.21-.5)*f.w/f.h*L.h,(.47-1)*L.h];L.crewSize=25;}return L;};
  const buildTower=Towers.build;
  Towers.build=function(){const t=buildTower.apply(this,arguments);if(!t)return t;const muzzle=t.muzzle;
   t.muzzle=function(){const q=muzzle.call(this),m=Game.map,painted=m&&(m.alliance84||m.human83||m.elf78||m.witch79||m.dwarf80||m.orc81),k=painted?Alive81.towerScale(m):1,off=painted?(Alive81.RING[Game.levelIndex]||45)*.12:0;return{x:this.x+(q.x-this.x)*k,y:this.y+off+(q.y-this.y)*k};};return t;
@@ -58,5 +60,5 @@
    g.fillStyle=p.kind==='enemyArrow'?'#bd6c50':p.o?.poison?'#96ba5b':'#e8ddbf';for(const n of [-1,1]){g.beginPath();g.moveTo(-9,0);g.lineTo(-12,n*2.5);g.lineTo(-7,n*1.3);g.lineTo(-6,0);g.closePath();g.fill();g.stroke();}g.restore();
   }
  };
- window.Mobile83={version:83,scheduleResize};
+ window.Mobile83={version:89,scheduleResize,crewHeights};
 })();

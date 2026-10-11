@@ -14,7 +14,7 @@
    if(id==='lyra'&&slot)return oldCast.call(this,u,slot);{const targets=near(p.x,p.y,180);if(id==='lyra'&&!slot){u.commandCd[0]=h.skill.cooldown;u.skillCd=u.commandCd[0];u.atk=0;for(const e of targets.slice(0,6)){e.windMarkT=6;Combat.fire('arrow',u.x,u.y-25,e,{damage:[h.skill.damage*m*.55,h.skill.damage*m*.65],type:'physical'});}add({id,slot,x:p.x,y:p.y,r:80,life:.75});return true;}
     if(id==='selene'){u.commandCd[slot]=slot?h.skill2.cooldown:h.skill.cooldown;u.atk=0;if(slot){for(const e of near(p.x,p.y,90)){e.stunT=e.boss?.15:1.1;e.slowT=3;e.slowMul=.5;}add({id,slot,x:p.x,y:p.y,r:90,life:3,damage:30*m});}else for(const e of targets.slice(0,5)){Combat.hitEnemy(e,h.skill.damage*m*.65,'magic',.2);add({id,slot,x:u.x,y:u.y-25,tx:e.x,ty:e.y-20,r:90,life:.65});}return true;}
     if(id==='nara'){u.commandCd[slot]=slot?h.skill2.cooldown:h.skill.cooldown;u.atk=0;if(slot){for(const a of Units.list)if(a.active&&Math.hypot(a.x-p.x,a.y-p.y)<112)a.warCryT=5;add({id,slot,x:p.x,y:p.y,r:140,life:1.2});}else{Hero.moveHero(u,p.x,p.y);u.speedBoostT=2;add({id,slot,u,x:p.x,y:p.y,r:125,life:.8,charge:true,damage:h.skill.damage*m,bleed:true});}return true;}
-    if(id==='borin'){u.commandCd[slot]=slot?h.skill2.cooldown:h.skill.cooldown;u.atk=0;if(slot)for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*35,y:p.y,r:23,life:12,mine:true,damage:90*m});else{for(let i=0;i<3;i++)add({id:'oria',slot:0,x:p.x+(i-1)*28,y:p.y,r:60,life:1.8,impact:.45+i*.25,damage:h.skill.damage*m*.7,physical:true});}return true;}
+    if(id==='borin'){u.commandCd[slot]=slot?h.skill2.cooldown:h.skill.cooldown;u.atk=0;if(slot)for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*35,y:p.y,r:23,life:12,mine:true,damage:90*m});else{for(let i=0;i<3;i++)add({id:'oria',slot:0,x:p.x+(i-1)*28,y:p.y,r:60,life:1.8,impact:.45+i*.25,fromX:u.x,fromY:u.y-20,damage:h.skill.damage*m*.7,physical:true});}return true;}
    }
    return oldCast.call(this,u,slot);
   }
@@ -24,13 +24,13 @@
    else{u.shieldT=4;Hero.moveHero(u,p.x,p.y);u.speedBoostT=2;add({id,slot,u,x:p.x,y:p.y,r:80,life:1.1,charge:true,damage:95*m});}
   }else if(id==='veyra'){
    if(slot){summon(u,p.x,p.y,2,14);add({id:'aldric',slot:0,x:p.x,y:p.y,r:55,life:.8});}
-   else for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*22,y:p.y,r:72,life:1.8,impact:.25+i*.38,damage:h.skill.damage*m*.55});
+   else for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*22,y:p.y,r:72,life:1.8,impact:.25+i*.38,fromX:u.x,fromY:u.y-20,damage:h.skill.damage*m*.55});
   }else if(id==='thalen'){
    if(slot)add({id,slot,x:p.x,y:p.y,r:80,life:3.5,damage:12*m});
    else{Hero.moveHero(u,p.x,p.y);u.speedBoostT=2;add({id,slot,u,x:p.x,y:p.y,r:85,life:1,charge:true,damage:h.skill.damage*m});}
   }else if(id==='oria'){
    if(slot){summon(u,p.x,p.y,1,12,'oria',true);add({id,slot,x:p.x,y:p.y,r:50,life:1});}
-   else for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*24,y:p.y,r:68,life:1.8,impact:.45+i*.3,damage:h.skill.damage*m*.55});
+   else for(let i=0;i<3;i++)add({id,slot,x:p.x+(i-1)*24,y:p.y,r:68,life:1.8,impact:.45+i*.3,fromX:u.x,fromY:u.y-20,damage:h.skill.damage*m*.55});
   }else if(id==='haldren'){
    if(slot){for(const a of Units.list)if(a.active&&Math.hypot(a.x-p.x,a.y-p.y)<104)a.shieldT=Math.max(a.shieldT||0,6);add({id,slot,x:p.x,y:p.y,r:130,life:1.3});}
    else add({id,slot,x:p.x,y:p.y,r:125,life:1.3,impact:.35,damage:h.skill.damage*m});

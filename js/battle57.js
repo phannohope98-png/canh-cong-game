@@ -41,7 +41,7 @@
   AudioSys.play(id==='oria'?'magic':id==='haldren'||id==='veyra'?'explode':'sword');return true;
  };
  const update=Effects.update;Effects.update=function(dt){update.call(this,dt);for(let i=zones.length-1;i>=0;i--){const z=zones[i];z.t+=dt;if(z.charge){if(z.u?.active&&Math.hypot(z.u.x-z.x,z.u.y-z.y)>24&&z.t<2.5)continue;z.charge=false;z.t=0;z.u.atk=0;}if(z.t>z.life){zones.splice(i,1);continue;}
-   if(z.mine){if(near(z.x,z.y,28).some(e=>!e.flying)){Combat.splash(z.x,z.y,65,[z.damage*.8,z.damage],'physical',{air:false});Effects.explosion(z.x,z.y-6,42,'#eda65b');zones.splice(i,1);}continue;}
+   if(z.mine){if(near(z.x,z.y,28).some(e=>!e.flying)){Combat.splash(z.x,z.y,65,[z.damage*.8,z.damage],'physical',{air:false});add({id:'borin',slot:0,x:z.x,y:z.y,r:24,life:.65});zones.splice(i,1);}continue;}
    if(z.impact!==undefined&&!z.done&&z.t>=z.impact){z.done=1;Combat.splash(z.x,z.y,z.r,[z.damage*.85,z.damage],z.id==='oria'&&!z.physical?'magic':'physical',{air:z.id==='oria'&&!z.physical});for(const e of near(z.x,z.y,z.r))if(!e.flying&&z.id!=='oria')e.stunT=Math.max(e.stunT||0,e.boss?.15:.7);Effects.burst(z.x,z.y,'#d7b583',10,90,.45,4,160);Effects.shake(2,.12);}
    if(z.id==='thalen'&&z.slot){for(const e of near(z.x,z.y,z.r)){e.slowT=.8;e.slowMul=e.boss?.8:.45;if(!e.boss)e.stunT=Math.max(e.stunT||0,.25);}}
    if(z.damage&&z.impact===undefined&&!z.mine){z.pulse-=dt;if(z.pulse<=0){z.pulse=z.spin?.6:z.id==='selene'?.7:99;if(z.bleed)for(const e of near(z.x,z.y,z.r))if(!e.flying)e.bleed56={left:3,pulse:.65,damage:z.damage*.12};Combat.splash(z.x,z.y,z.r,z.damage,z.id==='selene'?'magic':'physical',{air:z.id==='selene'});}}

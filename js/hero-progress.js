@@ -41,11 +41,11 @@
     const e=near(u.x,u.y,260)[0],x=e?.x??u.x,y=e?.y??u.y,col=colors[id];
     if(slot){
       if(id==='aldric'){Combat.splash(u.x,u.y,105,u.damage[1]*3*master,'physical');u.shieldT=4;}
-      else if(id==='lyra'){const threat=near(u.x,u.y,220)[0],px=Math.max(70,Math.min(Game.map.W-70,threat?u.x+(u.x>=threat.x?95:-95):u.postX)),py=Math.max(90,Math.min(Game.map.H-70,u.y-25));Effects.ring(u.x,u.y,8,45,.4,col,2);Hero.moveHero(u,px,py);u.speedBoostT=3;u.shieldT=2;}
+      else if(id==='lyra'){const threat=near(u.x,u.y,220)[0],px=Math.max(70,Math.min(Game.map.W-70,threat?u.x+(u.x>=threat.x?95:-95):u.postX)),py=Math.max(90,Math.min(Game.map.H-70,u.y-25));Effects.ring(u.x,u.y,6,20,.4,col,2);Hero.moveHero(u,px,py);u.speedBoostT=3;u.shieldT=2;}
       else if(id==='selene'){for(const o of near(x,y,110))o.stunT=Math.max(o.stunT||0,o.boss?.5:1.6);Combat.splash(x,y,110,u.damage[1]*2,'magic',{air:true});}
       else if(id==='borin'){Combat.splash(x,y,105,u.damage[1]*3,'true',{air:false});Effects.burst(x,y,col,15,110,.5,5,60);}
       else heal(u.x,u.y,180,.3*master);
-      zones.push({id:'burst',heroId:id,slot:1,x,y,r:105,t:0,life:1.1,col});Effects.ring(x,y,8,105,.5,col,3);return true;
+      zones.push({id:'burst',heroId:id,slot:1,x,y,r:105,t:0,life:1.1,col});Effects.ring(x,y,6,26,.5,col,3);return true;
     }
     if(id==='lyra'){
       let sx=u.x,sy=u.y;for(const o of near(x,y,h.skill.radius).slice(0,u.level>=35?6:4)){Combat.hitEnemy(o,h.skill.damage*b*master/2,'physical');o.slowT=3;o.slowMul=.6;o.windMarkT=5;zones.push({id:'thread',x:sx,y:sy,tx:o.x,ty:o.y,t:0,life:.65,col});sx=o.x;sy=o.y;}
